@@ -66,6 +66,28 @@ Then add **MIDI GenderBender** (`genderbender.jsfx`) to a track, send its MIDI t
 
 Projects saved with the plugin's old name still point to the old file. REAPER finds JSFX by file name, so keep the old plugin installed for them or swap in GenderBender in each project.
 
+## Use in other DAWs (VST3 / AU / CLAP via ysfx)
+
+JSFX only runs in REAPER, but [ysfx](https://github.com/JoepVanlier/ysfx) (the maintained fork) is a VST3/AU/CLAP plugin that loads `.jsfx` files in any DAW. GenderBender only uses standard JSFX features, so it should load as is.
+
+1. Install ysfx from its releases page.
+2. Install GenderBender into any folder with the same installer. It creates the `Effects/` + `Data/` layout ysfx expects:
+
+   ```sh
+   REAPER_DIR="$HOME/Documents/GenderBender-ysfx" sh tools/install.sh
+   ```
+
+   If REAPER is installed, you can skip this and point ysfx at REAPER's resource folder instead.
+3. In the DAW, add the ysfx **instrument** (the variant with MIDI output), load `Effects/GenderBender/genderbender.jsfx`, and route its MIDI output to a drum sampler. How you route MIDI out of a plugin depends on the DAW.
+
+Check these the first time:
+
+- **Style lists are empty:** ysfx didn't find `Data/drum_styles_v/`. Keep `Effects/` and `Data/` side by side in the same folder.
+- **The hitom and lotom slides (sliders 65 and 66) are missing:** the ysfx build only supports 64 sliders. Update ysfx. The sliders can't be renumbered.
+- **GUI text is slightly off:** ysfx draws fonts its own way. This is cosmetic.
+
+The SuperCollider editor still saves styles to REAPER's `Data/drum_styles_v/`. To use it with ysfx, change its `reaperFolder` setting or copy the `.txt` files across.
+
 ## Writing a style
 
 ```sh
