@@ -1,0 +1,51 @@
+name: CUMBIA SONIDERA 92
+# Cumbia sonidera / mexicana. Tempo sugerido: 92 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=timbal (aro)  clap=clap  hhc=guiro  hho=cencerro
+#        hitom=timbal alto  lotom=conga / timbal bajo
+# Groove: swing 54 · amount: kick 0 · slide: snare +4 ms
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=170 o=120 -=60 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con Density>=87, o con >=137, - con >=197.
+# Regla: lo esencial del ritmo va en X; los adornos en x/o/- para que Density los vaya sumando.
+
+[p0 p1]                         # INTRO: guiro solo
+hhc    XXX. XXX. XXX. XXX.
+[p1]
+kick   X... .... X... ....
+hho    X... X... X... X...
+
+[p2 p3]                         # ENERGIA
+kick   X..o ...X X..o ....
+snare  ..X. .-X. ..X. .-X.
+clap   .... X... .... X...
+hhc    XXX- XXX- XXX- XXX-
+hho    X.x. X.x. X.x. X.x.
+lotom  ..o. ..o. ..o. ..o.
+[p3]
+hitom  .... .... ..o. xxXX
+
+[p4 p5]                         # BASE: anticipacion del bombo en la "a" del 2
+kick   X... ...X X... ....
+snare  ..X. ..X. ..X. ..X.
+hhc    XXX. XXX. XXX. XXX.
+hho    X... X... X... X...
+lotom  .... ..o. .... ..o.
+[p5]
+kick   X... ...X X... ..o.
+hitom  .... .... .... .oxX
+
+[p6 p7]                         # VARIACION: tumbao de timbales
+kick   X... .... X... ....
+snare  ..X. ..X. ..X. ..X.
+hhc    XXX. XXX. XXX. XXX.
+hitom  ..x. .o.x ..x. .o.x
+lotom  o... ..o. o... ..o.
+[p7]
+hitom  .x.o x.o. .x.o xxXX
+
+[p8]                            # FILL: redoble de timbal
+kick   X... .... .... ...X
+hhc    XXX. XXX. .... ....
+hitom  x.x. x.xx x.xx XxXx
+lotom  ...o ..o. .o.o o.X.

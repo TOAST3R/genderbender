@@ -1,0 +1,48 @@
+name: CUMBIA DIGITAL 100
+# Cumbia digital / ZZK. Tempo sugerido: 100 BPM. Div por defecto (4).
+# Voces: kick=808  snare=rim  clap=clap  hhc=shaker  hho=hat abierto
+#        hitom=perc / bleep  lotom=tom sub
+# Groove: swing 50 (recto) · slide: hhc +3 ms
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=170 o=120 -=60 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con Density>=87, o con >=137, - con >=197.
+# Regla: lo esencial del ritmo va en X; los adornos en x/o/- para que Density los vaya sumando.
+
+[p0 p1]                         # INTRO: shaker
+hhc    -X-X -X-X -X-X -X-X
+[p1]
+hho    ..X. ..X. ..X. ..X.
+
+[p2 p3]                         # ENERGIA
+kick   X..o ...X ..X. .o..
+snare  ..o. .o.. ..o. .o..
+clap   .... X... .... X...
+hhc    xXxX xXxX xXxX xXxX
+hho    ..X. ..X. ..X. ..X.
+[p3]
+hitom  .... .... .... o.x.
+
+[p4 p5]                         # BASE: 808 sincopado
+kick   X... ...X ..X. ....
+clap   .... X... .... X...
+hhc    -X-X -X-X -X-X -X-X
+hho    ..X. ..X. ..X. ..X.
+lotom  .... .... .... ..o.
+[p5]
+kick   X... ...X ..X. ..o.
+hitom  .... .... .... o.x.
+
+[p6 p7]                         # VARIACION: medio tiempo, dub
+kick   X... .... .... ....
+clap   .... .... X... ....
+hhc    -X-X -X-X -X-X -X-X
+hitom  ...x ..o. ...x .o..
+lotom  ..o. ...o ..o. .o..
+[p7]
+kick   X... .... .... ..o.
+
+[p8]                            # FILL: redoble de 808 y clap
+kick   X... .... X.X. X.XX
+clap   .... X... ..X. XxXX
+hhc    -X-X -X-X .... ....

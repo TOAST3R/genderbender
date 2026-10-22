@@ -1,0 +1,47 @@
+name: CUMBIA REBAJADA 72
+# Cumbia rebajada (sonidera ralentizada, Monterrey). Tempo sugerido: 72 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=llamador  clap=clap  hhc=guiro  hho=cencerro
+#        hitom=timbal  lotom=conga grave
+# Groove: swing 55 · slide: snare +12 ms (arrastrado)
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=170 o=120 -=60 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con Density>=87, o con >=137, - con >=197.
+# Regla: lo esencial del ritmo va en X; los adornos en x/o/- para que Density los vaya sumando.
+
+[p0 p1]                         # INTRO: guiro en corcheas
+hhc    X.X. X.X. X.X. X.X.
+[p1]
+kick   X... .... X... ....
+
+[p2 p3]                         # ENERGIA
+kick   X... ...X X... ..o.
+snare  ..X. .-X. ..X. .-X.
+hhc    XXX. XXX. XXX. XXX.
+hho    X... X... X... X...
+lotom  .... .... X... ....
+[p3]
+hitom  .... .... .... .oxX
+
+[p4 p5]                         # BASE: pesada y con espacio
+kick   X... .... X... ....
+snare  ..X. ..X. ..X. ..X.
+hhc    X.X. X.X. X.X. X.X.
+hho    X... .... X... ....
+lotom  .... .... X... ....
+[p5]
+kick   X... ...o X... ....
+
+[p6 p7]                         # VARIACION: timbal y conga
+kick   X... .... X... ....
+snare  ..X. ..X. ..X. ..X.
+hhc    X.X. X.X. X.X. X.X.
+hitom  ..x. .o.. ..x. .o.x
+lotom  o... ..o. o... ..o.
+[p7]
+hitom  ..x. .o.. ..x. xoxX
+
+[p8]                            # FILL: redoble lento
+kick   X... .... .... ....
+hitom  x... x... x.x. xxXX
+lotom  .... ..o. .o.. o.X.

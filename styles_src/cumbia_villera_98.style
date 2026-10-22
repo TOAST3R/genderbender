@@ -1,0 +1,51 @@
+name: CUMBIA VILLERA 98
+# Cumbia villera (Argentina). Tempo sugerido: 98 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=timbal (aro)  clap=clap  hhc=guira  hho=hat abierto
+#        hitom=timbal alto  lotom=timbal bajo
+# Groove: swing 56 · slide: clap -5 ms (empuja)
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=170 o=120 -=60 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con Density>=87, o con >=137, - con >=197.
+# Regla: lo esencial del ritmo va en X; los adornos en x/o/- para que Density los vaya sumando.
+
+[p0 p1]                         # INTRO: guira
+hhc    XXxX XXxX XXxX XXxX
+[p1]
+clap   .... X... .... X...
+
+[p2 p3]                         # ENERGIA
+kick   X..o X... X..o X...
+snare  ..X. .xX. ..X. .xX.
+clap   .... X... .... X...
+hhc    XXXX XXXX XXXX XXXX
+hho    ..x. ..x. ..x. ..x.
+hitom  .... .... .... .oxX
+[p3]
+hitom  .... .... ..o. xoxX
+lotom  .... .... .... o.o.
+
+[p4 p5]                         # BASE
+kick   X... .... X... ....
+snare  ..X. ..X. ..X. ..X.
+clap   .... X... .... X...
+hhc    XXxX XXxX XXxX XXxX
+hitom  .... .... .... .oxX
+[p5]
+hitom  .... .... ..o. xoxX
+lotom  .... .... .... o.o.
+
+[p6 p7]                         # VARIACION: timbales al frente
+kick   X... .... X... ....
+clap   .... X... .... X...
+hhc    X.X. X.X. X.X. X.X.
+hitom  x.ox .x.o x.ox .xox
+lotom  ..o. o... ..o. o.o.
+[p7]
+hitom  x.ox .x.o xxox XxXx
+
+[p8]                            # FILL
+kick   X... .... .... ....
+clap   .... X... .... X...
+hitom  x.x. xxx. xoxo XxXx
+lotom  .o.o ...o .x.x .xXX

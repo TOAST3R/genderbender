@@ -1,0 +1,91 @@
+# GenderBender
+
+A MIDI drum-pattern generator for REAPER, written as a JSFX plugin, plus the tools used to write its drum styles.
+
+The plugin plays 7 voices: kick, snare, clap, closed hat, open hat, high tom and low tom. Each style has 9 patterns (p0–p8). An XY pad blends between patterns. Per-voice controls set density, division, break, velocity and duration, and a GROOVE strip adds swing and slide.
+
+## Layout
+
+| Path | What it is |
+|------|------------|
+| `GenderBender/genderbender.jsfx` | The plugin (66 sliders, GUI designed at 686×486 and scaled to the window) |
+| `GenderBender/genderbender.jsfx-ysfx.rpl` | Preset library (one preset, CUMBIA SONIDERA) |
+| `GenderBender/bg.png` | GUI background, generated from `bg_original.png` by `tools/extend_bg.py` |
+| `drum_styles_v/*.txt` | Styles the plugin loads (sliders 1–8 read this folder) |
+| `styles_src/*.style` | Readable sources for the cumbia styles |
+| `tools/make_style.py` | Builds a `.style` into a `.txt`, or decodes a `.txt` back into a `.style` |
+| `tools/extend_bg.py` | Regenerates `bg.png` (needs Pillow) |
+| `Gender_bender_editor.scd`, `presets/` | The original SuperCollider style editor and its presets (`.preset`, `.h`, `.txt`) |
+| `backup/` | The original JSFX and background, before the GROOVE change |
+| `openspec/` | Specs and change proposals (OpenSpec workflow) |
+
+## Included styles
+
+There are 31 styles in `drum_styles_v/`, each with 9 patterns. The BPM comes from the style's name, and the plugin doesn't set the tempo.
+
+| Family | Styles (BPM) |
+|--------|--------------|
+| Cumbia | CUMBIA COLOMBIANA (95), CUMBIA SONIDERA (92), CUMBIA VILLERA (98), CUMBIA DIGITAL (100), CUMBIA REBAJADA (72) |
+| Footwork / juke | 101 JUKE, Juke160 (160) |
+| Reggaeton / dancehall | 101 RAGATON |
+| House | Chicago.Jouse 125 (125), JetoHouse 135 (135), MIAMI BEIGE 135 (135) |
+| UK garage / 2-step | Two-stepppo, uk_fungui, uk_garbage |
+| Grime | GRIME140 (140), Grimer140 (140) |
+| Dubstep | DUBSTEP140 (140) ⚠, DubSteppo |
+| Drum & bass | drumbass, DurumBass160 (160) |
+| Techno | techAXX, TekkBooooring, TekkChungo ⚠, TekkThump |
+| R&B / trap | RB ⚠, WCOAST R&B 110 (110), VAPORTRAP |
+| Gqom | GQOM |
+| Other | ESTAIL, TEST2, ZZZZ BLACK |
+
+- Only the cumbias have readable sources in `styles_src/`; the rest were made with the SuperCollider editor, and most have a matching folder in `presets/`.
+- ⚠ `DUBSTEP140`, `RB` and `TekkChungo` contain non-numeric values (`i`, `-10.0`), and `make_style.py decode` rejects them. They may play wrong or partly silent.
+- In `ZZZZ BLACK`, `ESTAIL`, `GQOM` and `TEST2`, the FILL pattern (p8) is empty.
+- `presets/` also has folders with no style in `drum_styles_v/`: `00 PRUEBAS`, `DURUMBASS_160`, `DURUMBREAK_160`, `QWERTYUIOP` and `TEST`, plus these newer grooves that still need exporting from the SuperCollider editor before the plugin can play them: 101 DANCEHALL, 101 FOOTWORK, 101 FUNK FAVELA, 101 SPARSE, 101 STEPPA, 101 ZOUK KIZOMBA, 102 JUKE, AFRO BEAT, AFRO BEAT & JU JU, BASS 101, BELLY DANCE, BOUNCE, CUMBION, ELECTRO CYBOTRON, ELECTRO UR 138, JERSEY BASICS, MOTOWN BREAKS, NEW ORLEANS, NEW ORLEANS BOUNCE, SOCA, TekkBooooring 2222 and ZOUK KIZOMBA 2.
+
+## Install in REAPER (macOS)
+
+The plugin runs from REAPER's resource folder, not from this repo. Copy the files there after each change:
+
+```sh
+R="$HOME/Library/Application Support/REAPER"
+cp -R GenderBender "$R/Effects/"
+cp drum_styles_v/*.txt "$R/Data/drum_styles_v/"
+```
+
+Then add **MIDI GenderBender** (`genderbender.jsfx`) to a track, send its MIDI to a drum sampler (base note 36 by default), and press play. **ALL RND** gives every voice the same random style; **EACH RND** picks one per voice.
+
+Projects saved with the plugin's old name still point to the old file. REAPER finds JSFX by file name, so keep the old plugin installed for them or swap in GenderBender in each project.
+
+## Writing a style
+
+```sh
+python3 tools/make_style.py build styles_src/cumbia_villera_98.style    # -> drum_styles_v/CUMBIA VILLERA 98.txt
+python3 tools/make_style.py decode "drum_styles_v/GQOM.txt"            # prints a readable grid
+```
+
+The `.style` format:
+
+```
+name: MY STYLE 120
+[p4 p5]                       # these patterns get the lines below
+kick   X... .... X... ....    # 16 chars = 16ths, 32 = 32nds; spaces ignored
+hhc    XXxX XXxX XXxX XXxX
+```
+
+- Levels: `X=255 x=170 o=120 -=60 .=0`, or `[n]` for an exact value from 0 to 255.
+- Voices: `bdrum|kick`, `sdrum|snare`, `clap`, `hhclosed|hhc`, `hhopen|hho`, `hitom`, `lotom`.
+- Density decides which steps play. At the default (50), only `X` plays. Put the core rhythm on `X` and the ornaments on lower levels.
+- Cumbia pad layout: p4/p5 BASE (center), p2/p3 ENERGY, p6/p7 VARIATION, p0/p1 INTRO, p8 FILL.
+
+A malformed `.txt` makes the plugin go silent without showing an error. Check a new style by decoding it, then listening to it in REAPER.
+
+## Contributing with an AI agent
+
+Changes follow [OpenSpec](https://github.com/Fission-AI/OpenSpec). The repo includes its skills and commands for Claude Code (`.claude/`), OpenCode (`.opencode/`), Codex (`.codex/`), Cursor (`.cursor/`), GitHub Copilot (`.github/`) and Gemini CLI (`.gemini/`). The skills live once in `.claude/skills/`, and each other folder links to it. They need the CLI:
+
+```sh
+npm install -g @fission-ai/openspec@1.3.1
+```
+
+Then use `/opsx:propose`, `/opsx:apply`, `/opsx:archive` and `/opsx:explore` (`/opsx-…` in OpenCode, Cursor and Copilot; Codex has no slash commands, so ask it to use the `openspec-propose` skill and so on). Agents also read `AGENTS.md`. To add another agent, run `openspec init --tools <tool> .`, then replace its new `skills` folder with a symlink: `rm -r .<tool>/skills && ln -s ../.claude/skills .<tool>/skills`.

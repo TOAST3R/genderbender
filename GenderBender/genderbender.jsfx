@@ -1,0 +1,1617 @@
+desc: MIDI GenderBender
+filename:0,bg.png
+
+slider1:/drum_styles_v:none:kick style;
+slider2:/drum_styles_v:none:snare style;
+slider3:/drum_styles_v:none:clap style;
+slider4:/drum_styles_v:none:hhclosed style;
+slider5:/drum_styles_v:none:hhopen style;
+slider6:/drum_styles_v:none:hitom style;
+slider7:/drum_styles_v:none:lotom style;
+slider8:/drum_styles_v:none:-allStlyes;
+
+
+slider9:50<0,260,1>-kick_dens;
+slider10:4<0,10,1>-kick_div;
+slider11:0<0,10,1>-kick_break;
+slider12:127<0,127,1>-kick_velocity;
+slider13:1<0,250,1>-kick_duration;
+slider14:50<0,260,1>-snare_dens;
+slider15:4<0,10,1>-snare_div;
+slider16:0<0,10,1>-snare_break;
+slider17:127<0,127,1>-snare_velocity;
+slider18:1<0,250,1>-snare_duration;
+slider19:50<0,260,1>-clap_dens;
+slider20:4<0,10,1>-clap_div;
+slider21:0<0,10,1>-clap_break;
+slider22:127<0,127,1>-clap_velocity;
+slider23:1<0,250,1>-clap_duration;
+slider24:50<0,260,1>-hhclosed_dens;
+slider25:4<0,10,1>-hhclosed_div;
+slider26:0<0,10,1>-hhclosed_break;
+slider27:127<0,127,1>-hhclosed_velocity;
+slider28:1<0,250,1>-hhclosed_duration;
+slider29:50<0,260,1>-hhopen_dens;
+slider30:4<0,10,1>-hhopen_div;
+slider31:0<0,10,1>-hhopen_break;
+slider32:127<0,127,1>-hhopen_velocity;
+slider33:1<0,250,1>-hhopen_duration;
+slider34:50<0,260,1>-hitom_dens;
+slider35:4<0,10,1>-hitom_div;
+slider36:0<0,10,1>-hitom_break;
+slider37:127<0,127,1>-hitom_velocity;
+slider38:1<0,250,1>-hitom_duration;
+slider39:50<0,260,1>-lotom_dens;
+slider40:4<0,10,1>-lotom_div;
+slider41:0<0,10,1>-lotom_break;
+slider42:127<0,127,1>-lotom_velocity;
+slider43:1<0,250,1>-lotom_duration;
+
+ 
+slider44:0<-100,100,1>-Xmap;
+slider45:0<-100,100,1>-Ymap;
+////-------- AQUI PRESET NOTE el primer 0 es el preset-> 0<0,12,1> -----------
+
+slider46:36<1,100,1>-basenote;
+////-------- AQUI PRESET MULT el primer 0 es el preset-> 0<0,12,1> -----------
+slider47:0<0,12,1>-basenoteMultiplier;
+
+
+slider48:4<0,32,1>-breakInterval;
+slider49:1<1,32,1>-breakDur;
+slider50:0<0,255,1>-breakAmountRandom;
+slider51:4<0,32,1>-breakOffset;
+
+////-------- GROOVE: swing global (MPC 50-75%), swing amount por voz (0-100%), slide por voz (ms) -----------
+slider52:50<50,75,1>-swing;
+slider53:100<0,100,1>-kick_swingamt;
+slider54:100<0,100,1>-snare_swingamt;
+slider55:100<0,100,1>-clap_swingamt;
+slider56:100<0,100,1>-hhclosed_swingamt;
+slider57:100<0,100,1>-hhopen_swingamt;
+slider58:100<0,100,1>-hitom_swingamt;
+slider59:100<0,100,1>-lotom_swingamt;
+slider60:0<-30,30,1>-kick_slide;
+slider61:0<-30,30,1>-snare_slide;
+slider62:0<-30,30,1>-clap_slide;
+slider63:0<-30,30,1>-hhclosed_slide;
+slider64:0<-30,30,1>-hhopen_slide;
+slider65:0<-30,30,1>-hitom_slide;
+slider66:0<-30,30,1>-lotom_slide;
+
+
+
+
+@init
+/// EXTRACT STYLES DATA FROM THE TEXT FILE
+old_slider1=slider1;
+old_slider2=slider2;
+old_slider3=slider3;
+old_slider4=slider4;
+old_slider5=slider5;
+old_slider6=slider6;
+old_slider7=slider7;
+str = #myString;
+substr = #mySubString;
+temp=#tempchar;
+kicks=#kicks;
+kickArray0=#kick0;
+kickArray1=#kick1;
+kickArray2=#kick2;
+kickArray3=#kick3;
+kickArray4=#kick4;
+kickArray5=#kick5;
+kickArray6=#kick6;
+kickArray7=#kick7;
+kickArray8=#kick8;
+snares=#snares;
+snareArray0=#snare0;
+snareArray1=#snare1;
+snareArray2=#snare2;
+snareArray3=#snare3;
+snareArray4=#snare4;
+snareArray5=#snare5;
+snareArray6=#snare6;
+snareArray7=#snare7;
+snareArray8=#snare8;
+claps=#claps;
+clapArray0=#clap0;
+clapArray1=#clap1;
+clapArray2=#clap2;
+clapArray3=#clap3;
+clapArray4=#clap4;
+clapArray5=#clap5;
+clapArray6=#clap6;
+clapArray7=#clap7;
+clapArray8=#clap8;
+hhcloseds=#hhcloseds;
+hhclosedArray0=#hhclosed0;
+hhclosedArray1=#hhclosed1;
+hhclosedArray2=#hhclosed2;
+hhclosedArray3=#hhclosed3;
+hhclosedArray4=#hhclosed4;
+hhclosedArray5=#hhclosed5;
+hhclosedArray6=#hhclosed6;
+hhclosedArray7=#hhclosed7;
+hhclosedArray8=#hhclosed8;
+hhopens=#hhopens;
+hhopenArray0=#hhopen0;
+hhopenArray1=#hhopen1;
+hhopenArray2=#hhopen2;
+hhopenArray3=#hhopen3;
+hhopenArray4=#hhopen4;
+hhopenArray5=#hhopen5;
+hhopenArray6=#hhopen6;
+hhopenArray7=#hhopen7;
+hhopenArray8=#hhopen8;
+hitoms=#hitoms;
+hitomArray0=#hitom0;
+hitomArray1=#hitom1;
+hitomArray2=#hitom2;
+hitomArray3=#hitom3;
+hitomArray4=#hitom4;
+hitomArray5=#hitom5;
+hitomArray6=#hitom6;
+hitomArray7=#hitom7;
+hitomArray8=#hitom8;
+lotoms=#lotoms;
+lotomArray0=#lotom0;
+lotomArray1=#lotom1;
+lotomArray2=#lotom2;
+lotomArray3=#lotom3;
+lotomArray4=#lotom4;
+lotomArray5=#lotom5;
+lotomArray6=#lotom6;
+lotomArray7=#lotom7;
+lotomArray8=#lotom8;
+strSector=#strSector;
+// COLA DE EVENTOS (fuera de la zona de patrones 100..2187, que antes pisaba la cola vieja en 2100)
+QSIZE=128;
+evType=20000;   // 0 = libre, 1 = NoteOn pendiente, 2 = NoteOff pendiente
+evTime=20200;   // tiempo programado en negras (beat_position)
+evNote=20400;
+evVel=20600;
+evDur=20800;    // duracion en negras (solo NoteOn)
+evStraight=21000; // tiempo recto (sin swing/slide) del paso
+evVoice=21200;
+anticipT=21400; // por voz: tiempo recto del ultimo NoteOn emitido
+skipAt=21410;   // por voz: paso a omitir tras un salto (ya sono adelantado)
+memset(evType, 0, QSIZE);
+memset(anticipT, -1000000, 7);
+memset(skipAt, -1, 7);
+SLIDE_MAX_MS=30;
+evalHorizon=0;  // hasta que tiempo (negras) se han evaluado los pasos
+expectedB0=0;   // beat_position esperado al inicio del siguiente bloque
+wasPlaying=0;
+secondBar=0;
+
+// buffer=32;
+// function loadAllTracks()( 
+//       // i=0;
+//       // loop(7, 
+//  //        loadStyle()
+//  //      );
+    
+
+// );
+
+function loadStyle(sliderIn)(
+	nn_filename=#;
+	name=#myName;
+	strcpy_fromslider(nn_filename, slider(sliderIn));
+	strcpy(name, nn_filename);
+	!((handle = file_open(nn_filename)) < 0) ? ( // file_open successful
+
+
+		file_string(handle, str);
+		char=0;
+		temp=0;
+		kick = 100;
+		snare = 400;
+		clap = 700;
+		hhopen = 1000;
+		hhclosed = 1300;
+		hitom = 1600;
+		lotom = 1900;
+
+
+		len=strlen(str);
+		match("%s\/%s\/%s\/%s\/%s\/%s\/%s", str, kicks, snares, claps, hhcloseds,hhopens, hitoms,lotoms);
+		match("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", kicks,  kickArray0, kickArray1, kickArray2, kickArray3, kickArray4, kickArray5 , kickArray6, kickArray7, kickArray8);
+		match("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", snares,  snareArray0, snareArray1, snareArray2, snareArray3, snareArray4, snareArray5 , snareArray6, snareArray7, snareArray8);
+		match("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", claps,  clapArray0, clapArray1, clapArray2, clapArray3, clapArray4, clapArray5 , clapArray6, clapArray7, clapArray8);
+		match("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", hhcloseds,  hhclosedArray0, hhclosedArray1, hhclosedArray2, hhclosedArray3, hhclosedArray4, hhclosedArray5 , hhclosedArray6, hhclosedArray7, hhclosedArray8);
+		match("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", hhopens,  hhopenArray0, hhopenArray1, hhopenArray2, hhopenArray3, hhopenArray4, hhopenArray5 , hhopenArray6, hhopenArray7, hhopenArray8);
+		match("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", hitoms,  hitomArray0, hitomArray1, hitomArray2, hitomArray3, hitomArray4, hitomArray5 , hitomArray6, hitomArray7, hitomArray8);
+		match("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", lotoms,  lotomArray0, lotomArray1, lotomArray2, lotomArray3, lotomArray4, lotomArray5 , lotomArray6, lotomArray7, lotomArray8);
+
+		sliderIn==1? (
+			temp=#temp;
+			test1=#test1;
+			match("%s\|%s", kickArray0, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, kick[0], kick[1], kick[2], kick[3], kick[4], kick[5], kick[6], kick[7], kick[8],kick[9], kick[10], kick[11], kick[12], kick[13], kick[14], kick[15], kick[16], kick[17], kick[18], kick[19], kick[20], kick[21], kick[22], kick[23], kick[24], kick[25], kick[26], kick[27], kick[28], kick[29], kick[30], kick[31]); //OK
+			match("%s\|%s", kickArray1, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, kick[32], kick[33], kick[34], kick[35], kick[36], kick[37], kick[38], kick[39], kick[40],kick[41], kick[42], kick[43], kick[44], kick[45], kick[46], kick[47], kick[48], kick[49], kick[50], kick[51], kick[52], kick[53], kick[54], kick[55], kick[56], kick[57], kick[58], kick[59], kick[60], kick[61], kick[62], kick[63]); //OK
+			match("%s\|%s", kickArray2, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, kick[64], kick[65], kick[66], kick[67], kick[68], kick[69], kick[70], kick[71], kick[72],kick[73], kick[74], kick[75], kick[76], kick[77], kick[78], kick[79], kick[80], kick[81], kick[82], kick[83], kick[84], kick[85], kick[86], kick[87], kick[88], kick[89], kick[90], kick[91], kick[92], kick[93], kick[94], kick[95]); //OK
+			match("%s\|%s", kickArray3, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, kick[96], kick[97], kick[98], kick[99], kick[100], kick[101], kick[102], kick[103], kick[104],kick[105], kick[106], kick[107], kick[108], kick[109], kick[110], kick[111], kick[112], kick[113], kick[114], kick[115], kick[116], kick[117], kick[118], kick[119], kick[120], kick[121], kick[122], kick[123], kick[124], kick[125], kick[126], kick[127]); //OK
+			match("%s\|%s", kickArray4, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, kick[128], kick[129], kick[130], kick[131], kick[132], kick[133], kick[134], kick[135], kick[136],kick[137], kick[138], kick[139], kick[140], kick[141], kick[142], kick[143], kick[144], kick[145], kick[146], kick[147], kick[148], kick[149], kick[150], kick[151], kick[152], kick[153], kick[154], kick[155], kick[156], kick[157], kick[158], kick[159]); //OK
+			match("%s\|%s", kickArray5, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, kick[160], kick[161], kick[162], kick[163], kick[164], kick[165], kick[166], kick[167], kick[168],kick[169], kick[170], kick[171], kick[172], kick[173], kick[174], kick[175], kick[176], kick[177], kick[178], kick[179], kick[180], kick[181], kick[182], kick[183], kick[184], kick[185], kick[186], kick[187], kick[188], kick[189], kick[190], kick[191]); //OK
+			match("%s\|%s", kickArray6, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, kick[192], kick[193], kick[194], kick[195], kick[196], kick[197], kick[198], kick[199], kick[200],kick[201], kick[202], kick[203], kick[204], kick[205], kick[206], kick[207], kick[208], kick[209], kick[210], kick[211], kick[212], kick[213], kick[214], kick[215], kick[216], kick[217], kick[218], kick[219], kick[220], kick[221], kick[222], kick[223]); //OK
+			match("%s\|%s", kickArray7, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, kick[224], kick[225], kick[226], kick[227], kick[228], kick[229], kick[230], kick[231], kick[232],kick[233], kick[234], kick[235], kick[236], kick[237], kick[238], kick[239], kick[240], kick[241], kick[242], kick[243], kick[244], kick[245], kick[246], kick[247], kick[248], kick[249], kick[250], kick[251], kick[252], kick[253], kick[254], kick[255]); //OK
+			match("%s\|%s", kickArray8, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, kick[256], kick[257], kick[258], kick[259], kick[260], kick[261], kick[262], kick[263], kick[264],kick[265], kick[266], kick[267], kick[268], kick[269], kick[270], kick[271], kick[272], kick[273], kick[274], kick[275], kick[276], kick[277], kick[278], kick[279], kick[280], kick[281], kick[282], kick[283], kick[284], kick[285], kick[286], kick[287]); //OK
+		);
+
+sliderIn==2? (
+	temp=#temp;
+	test1=#test1;
+			match("%s\|%s", snareArray0, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, snare[0], snare[1], snare[2], snare[3], snare[4], snare[5], snare[6], snare[7], snare[8],snare[9], snare[10], snare[11], snare[12], snare[13], snare[14], snare[15], snare[16], snare[17], snare[18], snare[19], snare[20], snare[21], snare[22], snare[23], snare[24], snare[25], snare[26], snare[27], snare[28], snare[29], snare[30], snare[31]); //OK
+			match("%s\|%s", snareArray1, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, snare[32], snare[33], snare[34], snare[35], snare[36], snare[37], snare[38], snare[39], snare[40],snare[41], snare[42], snare[43], snare[44], snare[45], snare[46], snare[47], snare[48], snare[49], snare[50], snare[51], snare[52], snare[53], snare[54], snare[55], snare[56], snare[57], snare[58], snare[59], snare[60], snare[61], snare[62], snare[63]); //OK
+			match("%s\|%s", snareArray2, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, snare[64], snare[65], snare[66], snare[67], snare[68], snare[69], snare[70], snare[71], snare[72],snare[73], snare[74], snare[75], snare[76], snare[77], snare[78], snare[79], snare[80], snare[81], snare[82], snare[83], snare[84], snare[85], snare[86], snare[87], snare[88], snare[89], snare[90], snare[91], snare[92], snare[93], snare[94], snare[95]); //OK
+			match("%s\|%s", snareArray3, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, snare[96], snare[97], snare[98], snare[99], snare[100], snare[101], snare[102], snare[103], snare[104],snare[105], snare[106], snare[107], snare[108], snare[109], snare[110], snare[111], snare[112], snare[113], snare[114], snare[115], snare[116], snare[117], snare[118], snare[119], snare[120], snare[121], snare[122], snare[123], snare[124], snare[125], snare[126], snare[127]); //OK
+			match("%s\|%s", snareArray4, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, snare[128], snare[129], snare[130], snare[131], snare[132], snare[133], snare[134], snare[135], snare[136],snare[137], snare[138], snare[139], snare[140], snare[141], snare[142], snare[143], snare[144], snare[145], snare[146], snare[147], snare[148], snare[149], snare[150], snare[151], snare[152], snare[153], snare[154], snare[155], snare[156], snare[157], snare[158], snare[159]); //OK
+			match("%s\|%s", snareArray5, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, snare[160], snare[161], snare[162], snare[163], snare[164], snare[165], snare[166], snare[167], snare[168],snare[169], snare[170], snare[171], snare[172], snare[173], snare[174], snare[175], snare[176], snare[177], snare[178], snare[179], snare[180], snare[181], snare[182], snare[183], snare[184], snare[185], snare[186], snare[187], snare[188], snare[189], snare[190], snare[191]); //OK
+			match("%s\|%s", snareArray6, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, snare[192], snare[193], snare[194], snare[195], snare[196], snare[197], snare[198], snare[199], snare[200],snare[201], snare[202], snare[203], snare[204], snare[205], snare[206], snare[207], snare[208], snare[209], snare[210], snare[211], snare[212], snare[213], snare[214], snare[215], snare[216], snare[217], snare[218], snare[219], snare[220], snare[221], snare[222], snare[223]); //OK
+			match("%s\|%s", snareArray7, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, snare[224], snare[225], snare[226], snare[227], snare[228], snare[229], snare[230], snare[231], snare[232],snare[233], snare[234], snare[235], snare[236], snare[237], snare[238], snare[239], snare[240], snare[241], snare[242], snare[243], snare[244], snare[245], snare[246], snare[247], snare[248], snare[249], snare[250], snare[251], snare[252], snare[253], snare[254], snare[255]); //OK
+			match("%s\|%s", snareArray8, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, snare[256], snare[257], snare[258], snare[259], snare[260], snare[261], snare[262], snare[263], snare[264],snare[265], snare[266], snare[267], snare[268], snare[269], snare[270], snare[271], snare[272], snare[273], snare[274], snare[275], snare[276], snare[277], snare[278], snare[279], snare[280], snare[281], snare[282], snare[283], snare[284], snare[285], snare[286], snare[287]); //OK
+		);
+sliderIn==3? (
+	temp=#temp;
+	test1=#test1;
+			match("%s\|%s", clapArray0, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, clap[0], clap[1], clap[2], clap[3], clap[4], clap[5], clap[6], clap[7], clap[8],clap[9], clap[10], clap[11], clap[12], clap[13], clap[14], clap[15], clap[16], clap[17], clap[18], clap[19], clap[20], clap[21], clap[22], clap[23], clap[24], clap[25], clap[26], clap[27], clap[28], clap[29], clap[30], clap[31]); //OK
+			match("%s\|%s", clapArray1, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, clap[32], clap[33], clap[34], clap[35], clap[36], clap[37], clap[38], clap[39], clap[40],clap[41], clap[42], clap[43], clap[44], clap[45], clap[46], clap[47], clap[48], clap[49], clap[50], clap[51], clap[52], clap[53], clap[54], clap[55], clap[56], clap[57], clap[58], clap[59], clap[60], clap[61], clap[62], clap[63]); //OK
+			match("%s\|%s", clapArray2, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, clap[64], clap[65], clap[66], clap[67], clap[68], clap[69], clap[70], clap[71], clap[72],clap[73], clap[74], clap[75], clap[76], clap[77], clap[78], clap[79], clap[80], clap[81], clap[82], clap[83], clap[84], clap[85], clap[86], clap[87], clap[88], clap[89], clap[90], clap[91], clap[92], clap[93], clap[94], clap[95]); //OK
+			match("%s\|%s", clapArray3, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, clap[96], clap[97], clap[98], clap[99], clap[100], clap[101], clap[102], clap[103], clap[104],clap[105], clap[106], clap[107], clap[108], clap[109], clap[110], clap[111], clap[112], clap[113], clap[114], clap[115], clap[116], clap[117], clap[118], clap[119], clap[120], clap[121], clap[122], clap[123], clap[124], clap[125], clap[126], clap[127]); //OK
+			match("%s\|%s", clapArray4, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, clap[128], clap[129], clap[130], clap[131], clap[132], clap[133], clap[134], clap[135], clap[136],clap[137], clap[138], clap[139], clap[140], clap[141], clap[142], clap[143], clap[144], clap[145], clap[146], clap[147], clap[148], clap[149], clap[150], clap[151], clap[152], clap[153], clap[154], clap[155], clap[156], clap[157], clap[158], clap[159]); //OK
+			match("%s\|%s", clapArray5, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, clap[160], clap[161], clap[162], clap[163], clap[164], clap[165], clap[166], clap[167], clap[168],clap[169], clap[170], clap[171], clap[172], clap[173], clap[174], clap[175], clap[176], clap[177], clap[178], clap[179], clap[180], clap[181], clap[182], clap[183], clap[184], clap[185], clap[186], clap[187], clap[188], clap[189], clap[190], clap[191]); //OK
+			match("%s\|%s", clapArray6, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, clap[192], clap[193], clap[194], clap[195], clap[196], clap[197], clap[198], clap[199], clap[200],clap[201], clap[202], clap[203], clap[204], clap[205], clap[206], clap[207], clap[208], clap[209], clap[210], clap[211], clap[212], clap[213], clap[214], clap[215], clap[216], clap[217], clap[218], clap[219], clap[220], clap[221], clap[222], clap[223]); //OK
+			match("%s\|%s", clapArray7, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, clap[224], clap[225], clap[226], clap[227], clap[228], clap[229], clap[230], clap[231], clap[232],clap[233], clap[234], clap[235], clap[236], clap[237], clap[238], clap[239], clap[240], clap[241], clap[242], clap[243], clap[244], clap[245], clap[246], clap[247], clap[248], clap[249], clap[250], clap[251], clap[252], clap[253], clap[254], clap[255]); //OK
+			match("%s\|%s", clapArray8, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, clap[256], clap[257], clap[258], clap[259], clap[260], clap[261], clap[262], clap[263], clap[264],clap[265], clap[266], clap[267], clap[268], clap[269], clap[270], clap[271], clap[272], clap[273], clap[274], clap[275], clap[276], clap[277], clap[278], clap[279], clap[280], clap[281], clap[282], clap[283], clap[284], clap[285], clap[286], clap[287]); //OK
+		);
+sliderIn==4 ? (
+	temp=#temp;
+	test1=#test1;
+			match("%s\|%s", hhclosedArray0, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhclosed[0], hhclosed[1], hhclosed[2], hhclosed[3], hhclosed[4], hhclosed[5], hhclosed[6], hhclosed[7], hhclosed[8],hhclosed[9], hhclosed[10], hhclosed[11], hhclosed[12], hhclosed[13], hhclosed[14], hhclosed[15], hhclosed[16], hhclosed[17], hhclosed[18], hhclosed[19], hhclosed[20], hhclosed[21], hhclosed[22], hhclosed[23], hhclosed[24], hhclosed[25], hhclosed[26], hhclosed[27], hhclosed[28], hhclosed[29], hhclosed[30], hhclosed[31]); //OK
+			match("%s\|%s", hhclosedArray1, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhclosed[32], hhclosed[33], hhclosed[34], hhclosed[35], hhclosed[36], hhclosed[37], hhclosed[38], hhclosed[39], hhclosed[40],hhclosed[41], hhclosed[42], hhclosed[43], hhclosed[44], hhclosed[45], hhclosed[46], hhclosed[47], hhclosed[48], hhclosed[49], hhclosed[50], hhclosed[51], hhclosed[52], hhclosed[53], hhclosed[54], hhclosed[55], hhclosed[56], hhclosed[57], hhclosed[58], hhclosed[59], hhclosed[60], hhclosed[61], hhclosed[62], hhclosed[63]); //OK
+			match("%s\|%s", hhclosedArray2, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhclosed[64], hhclosed[65], hhclosed[66], hhclosed[67], hhclosed[68], hhclosed[69], hhclosed[70], hhclosed[71], hhclosed[72],hhclosed[73], hhclosed[74], hhclosed[75], hhclosed[76], hhclosed[77], hhclosed[78], hhclosed[79], hhclosed[80], hhclosed[81], hhclosed[82], hhclosed[83], hhclosed[84], hhclosed[85], hhclosed[86], hhclosed[87], hhclosed[88], hhclosed[89], hhclosed[90], hhclosed[91], hhclosed[92], hhclosed[93], hhclosed[94], hhclosed[95]); //OK
+			match("%s\|%s", hhclosedArray3, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhclosed[96], hhclosed[97], hhclosed[98], hhclosed[99], hhclosed[100], hhclosed[101], hhclosed[102], hhclosed[103], hhclosed[104],hhclosed[105], hhclosed[106], hhclosed[107], hhclosed[108], hhclosed[109], hhclosed[110], hhclosed[111], hhclosed[112], hhclosed[113], hhclosed[114], hhclosed[115], hhclosed[116], hhclosed[117], hhclosed[118], hhclosed[119], hhclosed[120], hhclosed[121], hhclosed[122], hhclosed[123], hhclosed[124], hhclosed[125], hhclosed[126], hhclosed[127]); //OK
+			match("%s\|%s", hhclosedArray4, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhclosed[128], hhclosed[129], hhclosed[130], hhclosed[131], hhclosed[132], hhclosed[133], hhclosed[134], hhclosed[135], hhclosed[136],hhclosed[137], hhclosed[138], hhclosed[139], hhclosed[140], hhclosed[141], hhclosed[142], hhclosed[143], hhclosed[144], hhclosed[145], hhclosed[146], hhclosed[147], hhclosed[148], hhclosed[149], hhclosed[150], hhclosed[151], hhclosed[152], hhclosed[153], hhclosed[154], hhclosed[155], hhclosed[156], hhclosed[157], hhclosed[158], hhclosed[159]); //OK
+			match("%s\|%s", hhclosedArray5, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhclosed[160], hhclosed[161], hhclosed[162], hhclosed[163], hhclosed[164], hhclosed[165], hhclosed[166], hhclosed[167], hhclosed[168],hhclosed[169], hhclosed[170], hhclosed[171], hhclosed[172], hhclosed[173], hhclosed[174], hhclosed[175], hhclosed[176], hhclosed[177], hhclosed[178], hhclosed[179], hhclosed[180], hhclosed[181], hhclosed[182], hhclosed[183], hhclosed[184], hhclosed[185], hhclosed[186], hhclosed[187], hhclosed[188], hhclosed[189], hhclosed[190], hhclosed[191]); //OK
+			match("%s\|%s", hhclosedArray6, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhclosed[192], hhclosed[193], hhclosed[194], hhclosed[195], hhclosed[196], hhclosed[197], hhclosed[198], hhclosed[199], hhclosed[200],hhclosed[201], hhclosed[202], hhclosed[203], hhclosed[204], hhclosed[205], hhclosed[206], hhclosed[207], hhclosed[208], hhclosed[209], hhclosed[210], hhclosed[211], hhclosed[212], hhclosed[213], hhclosed[214], hhclosed[215], hhclosed[216], hhclosed[217], hhclosed[218], hhclosed[219], hhclosed[220], hhclosed[221], hhclosed[222], hhclosed[223]); //OK
+			match("%s\|%s", hhclosedArray7, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhclosed[224], hhclosed[225], hhclosed[226], hhclosed[227], hhclosed[228], hhclosed[229], hhclosed[230], hhclosed[231], hhclosed[232],hhclosed[233], hhclosed[234], hhclosed[235], hhclosed[236], hhclosed[237], hhclosed[238], hhclosed[239], hhclosed[240], hhclosed[241], hhclosed[242], hhclosed[243], hhclosed[244], hhclosed[245], hhclosed[246], hhclosed[247], hhclosed[248], hhclosed[249], hhclosed[250], hhclosed[251], hhclosed[252], hhclosed[253], hhclosed[254], hhclosed[255]); //OK
+			match("%s\|%s", hhclosedArray8, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhclosed[256], hhclosed[257], hhclosed[258], hhclosed[259], hhclosed[260], hhclosed[261], hhclosed[262], hhclosed[263], hhclosed[264],hhclosed[265], hhclosed[266], hhclosed[267], hhclosed[268], hhclosed[269], hhclosed[270], hhclosed[271], hhclosed[272], hhclosed[273], hhclosed[274], hhclosed[275], hhclosed[276], hhclosed[277], hhclosed[278], hhclosed[279], hhclosed[280], hhclosed[281], hhclosed[282], hhclosed[283], hhclosed[284], hhclosed[285], hhclosed[286], hhclosed[287]); //OK
+		);
+sliderIn==5 ? (
+	temp=#temp;
+	test1=#test1;
+			match("%s\|%s", hhopenArray0, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhopen[0], hhopen[1], hhopen[2], hhopen[3], hhopen[4], hhopen[5], hhopen[6], hhopen[7], hhopen[8],hhopen[9], hhopen[10], hhopen[11], hhopen[12], hhopen[13], hhopen[14], hhopen[15], hhopen[16], hhopen[17], hhopen[18], hhopen[19], hhopen[20], hhopen[21], hhopen[22], hhopen[23], hhopen[24], hhopen[25], hhopen[26], hhopen[27], hhopen[28], hhopen[29], hhopen[30], hhopen[31]); //OK
+			match("%s\|%s", hhopenArray1, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhopen[32], hhopen[33], hhopen[34], hhopen[35], hhopen[36], hhopen[37], hhopen[38], hhopen[39], hhopen[40],hhopen[41], hhopen[42], hhopen[43], hhopen[44], hhopen[45], hhopen[46], hhopen[47], hhopen[48], hhopen[49], hhopen[50], hhopen[51], hhopen[52], hhopen[53], hhopen[54], hhopen[55], hhopen[56], hhopen[57], hhopen[58], hhopen[59], hhopen[60], hhopen[61], hhopen[62], hhopen[63]); //OK
+			match("%s\|%s", hhopenArray2, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhopen[64], hhopen[65], hhopen[66], hhopen[67], hhopen[68], hhopen[69], hhopen[70], hhopen[71], hhopen[72],hhopen[73], hhopen[74], hhopen[75], hhopen[76], hhopen[77], hhopen[78], hhopen[79], hhopen[80], hhopen[81], hhopen[82], hhopen[83], hhopen[84], hhopen[85], hhopen[86], hhopen[87], hhopen[88], hhopen[89], hhopen[90], hhopen[91], hhopen[92], hhopen[93], hhopen[94], hhopen[95]); //OK
+			match("%s\|%s", hhopenArray3, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhopen[96], hhopen[97], hhopen[98], hhopen[99], hhopen[100], hhopen[101], hhopen[102], hhopen[103], hhopen[104],hhopen[105], hhopen[106], hhopen[107], hhopen[108], hhopen[109], hhopen[110], hhopen[111], hhopen[112], hhopen[113], hhopen[114], hhopen[115], hhopen[116], hhopen[117], hhopen[118], hhopen[119], hhopen[120], hhopen[121], hhopen[122], hhopen[123], hhopen[124], hhopen[125], hhopen[126], hhopen[127]); //OK
+			match("%s\|%s", hhopenArray4, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhopen[128], hhopen[129], hhopen[130], hhopen[131], hhopen[132], hhopen[133], hhopen[134], hhopen[135], hhopen[136],hhopen[137], hhopen[138], hhopen[139], hhopen[140], hhopen[141], hhopen[142], hhopen[143], hhopen[144], hhopen[145], hhopen[146], hhopen[147], hhopen[148], hhopen[149], hhopen[150], hhopen[151], hhopen[152], hhopen[153], hhopen[154], hhopen[155], hhopen[156], hhopen[157], hhopen[158], hhopen[159]); //OK
+			match("%s\|%s", hhopenArray5, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhopen[160], hhopen[161], hhopen[162], hhopen[163], hhopen[164], hhopen[165], hhopen[166], hhopen[167], hhopen[168],hhopen[169], hhopen[170], hhopen[171], hhopen[172], hhopen[173], hhopen[174], hhopen[175], hhopen[176], hhopen[177], hhopen[178], hhopen[179], hhopen[180], hhopen[181], hhopen[182], hhopen[183], hhopen[184], hhopen[185], hhopen[186], hhopen[187], hhopen[188], hhopen[189], hhopen[190], hhopen[191]); //OK
+			match("%s\|%s", hhopenArray6, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhopen[192], hhopen[193], hhopen[194], hhopen[195], hhopen[196], hhopen[197], hhopen[198], hhopen[199], hhopen[200],hhopen[201], hhopen[202], hhopen[203], hhopen[204], hhopen[205], hhopen[206], hhopen[207], hhopen[208], hhopen[209], hhopen[210], hhopen[211], hhopen[212], hhopen[213], hhopen[214], hhopen[215], hhopen[216], hhopen[217], hhopen[218], hhopen[219], hhopen[220], hhopen[221], hhopen[222], hhopen[223]); //OK
+			match("%s\|%s", hhopenArray7, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhopen[224], hhopen[225], hhopen[226], hhopen[227], hhopen[228], hhopen[229], hhopen[230], hhopen[231], hhopen[232],hhopen[233], hhopen[234], hhopen[235], hhopen[236], hhopen[237], hhopen[238], hhopen[239], hhopen[240], hhopen[241], hhopen[242], hhopen[243], hhopen[244], hhopen[245], hhopen[246], hhopen[247], hhopen[248], hhopen[249], hhopen[250], hhopen[251], hhopen[252], hhopen[253], hhopen[254], hhopen[255]); //OK
+			match("%s\|%s", hhopenArray8, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hhopen[256], hhopen[257], hhopen[258], hhopen[259], hhopen[260], hhopen[261], hhopen[262], hhopen[263], hhopen[264],hhopen[265], hhopen[266], hhopen[267], hhopen[268], hhopen[269], hhopen[270], hhopen[271], hhopen[272], hhopen[273], hhopen[274], hhopen[275], hhopen[276], hhopen[277], hhopen[278], hhopen[279], hhopen[280], hhopen[281], hhopen[282], hhopen[283], hhopen[284], hhopen[285], hhopen[286], hhopen[287]); //OK
+		);
+sliderIn==6 ? (
+	temp=#temp;
+	test1=#test1;
+			match("%s\|%s", hitomArray0, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hitom[0], hitom[1], hitom[2], hitom[3], hitom[4], hitom[5], hitom[6], hitom[7], hitom[8],hitom[9], hitom[10], hitom[11], hitom[12], hitom[13], hitom[14], hitom[15], hitom[16], hitom[17], hitom[18], hitom[19], hitom[20], hitom[21], hitom[22], hitom[23], hitom[24], hitom[25], hitom[26], hitom[27], hitom[28], hitom[29], hitom[30], hitom[31]); //OK
+			match("%s\|%s", hitomArray1, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hitom[32], hitom[33], hitom[34], hitom[35], hitom[36], hitom[37], hitom[38], hitom[39], hitom[40],hitom[41], hitom[42], hitom[43], hitom[44], hitom[45], hitom[46], hitom[47], hitom[48], hitom[49], hitom[50], hitom[51], hitom[52], hitom[53], hitom[54], hitom[55], hitom[56], hitom[57], hitom[58], hitom[59], hitom[60], hitom[61], hitom[62], hitom[63]); //OK
+			match("%s\|%s", hitomArray2, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hitom[64], hitom[65], hitom[66], hitom[67], hitom[68], hitom[69], hitom[70], hitom[71], hitom[72],hitom[73], hitom[74], hitom[75], hitom[76], hitom[77], hitom[78], hitom[79], hitom[80], hitom[81], hitom[82], hitom[83], hitom[84], hitom[85], hitom[86], hitom[87], hitom[88], hitom[89], hitom[90], hitom[91], hitom[92], hitom[93], hitom[94], hitom[95]); //OK
+			match("%s\|%s", hitomArray3, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hitom[96], hitom[97], hitom[98], hitom[99], hitom[100], hitom[101], hitom[102], hitom[103], hitom[104],hitom[105], hitom[106], hitom[107], hitom[108], hitom[109], hitom[110], hitom[111], hitom[112], hitom[113], hitom[114], hitom[115], hitom[116], hitom[117], hitom[118], hitom[119], hitom[120], hitom[121], hitom[122], hitom[123], hitom[124], hitom[125], hitom[126], hitom[127]); //OK
+			match("%s\|%s", hitomArray4, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hitom[128], hitom[129], hitom[130], hitom[131], hitom[132], hitom[133], hitom[134], hitom[135], hitom[136],hitom[137], hitom[138], hitom[139], hitom[140], hitom[141], hitom[142], hitom[143], hitom[144], hitom[145], hitom[146], hitom[147], hitom[148], hitom[149], hitom[150], hitom[151], hitom[152], hitom[153], hitom[154], hitom[155], hitom[156], hitom[157], hitom[158], hitom[159]); //OK
+			match("%s\|%s", hitomArray5, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hitom[160], hitom[161], hitom[162], hitom[163], hitom[164], hitom[165], hitom[166], hitom[167], hitom[168],hitom[169], hitom[170], hitom[171], hitom[172], hitom[173], hitom[174], hitom[175], hitom[176], hitom[177], hitom[178], hitom[179], hitom[180], hitom[181], hitom[182], hitom[183], hitom[184], hitom[185], hitom[186], hitom[187], hitom[188], hitom[189], hitom[190], hitom[191]); //OK
+			match("%s\|%s", hitomArray6, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hitom[192], hitom[193], hitom[194], hitom[195], hitom[196], hitom[197], hitom[198], hitom[199], hitom[200],hitom[201], hitom[202], hitom[203], hitom[204], hitom[205], hitom[206], hitom[207], hitom[208], hitom[209], hitom[210], hitom[211], hitom[212], hitom[213], hitom[214], hitom[215], hitom[216], hitom[217], hitom[218], hitom[219], hitom[220], hitom[221], hitom[222], hitom[223]); //OK
+			match("%s\|%s", hitomArray7, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hitom[224], hitom[225], hitom[226], hitom[227], hitom[228], hitom[229], hitom[230], hitom[231], hitom[232],hitom[233], hitom[234], hitom[235], hitom[236], hitom[237], hitom[238], hitom[239], hitom[240], hitom[241], hitom[242], hitom[243], hitom[244], hitom[245], hitom[246], hitom[247], hitom[248], hitom[249], hitom[250], hitom[251], hitom[252], hitom[253], hitom[254], hitom[255]); //OK
+			match("%s\|%s", hitomArray8, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, hitom[256], hitom[257], hitom[258], hitom[259], hitom[260], hitom[261], hitom[262], hitom[263], hitom[264],hitom[265], hitom[266], hitom[267], hitom[268], hitom[269], hitom[270], hitom[271], hitom[272], hitom[273], hitom[274], hitom[275], hitom[276], hitom[277], hitom[278], hitom[279], hitom[280], hitom[281], hitom[282], hitom[283], hitom[284], hitom[285], hitom[286], hitom[287]); //OK
+		);
+sliderIn==7 ? (
+	temp=#temp;
+	test1=#test1;
+			match("%s\|%s", lotomArray0, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, lotom[0], lotom[1], lotom[2], lotom[3], lotom[4], lotom[5], lotom[6], lotom[7], lotom[8],lotom[9], lotom[10], lotom[11], lotom[12], lotom[13], lotom[14], lotom[15], lotom[16], lotom[17], lotom[18], lotom[19], lotom[20], lotom[21], lotom[22], lotom[23], lotom[24], lotom[25], lotom[26], lotom[27], lotom[28], lotom[29], lotom[30], lotom[31]); //OK
+			match("%s\|%s", lotomArray1, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, lotom[32], lotom[33], lotom[34], lotom[35], lotom[36], lotom[37], lotom[38], lotom[39], lotom[40],lotom[41], lotom[42], lotom[43], lotom[44], lotom[45], lotom[46], lotom[47], lotom[48], lotom[49], lotom[50], lotom[51], lotom[52], lotom[53], lotom[54], lotom[55], lotom[56], lotom[57], lotom[58], lotom[59], lotom[60], lotom[61], lotom[62], lotom[63]); //OK
+			match("%s\|%s", lotomArray2, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, lotom[64], lotom[65], lotom[66], lotom[67], lotom[68], lotom[69], lotom[70], lotom[71], lotom[72],lotom[73], lotom[74], lotom[75], lotom[76], lotom[77], lotom[78], lotom[79], lotom[80], lotom[81], lotom[82], lotom[83], lotom[84], lotom[85], lotom[86], lotom[87], lotom[88], lotom[89], lotom[90], lotom[91], lotom[92], lotom[93], lotom[94], lotom[95]); //OK
+			match("%s\|%s", lotomArray3, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, lotom[96], lotom[97], lotom[98], lotom[99], lotom[100], lotom[101], lotom[102], lotom[103], lotom[104],lotom[105], lotom[106], lotom[107], lotom[108], lotom[109], lotom[110], lotom[111], lotom[112], lotom[113], lotom[114], lotom[115], lotom[116], lotom[117], lotom[118], lotom[119], lotom[120], lotom[121], lotom[122], lotom[123], lotom[124], lotom[125], lotom[126], lotom[127]); //OK
+			match("%s\|%s", lotomArray4, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, lotom[128], lotom[129], lotom[130], lotom[131], lotom[132], lotom[133], lotom[134], lotom[135], lotom[136],lotom[137], lotom[138], lotom[139], lotom[140], lotom[141], lotom[142], lotom[143], lotom[144], lotom[145], lotom[146], lotom[147], lotom[148], lotom[149], lotom[150], lotom[151], lotom[152], lotom[153], lotom[154], lotom[155], lotom[156], lotom[157], lotom[158], lotom[159]); //OK
+			match("%s\|%s", lotomArray5, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, lotom[160], lotom[161], lotom[162], lotom[163], lotom[164], lotom[165], lotom[166], lotom[167], lotom[168],lotom[169], lotom[170], lotom[171], lotom[172], lotom[173], lotom[174], lotom[175], lotom[176], lotom[177], lotom[178], lotom[179], lotom[180], lotom[181], lotom[182], lotom[183], lotom[184], lotom[185], lotom[186], lotom[187], lotom[188], lotom[189], lotom[190], lotom[191]); //OK
+			match("%s\|%s", lotomArray6, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, lotom[192], lotom[193], lotom[194], lotom[195], lotom[196], lotom[197], lotom[198], lotom[199], lotom[200],lotom[201], lotom[202], lotom[203], lotom[204], lotom[205], lotom[206], lotom[207], lotom[208], lotom[209], lotom[210], lotom[211], lotom[212], lotom[213], lotom[214], lotom[215], lotom[216], lotom[217], lotom[218], lotom[219], lotom[220], lotom[221], lotom[222], lotom[223]); //OK
+			match("%s\|%s", lotomArray7, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, lotom[224], lotom[225], lotom[226], lotom[227], lotom[228], lotom[229], lotom[230], lotom[231], lotom[232],lotom[233], lotom[234], lotom[235], lotom[236], lotom[237], lotom[238], lotom[239], lotom[240], lotom[241], lotom[242], lotom[243], lotom[244], lotom[245], lotom[246], lotom[247], lotom[248], lotom[249], lotom[250], lotom[251], lotom[252], lotom[253], lotom[254], lotom[255]); //OK
+			match("%s\|%s", lotomArray8, test1, temp); //TEMP
+			match("%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d\,%d", temp, lotom[256], lotom[257], lotom[258], lotom[259], lotom[260], lotom[261], lotom[262], lotom[263], lotom[264],lotom[265], lotom[266], lotom[267], lotom[268], lotom[269], lotom[270], lotom[271], lotom[272], lotom[273], lotom[274], lotom[275], lotom[276], lotom[277], lotom[278], lotom[279], lotom[280], lotom[281], lotom[282], lotom[283], lotom[284], lotom[285], lotom[286], lotom[287]); //OK
+		);
+
+
+file_close(handle);
+);
+
+);
+
+sector=0;
+Xmap=0;
+Ymap=0;
+Kdrum=255;
+Sdrum=255;
+Cdrum=0;
+H1drum=0;
+H2drum=0;
+Tdrum1=0;
+Tdrum2=0;
+ext_noinit=1.0;
+divs=5000;
+divs[0]=1;
+divs[1]=1;
+divs[2]=2;
+divs[3]=4;
+divs[4]=8;
+divs[5]=12;
+divs[6]=16;
+divs[7]=24;
+divs[8]=32;
+divs[9]=16;
+divs[10]=12;
+divisions=11;
+
+// ---------- COLA DE EVENTOS MIDI ----------
+// encola un evento; devuelve 0 si la cola esta llena (el NoteOn se descarta)
+function qPush(type, t, note, vel, dur, ts, v) local(i, done)(
+	i=0; done=0;
+	while (i < QSIZE && !done) (
+		evType[i]==0 ? (
+			evType[i]=type; evTime[i]=t; evNote[i]=note; evVel[i]=vel; evDur[i]=dur;
+			evStraight[i]=ts; evVoice[i]=v;
+			done=1;
+		);
+		i+=1;
+	);
+	done;
+);
+
+// offset de sample dentro del bloque actual para el tiempo t (negras)
+function sampleOffset(t)(
+	min(max(floor((t - b0) / bpb), 0), samplesblock-1);
+);
+
+// envia y libera los NoteOff pendientes de la nota noteFilter (<0 = todas)
+function flushNoteOffs(offset, noteFilter) local(i)(
+	i=0;
+	loop(QSIZE,
+		evType[i]==2 && (noteFilter < 0 || evNote[i]==noteFilter) ? (
+			midisend(offset, $x80, evNote[i], 0);
+			evType[i]=0;
+		);
+		i+=1;
+	);
+);
+
+// salto de transporte / stop: suelta las notas que suenan y descarta los NoteOn pendientes
+function resetQueue()(
+	flushNoteOffs(0, -1);
+	memset(evType, 0, QSIZE);
+);
+
+// emite en orden temporal (NoteOff antes que NoteOn si empatan) los eventos con t < b1
+// (el ultimo medio sample queda para el bloque siguiente: un paso justo en el final de un loop no suena)
+function emitDue() local(i, best, bt, off, n)(
+	while (
+		best=-1; bt=b1 - 0.5*bpb;
+		i=0;
+		loop(QSIZE,
+			evType[i] && (evTime[i] < bt || (best >= 0 && evTime[i]==bt && evType[i]==2 && evType[best]==1)) ? (
+				best=i; bt=evTime[i];
+			);
+			i+=1;
+		);
+		best >= 0 ? (
+			off = sampleOffset(evTime[best]);
+			n = evNote[best];
+			evType[best]==1 ? (
+				evType[best]=0;
+				flushNoteOffs(off, n);  // re-disparo: el NoteOff viejo no corta la nota nueva
+				midisend(off, $x90, n, evVel[best]);
+				anticipT[evVoice[best]] = evStraight[best];
+				evType[best]=2;         // el mismo hueco pasa a ser su NoteOff
+				evTime[best]+=evDur[best];
+			) : (
+				midisend(off, $x80, n, 0);
+				evType[best]=0;
+			);
+		);
+		best >= 0;
+	);
+);
+
+// ---------- SWING ----------
+// deformacion lineal a trozos de cada corchea: la 2a semicorchea pasa de 0.25 a s/100*0.5 negras
+function swingWarp(t, s) local(cell, u, p)(
+	cell = floor(t*2)/2;
+	u = t - cell;
+	p = s/100*0.5;
+	cell + (u < 0.25 ? u*(p/0.25) : p + (u-0.25)*((0.5-p)/0.25));
+);
+
+function inBreakWindow(t) local(c)(
+	c = t % (breakInterval.val_pos) + 1;
+	c >= breakOffset.val_pos && c >= breakInterval.val_pos - (breakDur.val_pos-1);
+);
+
+function kdrumFunc()(
+	//SECTOR 1 0,1,2 3
+
+	sector == 1 ? Kdrum = ( ( (kick[kickPosition+(32*(0 + secondBar)) ] * Xmap) + (kick[kickPosition+(32*( 2  + secondBar )) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (kick[kickPosition+(32*( 4  + secondBar ))] * Xmap) + (kick[kickPosition+(32*( 6  + secondBar ))] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+	sector == 2 ? Kdrum = ( ( (kick[kickPosition+(32*(0 + secondBar)) ] * Xmap) + (kick[kickPosition+(32*( 4  + secondBar ))] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (kick[kickPosition+(32*( 6  + secondBar ))] * Xmap) + (kick[kickPosition+(32*( 8 ))] * (1 - Xmap) ) ) * (1 - Ymap) );
+	sector == 3 ? Kdrum = ( ( (kick[kickPosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (kick[kickPosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (kick[kickPosition+(32*( 8 ))] * ( 1 - Xmap )) + (kick[kickPosition+(32*( 6  + secondBar ))] * Xmap ) ) * Ymap );
+	sector == 4 ? Kdrum = ( ( (kick[kickPosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (kick[kickPosition+(32*( 8 ))] * Xmap ) ) * Ymap ) + ( ( (kick[kickPosition+(32*( 4  + secondBar ))] * ( 1 - Xmap ) ) + (kick[kickPosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap) );
+);
+
+function sdrumFunc()(
+	//SECTOR 1 0,1,2 3
+
+	sector == 1 ? Sdrum = ( ( (snare[snarePosition+(32*(0 + secondBar)) ] * Xmap) + (snare[snarePosition+(32*( 2  + secondBar )) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (snare[snarePosition+(32*( 4  + secondBar ))] * Xmap) + (snare[snarePosition+(32*( 6  + secondBar ))] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+	sector == 2 ? Sdrum = ( ( (snare[snarePosition+(32*(0 + secondBar)) ] * Xmap) + (snare[snarePosition+(32*( 4  + secondBar ))] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (snare[snarePosition+(32*( 6  + secondBar ))] * Xmap) + (snare[snarePosition+(32*( 8 ))] * (1 - Xmap) ) ) * (1 - Ymap) );
+	sector == 3 ? Sdrum = ( ( (snare[snarePosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (snare[snarePosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (snare[snarePosition+(32*( 8 ))] * ( 1 - Xmap )) + (snare[snarePosition+(32*( 6  + secondBar ))] * Xmap ) ) * Ymap );
+	sector == 4 ? Sdrum = ( ( (snare[snarePosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (snare[snarePosition+(32*( 8 ))] * Xmap ) ) * Ymap ) + ( ( (snare[snarePosition+(32*( 4  + secondBar ))] * ( 1 - Xmap ) ) + (snare[snarePosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap) );
+);
+
+function cdrumFunc()(
+	//SECTOR 1 0,1,2 3
+
+	sector == 1 ? Cdrum = ( ( (clap[clapPosition+(32*(0 + secondBar)) ] * Xmap) + (clap[clapPosition+(32*( 2  + secondBar )) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (clap[clapPosition+(32*( 4  + secondBar ))] * Xmap) + (clap[clapPosition+(32*( 6  + secondBar ))] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+	sector == 2 ? Cdrum = ( ( (clap[clapPosition+(32*(0 + secondBar)) ] * Xmap) + (clap[clapPosition+(32*( 4  + secondBar ))] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (clap[clapPosition+(32*( 6  + secondBar ))] * Xmap) + (clap[clapPosition+(32*( 8 ))] * (1 - Xmap) ) ) * (1 - Ymap) );
+	sector == 3 ? Cdrum = ( ( (clap[clapPosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (clap[clapPosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (clap[clapPosition+(32*( 8 ))] * ( 1 - Xmap )) + (clap[clapPosition+(32*( 6  + secondBar ))] * Xmap ) ) * Ymap );
+	sector == 4 ? Cdrum = ( ( (clap[clapPosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (clap[clapPosition+(32*( 8 ))] * Xmap ) ) * Ymap ) + ( ( (clap[clapPosition+(32*( 4  + secondBar ))] * ( 1 - Xmap ) ) + (clap[clapPosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap) );
+);
+
+function hhcdrumFunc()(
+	//SECTOR 1 0,1,2 3
+
+	sector == 1 ? H1drum = ( ( (hhclosed[hhclosedPosition+(32*(0 + secondBar)) ] * Xmap) + (hhclosed[hhclosedPosition+(32*( 2  + secondBar )) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (hhclosed[hhclosedPosition+(32*( 4  + secondBar ))] * Xmap) + (hhclosed[hhclosedPosition+(32*( 6  + secondBar ))] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+	sector == 2 ? H1drum = ( ( (hhclosed[hhclosedPosition+(32*(0 + secondBar)) ] * Xmap) + (hhclosed[hhclosedPosition+(32*( 4  + secondBar ))] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (hhclosed[hhclosedPosition+(32*( 6  + secondBar ))] * Xmap) + (hhclosed[hhclosedPosition+(32*( 8 ))] * (1 - Xmap) ) ) * (1 - Ymap) );
+	sector == 3 ? H1drum = ( ( (hhclosed[hhclosedPosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (hhclosed[hhclosedPosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (hhclosed[hhclosedPosition+(32*( 8 ))] * ( 1 - Xmap )) + (hhclosed[hhclosedPosition+(32*( 6  + secondBar ))] * Xmap ) ) * Ymap );
+	sector == 4 ? H1drum = ( ( (hhclosed[hhclosedPosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (hhclosed[hhclosedPosition+(32*( 8 ))] * Xmap ) ) * Ymap ) + ( ( (hhclosed[hhclosedPosition+(32*( 4  + secondBar ))] * ( 1 - Xmap ) ) + (hhclosed[hhclosedPosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap) );
+);
+
+function hhodrumFunc()(
+	//SECTOR 1 0,1,2 3
+
+	sector == 1 ? H2drum = ( ( (hhopen[hhopenPosition+(32*(0 + secondBar)) ] * Xmap) + (hhopen[hhopenPosition+(32*( 2  + secondBar )) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (hhopen[hhopenPosition+(32*( 4  + secondBar ))] * Xmap) + (hhopen[hhopenPosition+(32*( 6  + secondBar ))] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+	sector == 2 ? H2drum = ( ( (hhopen[hhopenPosition+(32*(0 + secondBar)) ] * Xmap) + (hhopen[hhopenPosition+(32*( 4  + secondBar ))] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (hhopen[hhopenPosition+(32*( 6  + secondBar ))] * Xmap) + (hhopen[hhopenPosition+(32*( 8 ))] * (1 - Xmap) ) ) * (1 - Ymap) );
+	sector == 3 ? H2drum = ( ( (hhopen[hhopenPosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (hhopen[hhopenPosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (hhopen[hhopenPosition+(32*( 8 ))] * ( 1 - Xmap )) + (hhopen[hhopenPosition+(32*( 6  + secondBar ))] * Xmap ) ) * Ymap );
+	sector == 4 ? H2drum = ( ( (hhopen[hhopenPosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (hhopen[hhopenPosition+(32*( 8 ))] * Xmap ) ) * Ymap ) + ( ( (hhopen[hhopenPosition+(32*( 4  + secondBar ))] * ( 1 - Xmap ) ) + (hhopen[hhopenPosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap) );
+);
+
+function htdrumFunc()(
+	//SECTOR 1 0,1,2 3
+
+	sector == 1 ? Tdrum1 = ( ( (hitom[hitomPosition+(32*(0 + secondBar)) ] * Xmap) + (hitom[hitomPosition+(32*( 2  + secondBar )) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (hitom[hitomPosition+(32*( 4  + secondBar ))] * Xmap) + (hitom[hitomPosition+(32*( 6  + secondBar ))] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+	sector == 2 ? Tdrum1 = ( ( (hitom[hitomPosition+(32*(0 + secondBar)) ] * Xmap) + (hitom[hitomPosition+(32*( 4  + secondBar ))] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (hitom[hitomPosition+(32*( 6  + secondBar ))] * Xmap) + (hitom[hitomPosition+(32*( 8 ))] * (1 - Xmap) ) ) * (1 - Ymap) );
+	sector == 3 ? Tdrum1 = ( ( (hitom[hitomPosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (hitom[hitomPosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (hitom[hitomPosition+(32*( 8 ))] * ( 1 - Xmap )) + (hitom[hitomPosition+(32*( 6  + secondBar ))] * Xmap ) ) * Ymap );
+	sector == 4 ? Tdrum1 = ( ( (hitom[hitomPosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (hitom[hitomPosition+(32*( 8 ))] * Xmap ) ) * Ymap ) + ( ( (hitom[hitomPosition+(32*( 4  + secondBar ))] * ( 1 - Xmap ) ) + (hitom[hitomPosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap) );
+);
+
+function ltdrumFunc()(
+	//SECTOR 1 0,1,2 3
+
+	sector == 1 ? Tdrum2 = ( ( (lotom[lotomPosition+(32*(0 + secondBar)) ] * Xmap) + (lotom[lotomPosition+(32*( 2  + secondBar )) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (lotom[lotomPosition+(32*( 4  + secondBar ))] * Xmap) + (lotom[lotomPosition+(32*( 6  + secondBar ))] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+	sector == 2 ? Tdrum2 = ( ( (lotom[lotomPosition+(32*(0 + secondBar)) ] * Xmap) + (lotom[lotomPosition+(32*( 4  + secondBar ))] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (lotom[lotomPosition+(32*( 6  + secondBar ))] * Xmap) + (lotom[lotomPosition+(32*( 8 ))] * (1 - Xmap) ) ) * (1 - Ymap) );
+	sector == 3 ? Tdrum2 = ( ( (lotom[lotomPosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (lotom[lotomPosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (lotom[lotomPosition+(32*( 8 ))] * ( 1 - Xmap )) + (lotom[lotomPosition+(32*( 6  + secondBar ))] * Xmap ) ) * Ymap );
+	sector == 4 ? Tdrum2 = ( ( (lotom[lotomPosition+(32*(0 + secondBar)) ] * ( 1 - Xmap ) ) + (lotom[lotomPosition+(32*( 8 ))] * Xmap ) ) * Ymap ) + ( ( (lotom[lotomPosition+(32*( 4  + secondBar ))] * ( 1 - Xmap ) ) + (lotom[lotomPosition+(32*( 2  + secondBar ))] * Xmap ) ) * ( 1 - Ymap) );
+);
+
+function changeBar()( 
+
+	secondBar > 0 ? secondBar=100 : secondBar=0;
+
+);
+
+// ---------- RANDOM STYLES ----------
+// cuenta cuantos archivos hay en la lista de estilos: recorre los valores del slider8
+// (archivo, sin uso) hasta que no haya nombre o se repita (por si REAPER limita el valor)
+function countStyles() local(i, n, ok, h, keep)(
+	keep = slider8;
+	i=0; n=0; ok=1;
+	#prev = "";
+	while (ok && i < 512) (
+		slider8 = i;
+		strcpy_fromslider(#probe, slider8);
+		strlen(#probe) > 0 && strcmp(#probe, #prev) != 0 && (h = file_open(#probe)) >= 0 ? (
+			file_close(h);
+			strcpy(#prev, #probe);
+			n += 1;
+			i += 1;
+		) : ok = 0;
+	);
+	slider8 = keep;
+	n;
+);
+
+STYLE_FIRST = 0;          // primer indice valido (sube a 1 si el 0 no es un estilo real)
+numStyles = countStyles();
+numStyles < 1 ? numStyles = 24;
+lastCap = 0;
+
+// evalua el paso pos de la voz v (0..6): morph XY + densidad (o break). Devuelve 1 si suena.
+function voiceHit(v, pos, brk) local(val, dens)(
+	v==0 ? (kickPosition=pos;     kdrumFunc();   val=Kdrum;  dens=kick_Dens.val_pos);
+	v==1 ? (snarePosition=pos;    sdrumFunc();   val=Sdrum;  dens=snare_Dens.val_pos);
+	v==2 ? (clapPosition=pos;     cdrumFunc();   val=Cdrum;  dens=clap_Dens.val_pos);
+	v==3 ? (hhclosedPosition=pos; hhcdrumFunc(); val=H1drum; dens=hhclosed_Dens.val_pos);
+	v==4 ? (hhopenPosition=pos;   hhodrumFunc(); val=H2drum; dens=hhopen_Dens.val_pos);
+	v==5 ? (hitomPosition=pos;    htdrumFunc();  val=Tdrum1; dens=hitom_Dens.val_pos);
+	v==6 ? (lotomPosition=pos;    ltdrumFunc();  val=Tdrum2; dens=lotom_Dens.val_pos);
+	brk ? (256-val) < (dens/2 - rand(breakAmountRandom.val_pos)) : (256-val) < dens;
+);
+
+// programa los pasos de la voz v en la rejilla divs[idx] cuyo tiempo recto cae en (h0, h1]
+// brk=1 rejilla de break, brk=0 rejilla normal (en la ventana de break la normal no suena)
+function scheduleGrid(v, idx, brk, h0, h1) local(div, k, kEnd, t, inBrk, sv, tt)(
+	div = divs[floor(idx)];
+	k = floor(h0*div) + 1;
+	kEnd = floor(h1*div);
+	while (k <= kEnd) (
+		t = k / div;
+		inBrk = slider(11+5*v) > 0 && inBreakWindow(t) ? 1 : 0;
+		abs(t - skipAt[v]) < 0.000001 ? (
+			inBrk = -1;  // ya sono adelantado antes del salto (slide negativo en un loop)
+			skipAt[v] = -1;
+		);
+		t >= 0 && inBrk == brk ? (
+			secondBar = (floor(t) % 8) >= 4;
+			voiceHit(v, k % 32, brk) ? (
+				sv = 50 + (slider52 - 50) * slider(53+v) / 100;
+				tt = swingWarp(t, sv) + slider(60+v) / 1000 * tempo / 60;
+				qPush(1, tt, (slider46+(7*slider47))+v, slider(12+5*v), slider(13+5*v) / (ts_num*16), t, v);
+			);
+		);
+		k += 1;
+	);
+);
+
+
+// function sdrumFunc()(
+//       sector == 1 ? Sdrum = ( ( (snare[snarePosition+(32*0) + secondBar] * Xmap) + (snare[snarePosition+(32*1) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (snare[snarePosition+(32*5)] * Xmap) + (snare[snarePosition+(32*2)] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+//       sector == 2 ? Sdrum = ( ( (snare[snarePosition+(32*0) + secondBar] * Xmap) + (snare[snarePosition+(32*2)] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (snare[snarePosition+(32*6)] * Xmap) + (snare[snarePosition+(32*3)] * (1 - Xmap) ) ) * (1 - Ymap) );
+//       sector == 3 ? Sdrum = ( ( (snare[snarePosition+(32*0) + secondBar] * ( 1 - Xmap ) ) + (snare[snarePosition+(32*3)] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (snare[snarePosition+(32*7)] * ( 1 - Xmap )) + (snare[snarePosition+(32*4)] * Xmap ) ) * Ymap );
+//       sector == 4 ? Sdrum = ( ( (snare[snarePosition+(32*0) + secondBar] * ( 1 - Xmap ) ) + (snare[snarePosition+(32*4)] * Xmap ) ) * Ymap ) + ( ( (snare[snarePosition+(32*8)] * ( 1 - Xmap ) ) + (snare[snarePosition+(32*5)] * Xmap ) ) * ( 1 - Ymap) );
+// );
+// function cdrumFunc()(
+//       sector == 1 ? Cdrum = ( ( (clap[clapPosition+(32*0) + secondBar] * Xmap) + (clap[clapPosition+(32*1) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (clap[clapPosition+(32*5)] * Xmap) + (clap[clapPosition+(32*2)] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+//       sector == 2 ? Cdrum = ( ( (clap[clapPosition+(32*0) + secondBar] * Xmap) + (clap[clapPosition+(32*2)] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (clap[clapPosition+(32*6)] * Xmap) + (clap[clapPosition+(32*3)] * (1 - Xmap) ) ) * (1 - Ymap) );
+//       sector == 3 ? Cdrum = ( ( (clap[clapPosition+(32*0) + secondBar] * ( 1 - Xmap ) ) + (clap[clapPosition+(32*3)] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (clap[clapPosition+(32*7)] * ( 1 - Xmap )) + (clap[clapPosition+(32*4)] * Xmap ) ) * Ymap );
+//       sector == 4 ? Cdrum = ( ( (clap[clapPosition+(32*0) + secondBar] * ( 1 - Xmap ) ) + (clap[clapPosition+(32*4)] * Xmap ) ) * Ymap ) + ( ( (clap[clapPosition+(32*8)] * ( 1 - Xmap ) ) + (clap[clapPosition+(32*5)] * Xmap ) ) * ( 1 - Ymap) );
+// );
+// function hhcdrumFunc()(
+//       sector == 1 ? H1drum = ( ( (hhclosed[hhclosedPosition+(32*0) + secondBar] * Xmap) + (hhclosed[hhclosedPosition+(32*1) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (hhclosed[hhclosedPosition+(32*5)] * Xmap) + (hhclosed[hhclosedPosition+(32*2)] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+//       sector == 2 ? H1drum = ( ( (hhclosed[hhclosedPosition+(32*0) + secondBar] * Xmap) + (hhclosed[hhclosedPosition+(32*2)] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (hhclosed[hhclosedPosition+(32*6)] * Xmap) + (hhclosed[hhclosedPosition+(32*3)] * (1 - Xmap) ) ) * (1 - Ymap) );
+//       sector == 3 ? H1drum = ( ( (hhclosed[hhclosedPosition+(32*0) + secondBar] * ( 1 - Xmap ) ) + (hhclosed[hhclosedPosition+(32*3)] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (hhclosed[hhclosedPosition+(32*7)] * ( 1 - Xmap )) + (hhclosed[hhclosedPosition+(32*4)] * Xmap ) ) * Ymap );
+//       sector == 4 ? H1drum = ( ( (hhclosed[hhclosedPosition+(32*0) + secondBar] * ( 1 - Xmap ) ) + (hhclosed[hhclosedPosition+(32*4)] * Xmap ) ) * Ymap ) + ( ( (hhclosed[hhclosedPosition+(32*8)] * ( 1 - Xmap ) ) + (hhclosed[hhclosedPosition+(32*5)] * Xmap ) ) * ( 1 - Ymap) );
+//       kkk=sector;
+// );
+// function hhodrumFunc()(
+//       sector == 1 ? H2drum = ( ( (hhopen[hhopenPosition+(32*0) + secondBar] * Xmap) + (hhopen[hhopenPosition+(32*1) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (hhopen[hhopenPosition+(32*5)] * Xmap) + (hhopen[hhopenPosition+(32*2)] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+//       sector == 2 ? H2drum = ( ( (hhopen[hhopenPosition+(32*0) + secondBar] * Xmap) + (hhopen[hhopenPosition+(32*2)] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (hhopen[hhopenPosition+(32*6)] * Xmap) + (hhopen[hhopenPosition+(32*3)] * (1 - Xmap) ) ) * (1 - Ymap) );
+//       sector == 3 ? H2drum = ( ( (hhopen[hhopenPosition+(32*0) + secondBar] * ( 1 - Xmap ) ) + (hhopen[hhopenPosition+(32*3)] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (hhopen[hhopenPosition+(32*7)] * ( 1 - Xmap )) + (hhopen[hhopenPosition+(32*4)] * Xmap ) ) * Ymap );
+//       sector == 4 ? H2drum = ( ( (hhopen[hhopenPosition+(32*0) + secondBar] * ( 1 - Xmap ) ) + (hhopen[hhopenPosition+(32*4)] * Xmap ) ) * Ymap ) + ( ( (hhopen[hhopenPosition+(32*8)] * ( 1 - Xmap ) ) + (hhopen[hhopenPosition+(32*5)] * Xmap ) ) * ( 1 - Ymap) );
+// );
+// function htdrumFunc()(
+//       sector == 1 ? Tdrum1 = ( ( (hitom[hitomPosition+(32*0) + secondBar] * Xmap) + (hitom[hitomPosition+(32*1) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (hitom[hitomPosition+(32*5)] * Xmap) + (hitom[hitomPosition+(32*2)] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+//       sector == 2 ? Tdrum1 = ( ( (hitom[hitomPosition+(32*0) + secondBar] * Xmap) + (hitom[hitomPosition+(32*2)] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (hitom[hitomPosition+(32*6)] * Xmap) + (hitom[hitomPosition+(32*3)] * (1 - Xmap) ) ) * (1 - Ymap) );
+//       sector == 3 ? Tdrum1 = ( ( (hitom[hitomPosition+(32*0) + secondBar] * ( 1 - Xmap ) ) + (hitom[hitomPosition+(32*3)] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (hitom[hitomPosition+(32*7)] * ( 1 - Xmap )) + (hitom[hitomPosition+(32*4)] * Xmap ) ) * Ymap );
+//       sector == 4 ? Tdrum1 = ( ( (hitom[hitomPosition+(32*0) + secondBar] * ( 1 - Xmap ) ) + (hitom[hitomPosition+(32*4)] * Xmap ) ) * Ymap ) + ( ( (hitom[hitomPosition+(32*8)] * ( 1 - Xmap ) ) + (hitom[hitomPosition+(32*5)] * Xmap ) ) * ( 1 - Ymap) );
+// );
+// function ltdrumFunc()(
+//       sector == 1 ? Tdrum2 = ( ( (lotom[lotomPosition+(32*0) + secondBar] * Xmap) + (lotom[lotomPosition+(32*1) ] * (1 - Xmap) ) ) * Ymap ) + ( ( (lotom[lotomPosition+(32*5)] * Xmap) + (lotom[lotomPosition+(32*2)] * (1 - Xmap) ) ) * ( 1 - Ymap) );
+//       sector == 2 ? Tdrum2 = ( ( (lotom[lotomPosition+(32*0) + secondBar] * Xmap) + (lotom[lotomPosition+(32*2)] * (1 - Xmap) ) ) * ( Ymap ) ) + ( ( (lotom[lotomPosition+(32*6)] * Xmap) + (lotom[lotomPosition+(32*3)] * (1 - Xmap) ) ) * (1 - Ymap) );
+//       sector == 3 ? Tdrum2 = ( ( (lotom[lotomPosition+(32*0) + secondBar] * ( 1 - Xmap ) ) + (lotom[lotomPosition+(32*3)] * Xmap ) ) * ( 1 - Ymap ) ) + ( ( (lotom[lotomPosition+(32*7)] * ( 1 - Xmap )) + (lotom[lotomPosition+(32*4)] * Xmap ) ) * Ymap );
+//       sector == 4 ? Tdrum2 = ( ( (lotom[lotomPosition+(32*0) + secondBar] * ( 1 - Xmap ) ) + (lotom[lotomPosition+(32*4)] * Xmap ) ) * Ymap ) + ( ( (lotom[lotomPosition+(32*8)] * ( 1 - Xmap ) ) + (lotom[lotomPosition+(32*5)] * Xmap ) ) * ( 1 - Ymap) );
+// );
+
+
+!kick_Dens.val_pos ? kick_Dens.val_pos = 200;
+!kick_Div.val_pos ? kick_Div.val_pos = 4;
+!kick_Velocity.val_pos ? kick_Velocity.val_pos = 100;
+!kick_Duration.val_pos ? kick_Duration.val_pos = 1;
+
+!snare_Dens.val_pos ? snare_Dens.val_pos = 200;
+!snare_Div.val_pos ? snare_Div.val_pos = 4;
+!snare_Velocity.val_pos ? snare_Velocity.val_pos = 100;
+!snare_Duration.val_pos ? snare_Duration.val_pos = 1;
+
+!clap_Dens.val_pos ? clap_Dens.val_pos = 200;
+!clap_Div.val_pos ? clap_Div.val_pos = 4;
+!clap_Velocity.val_pos ? clap_Velocity.val_pos = 100;
+!clap_Duration.val_pos ? clap_Duration.val_pos = 1;
+
+!hhclosed_Dens.val_pos ? hhclosed_Dens.val_pos = 200;
+!hhclosed_Div.val_pos ? hhclosed_Div.val_pos = 4;
+!hhclosed_Velocity.val_pos ? hhclosed_Velocity.val_pos = 100;
+!hhclosed_Duration.val_pos ? hhclosed_Duration.val_pos = 1;
+
+!hhopen_Dens.val_pos ? hhopen_Dens.val_pos = 200;
+!hhopen_Div.val_pos ? hhopen_Div.val_pos = 4;
+!hhopen_Velocity.val_pos ? hhopen_Velocity.val_pos = 100;
+!hhopen_Duration.val_pos ? hhopen_Duration.val_pos = 1;
+
+!hitom_Dens.val_pos ? hitom_Dens.val_pos = 200;
+!hitom_Div.val_pos ? hitom_Div.val_pos = 4;
+!hitom_Velocity.val_pos ? hitom_Velocity.val_pos = 100;
+!hitom_Duration.val_pos ? hitom_Duration.val_pos = 1;
+
+!lotom_Dens.val_pos ? lotom_Dens.val_pos = 200;
+!lotom_Div.val_pos ? lotom_Div.val_pos = 4;
+!lotom_Velocity.val_pos ? lotom_Velocity.val_pos = 100;
+!lotom_Duration.val_pos ? lotom_Duration.val_pos = 1;
+
+!xmap.val_pos ? xmap.val_pos = 0;
+!ymap.val_pos ? ymap.val_pos = 0;
+!basenote.val_pos ? basenote.val_pos = 36;
+!basenoteMultiplier.val_pos ? basenoteMultiplier.val_pos = 0;
+
+!breakInterval.val_pos ? breakInterval.val_pos = 0;
+!breakDur.val_pos ? breakDur.val_pos = 0;
+!breakOffset.val_pos ? breakOffset.val_pos = 4;
+!breakAmountRandom.val_pos ? breakAmountRandom.val_pos = 1;
+
+// GROOVE: los knobs arrancan con el valor del slider y resetean (ctrl+click) a su valor neutro
+grooveSwing.val_pos = slider52;      grooveSwing.reset_val = 50;
+kick_SwingAmt.val_pos = slider53;    kick_SwingAmt.reset_val = 100;
+snare_SwingAmt.val_pos = slider54;   snare_SwingAmt.reset_val = 100;
+clap_SwingAmt.val_pos = slider55;    clap_SwingAmt.reset_val = 100;
+hhclosed_SwingAmt.val_pos = slider56; hhclosed_SwingAmt.reset_val = 100;
+hhopen_SwingAmt.val_pos = slider57;  hhopen_SwingAmt.reset_val = 100;
+hitom_SwingAmt.val_pos = slider58;   hitom_SwingAmt.reset_val = 100;
+lotom_SwingAmt.val_pos = slider59;   lotom_SwingAmt.reset_val = 100;
+kick_Slide.val_pos = slider60;       kick_Slide.reset_val = 0;
+snare_Slide.val_pos = slider61;      snare_Slide.reset_val = 0;
+clap_Slide.val_pos = slider62;       clap_Slide.reset_val = 0;
+hhclosed_Slide.val_pos = slider63;   hhclosed_Slide.reset_val = 0;
+hhopen_Slide.val_pos = slider64;     hhopen_Slide.reset_val = 0;
+hitom_Slide.val_pos = slider65;      hitom_Slide.reset_val = 0;
+lotom_Slide.val_pos = slider66;      lotom_Slide.reset_val = 0;
+
+
+
+
+@slider
+
+slider1 != old_slider1 ? (
+ loadStyle(1);
+ old_slider1=slider1;
+);
+slider2 != old_slider2 ? (
+ loadStyle(2);
+ old_slider2=slider2;
+);
+slider3 != old_slider3 ? (
+ loadStyle(3);
+ old_slider3=slider3;
+);
+slider4 != old_slider4 ? (
+ loadStyle(4);
+ old_slider4=slider4;
+);
+slider5 != old_slider5 ? (
+ loadStyle(5);
+ old_slider5=slider5;
+);
+slider6 != old_slider6 ? (
+ loadStyle(6);
+ old_slider6=slider6;
+);
+slider7 != old_slider7 ? (
+ loadStyle(7);
+ old_slider7=slider7;
+);
+
+slider44 < 0 && slider45 < 0 ?  sector = 1;
+slider44 < 0 && slider45 > 0 ?  sector = 2;
+slider44 >= 0 && slider45 >= 0 ?  sector = 3;
+slider44 >= 0 && slider45 <= 0 ?  sector = 4;
+
+Xmap=abs(slider44/100);
+Ymap=abs(slider45/100);
+
+
+@serialize
+
+file_var(0, kick_Dens.val_pos);
+file_var(0, kick_Div.val_pos);
+file_var(0, kick_Break.val_pos);
+file_var(0, kick_Velocity.val_pos);
+file_var(0, kick_Duration.val_pos);
+
+file_var(0, snare_Dens.val_pos);
+file_var(0, snare_Div.val_pos);
+file_var(0, snare_Break.val_pos);
+file_var(0, snare_Velocity.val_pos);
+file_var(0, snare_Duration.val_pos);
+
+file_var(0, clap_Dens.val_pos);
+file_var(0, clap_Div.val_pos);
+file_var(0, clap_Break.val_pos);
+file_var(0, clap_Velocity.val_pos);
+file_var(0, clap_Duration.val_pos);
+
+file_var(0, hhclosed_Dens.val_pos);
+file_var(0, hhclosed_Div.val_pos);
+file_var(0, hhclosed_Break.val_pos);
+file_var(0, hhclosed_Velocity.val_pos);
+file_var(0, hhclosed_Duration.val_pos);
+
+file_var(0, hhopen_Dens.val_pos);
+file_var(0, hhopen_Div.val_pos);
+file_var(0, hhopen_Break.val_pos);
+file_var(0, hhopen_Velocity.val_pos);
+file_var(0, hhopen_Duration.val_pos);
+
+file_var(0, hitom_Dens.val_pos);
+file_var(0, hitom_Div.val_pos);
+file_var(0, hitom_Break.val_pos);
+file_var(0, hitom_Velocity.val_pos);
+file_var(0, hitom_Duration.val_pos);
+
+file_var(0, lotom_Dens.val_pos);
+file_var(0, lotom_Div.val_pos);
+file_var(0, lotom_Break.val_pos);
+file_var(0, lotom_Velocity.val_pos);
+file_var(0, lotom_Duration.val_pos);
+
+
+file_var(0, xmap.val_pos);
+file_var(0, ymap.val_pos);
+file_var(0, basenote.val_pos);
+file_var(0, basenoteMultiplier.val_pos);
+
+file_var(0, breakInterval.val_pos);
+file_var(0, breakDur.val_pos);
+file_var(0, breakOffset.val_pos);
+file_var(0, breakAmountRandom.val_pos);
+
+// GROOVE (al final para que los estados antiguos sigan cargando)
+file_var(0, grooveSwing.val_pos);
+file_var(0, kick_SwingAmt.val_pos);
+file_var(0, snare_SwingAmt.val_pos);
+file_var(0, clap_SwingAmt.val_pos);
+file_var(0, hhclosed_SwingAmt.val_pos);
+file_var(0, hhopen_SwingAmt.val_pos);
+file_var(0, hitom_SwingAmt.val_pos);
+file_var(0, lotom_SwingAmt.val_pos);
+file_var(0, kick_Slide.val_pos);
+file_var(0, snare_Slide.val_pos);
+file_var(0, clap_Slide.val_pos);
+file_var(0, hhclosed_Slide.val_pos);
+file_var(0, hhopen_Slide.val_pos);
+file_var(0, hitom_Slide.val_pos);
+file_var(0, lotom_Slide.val_pos);
+
+kick_Div.val_pos=slider10;
+
+kick_Break.val_pos=slider11;
+
+kick_velocity.val_pos=slider12;
+
+kick_Duration.val_pos=slider13;
+
+snare_Dens.val_pos=slider14;
+
+snare_Div.val_pos=slider15;
+
+snare_Break.val_pos=slider16;
+
+snare_velocity.val_pos=slider17;
+
+snare_Duration.val_pos=slider18;
+
+clap_Dens.val_pos=slider19;
+
+clap_Div.val_pos=slider20;
+
+clap_Break.val_pos=slider21;
+
+clap_velocity.val_pos=slider22;
+
+clap_Duration.val_pos=slider23;
+
+hhclosed_Dens.val_pos=slider24;
+
+hhclosed_Div.val_pos=slider25;
+
+hhclosed_Break.val_pos=slider26;
+
+hhclosed_velocity.val_pos=slider27;
+
+hhclosed_Duration.val_pos=slider28;
+
+hhopen_Dens.val_pos=slider29;
+
+hhopen_Div.val_pos=slider30;
+
+hhopen_Break.val_pos=slider31;
+
+hhopen_velocity.val_pos=slider32;
+
+hhopen_Duration.val_pos=slider33;
+
+hitom_Dens.val_pos=slider34;
+
+hitom_Div.val_pos=slider35;
+
+hitom_Break.val_pos=slider36;
+
+hitom_velocity.val_pos=slider37;
+
+hitom_Duration.val_pos=slider38;
+
+lotom_Dens.val_pos=slider39;
+
+lotom_Div.val_pos=slider40;
+
+lotom_Break.val_pos=slider41;
+
+lotom_velocity.val_pos=slider42;
+
+lotom_Duration.val_pos=slider43;
+
+xmap.val_pos=slider44;
+
+ymap.val_pos=slider45;
+
+basenote.val_pos=slider46;
+
+basenoteMultiplier.val_pos=slider47;
+
+
+
+
+@block
+// PLANIFICADOR: cada paso se evalua con antelacion (lookahead = SLIDE_MAX_MS) y se emite
+// con precision de sample en t = swing(t_recto) + slide. Ver openspec/changes/add-swing-slide.
+b0 = beat_position;
+bpb = tempo / (60 * srate);          // negras por sample
+b1 = b0 + samplesblock * bpb;        // fin del bloque
+
+play_state==0 ? (
+	kickPosition=0;
+	snarePosition=0;
+	clapPosition=0;
+	hhclosedPosition=0;
+	hhopenPosition=0;
+	hitomPosition=0;
+	lotomPosition=0;
+);
+
+play_state&1 ? (
+	// arranque, loop o seek: soltar notas y re-evaluar desde la nueva posicion
+	(!wasPlaying || abs(b0 - expectedB0) > 0.02) ? (
+		resetQueue();
+		// una voz que ya adelanto un paso mas alla del punto de salto no repite el paso de la nueva posicion
+		v=0;
+		loop(7,
+			skipAt[v] = wasPlaying && anticipT[v] >= expectedB0 - 0.000001 ? b0 : -1;
+			anticipT[v] = -1000000;
+			v+=1;
+		);
+		evalHorizon = b0 - 0.000001;
+	);
+
+	h1 = b1 + SLIDE_MAX_MS / 1000 * tempo / 60;
+	v=0;
+	loop(7,
+		scheduleGrid(v, slider(10+5*v), 0, evalHorizon, h1);
+		slider(11+5*v) > 0 ? scheduleGrid(v, slider(11+5*v), 1, evalHorizon, h1);
+		v+=1;
+	);
+	evalHorizon = h1;
+
+	emitDue();
+	wasPlaying = 1;
+	expectedB0 = b1;
+) : (
+	// stop / pausa: ninguna nota colgada
+	wasPlaying ? resetQueue();
+	wasPlaying = 0;
+);
+
+@sample
+
+@gfx 686 486
+// ---- ESCALADO: toda la UI se dibuja a 686x486 en un buffer y luego se reescala a la ventana ----
+UI_W = 686; UI_H = 486; UI_BUF = 10;
+!uiInit ? ( gfx_setimgdim(UI_BUF, UI_W, UI_H); uiInit = 1; );
+uiScale = min(gfx_w/UI_W, gfx_h/UI_H);
+uiScale < 0.1 ? uiScale = 0.1;
+uiOffX = floor((gfx_w - UI_W*uiScale)/2);
+uiOffY = floor((gfx_h - UI_H*uiScale)/2);
+// raton en coordenadas de diseno (686x486)
+mx = (mouse_x - uiOffX)/uiScale;
+my = (mouse_y - uiOffY)/uiScale;
+gfx_mode = 0;
+gfx_dest = UI_BUF;
+gfx_set(0,0,0,1);
+gfx_rect(0,0,UI_W,UI_H);
+gfx_setfont(1,Arial,14,'b');
+
+function init_mouse() (
+	!X ? (X = mx;);
+	!Y ? (Y = my;);
+);
+function uninit_mouse() (
+	X = 0;
+	Y = 0;
+);
+mouse_cap ? init_mouse() : uninit_mouse();
+
+gfx_a = 1;
+gfx_x = 0; gfx_y = 0;
+gfx_blit(0,1,0);
+
+
+function drawmeter(redux,max,x_pos,y_pos)
+instance(redux,col1,col2,prec,unit,val_str,unit,str_x,str_y,)
+(
+	gfx_r = 1;
+	gfx_g = 1;
+	gfx_b = 1;
+	gfx_a = 0;
+	gfx_x = x_pos; gfx_y = y_pos;
+	// gfx_rectto(x_pos,10+y_pos);
+
+	gfx_x = x_pos; gfx_y = y_pos+1;
+
+	redux = max(redux,1);
+	redux = min(redux,255);
+	redux = floor(redux*(50/max));
+	gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 0.9;
+	gfx_rectto(20+x_pos,y_pos-redux);
+	gfx_r = 1; gfx_g = 0; gfx_b = 0; gfx_a = 0.9;
+	gfx_x = x_pos; gfx_y = y_pos;
+	// gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 0.3;
+	//   step_size >= 1 ? prec = "%.0f";
+	//   step_size < 1 ? prec = "%.1f";
+	//   step_size < 0.1 ? prec = "%.2f";
+	//   val_str = sprintf (#,prec,redux);
+	//   val_str = strcat(val_str, unit);
+
+	//   gfx_measurestr(val_str,str_x,str_y);
+	//   gfx_x = x_pos+(40/2)-(str_x/2) ; gfx_y = 5+y_pos+40-(str_y/8)-2;
+	//   gfx_drawstr(val_str);
+
+
+	// gfx_rectto(x_pos, y_pos);
+);
+
+function map(x, in_min, in_max, out_min, out_max)(
+ (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+);
+
+function drawmeterMap(redux,min,max,x_pos,y_pos)
+instance(redux,col1,col2,prec,unit,val_str,unit,str_x,str_y,)
+(
+	gfx_r = 1;
+	gfx_g = 1;
+	gfx_b = 1;
+	gfx_a = 0;
+	gfx_x = x_pos; gfx_y = y_pos;
+	// gfx_rectto(x_pos,10+y_pos);
+
+	gfx_x = x_pos; gfx_y = y_pos+1;
+
+	redux = floor(map(redux, min, max, 0, 50));
+
+	// redux = floor(redux*(50/max));
+	gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 0.9;
+	gfx_rectto(20+x_pos,y_pos-redux);
+	gfx_r = 0; gfx_g = 0; gfx_b = 0; gfx_a = 0.9;
+	gfx_x = x_pos; gfx_y = y_pos;
+
+	// gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 0.3;
+	//   step_size >= 1 ? prec = "%.0f";
+	//   step_size < 1 ? prec = "%.1f";
+	//   step_size < 0.1 ? prec = "%.2f";
+	//   val_str = sprintf (#,prec,redux);
+	//   val_str = strcat(val_str, unit);
+
+	//   gfx_measurestr(val_str,str_x,str_y);
+	//   gfx_x = x_pos+(40/2)-(str_x/2) ; gfx_y = 5+y_pos+40-(str_y/8)-2;
+	//   gfx_drawstr(val_str);
+
+
+	// gfx_rectto(x_pos, y_pos);
+);
+
+
+
+
+function draw_pot_automate(sliderIn, pot_x,pot_y,min_val,max_val,step_size,
+	frame_width,frame_height,frame_count,showval,gfxindex)
+instance(
+	total_steps,rpos,pos_temp,val_pos,coordinatelist,
+	val_temp,prec,val_str,unit,str_x,str_y,reset_val
+)
+(
+	total_steps = (max_val - min_val) / step_size;
+	!mouse_cap ? (pos_temp = my; val_temp = val_pos;);
+
+	X > pot_x && X < pot_x+frame_width && Y > pot_y && Y < pot_y+frame_height ? (
+		val_pos = -((my - pos_temp)/ (total_steps < 50 ? (1/total_steps*100) : 1) *step_size) + (val_temp / (total_steps / frame_height)) / (frame_height / total_steps);
+		mouse_cap & 4 ? val_pos = reset_val;
+		slider_automate(slider(sliderIn));
+	);
+
+	val_pos = max(val_pos,min_val);
+	val_pos = min(val_pos,max_val);
+	rpos = floor( (val_pos - min_val) * ((frame_count) / total_steps) / step_size) * frame_height;
+	rpos = min(rpos,(frame_count * frame_height) - frame_height);
+	coordinatelist[0] = 0;
+	coordinatelist[1] = rpos;
+	coordinatelist[2] = coordinatelist[6] = frame_width;
+	coordinatelist[3] = coordinatelist[7] = frame_height;
+	coordinatelist[4] = pot_x;
+	coordinatelist[5] = pot_y;
+	coordinatelist[6] = pot_y+10;
+	gfx_a=1;
+	gfx_r=1;gfx_g=1;gfx_b=1;
+	gfx_blitext(gfxindex, coordinatelist, 0);
+
+	showval ? (
+		step_size >= 1 ? prec = "%.0f";
+		step_size < 1 ? prec = "%.1f";
+		step_size < 0.1 ? prec = "%.2f";
+		val_str = sprintf(#, "%d",val_pos);
+		// val_str = strcat(val_str, unit);
+
+		gfx_measurestr(val_str,str_x,str_y);
+		gfx_x = pot_x+(frame_width/2)-(str_x/2) ; gfx_y = 5+pot_y+frame_height-(str_y/8)-2;
+		gfx_drawstr(val_str);
+
+	);
+
+	val_pos;
+);
+
+function drawSector(xpos, ypos)(
+	gfx_measurestr(sector,xpos,ypos);
+	gfx_x=xpos;
+	gfx_y=ypos;
+	strSector=sector;
+	gfx_a=1;
+	gfx_r=1;gfx_g=1;gfx_b=1;
+	gfx_drawnumber(sector,1);
+);
+
+
+//pot_x,pot_y,min_val,max_val,step_size,frame_width,frame_height,frame_count,showval,gfxindex
+//KICK
+ox=0;
+oy=0;
+xoffset=40;
+p=0;
+kick_Dens.val_pos=slider9;
+kick_Dens.draw_pot_automate(9,28+ox,oy,0,255,1,20,90,30,2,4);
+drawmeter(kick_Dens.val_pos,255,28+ox,80);
+slider9=kick_Dens.val_pos;
+
+
+
+p=1;
+kick_Div.val_pos=slider10;
+kick_Div.draw_pot_automate(10, 28+(xoffset*p)+ox,oy,0,9,1,20,90,9,2,4);
+drawmeter(kick_Div.val_pos,9,28+(xoffset*p)+ox,80);
+slider10=floor(kick_Div.val_pos);
+
+p=2;
+kick_Break.val_pos=slider11;
+kick_Break.draw_pot_automate(11, 28+(xoffset*p)+ox,oy,0,10,1,20,90,9,2,4);
+drawmeterMap(kick_Break.val_pos,0,10,28+(xoffset*p)+ox,80);
+slider11=floor(kick_Break.val_pos);
+
+p=3;
+kick_velocity.val_pos=slider12;
+kick_velocity.draw_pot_automate(12, 28+(xoffset*p)+ox,oy,0,127,1,20,90,9,2,4);
+drawmeter(kick_velocity.val_pos,127,28+(xoffset*p)+ox,80);
+slider12=kick_velocity.val_pos;
+
+p=4;
+kick_Duration.val_pos=slider13;
+kick_Duration.draw_pot_automate(13, 28+(xoffset*p)+ox,oy,1,250,1,20,90,9,2,4);
+drawmeterMap(kick_Duration.val_pos,1,250,28+(xoffset*p)+ox,80);
+slider13=kick_Duration.val_pos;
+
+//SNARE
+ox=220;
+oy=0;
+xoffset=40;
+p=0;
+snare_Dens.val_pos=slider14;
+snare_Dens.draw_pot_automate(14, 28+ox,oy,0,255,1,20,90,30,2,4);
+drawmeter(snare_Dens.val_pos,255,28+ox,80);
+slider14=snare_Dens.val_pos;
+
+p=1;
+snare_Div.val_pos=slider15;
+snare_Div.draw_pot_automate(15, 28+(xoffset*p)+ox,oy,0,9,1,20,90,9,2,4);
+drawmeter(snare_Div.val_pos,9,28+(xoffset*p)+ox,80);
+slider15=floor(snare_Div.val_pos);
+
+p=2;
+snare_Break.val_pos=slider16;
+snare_Break.draw_pot_automate(16, 28+(xoffset*p)+ox,oy,0,10,1,20,90,9,2,4);
+drawmeter(snare_Break.val_pos,10,28+(xoffset*p)+ox,80);
+slider16=floor(snare_Break.val_pos);
+
+p=3;
+snare_velocity.val_pos=slider17;
+snare_velocity.draw_pot_automate(17, 28+(xoffset*p)+ox,oy,0,127,1,20,90,9,2,4);
+drawmeter(snare_Velocity.val_pos,127,28+(xoffset*p)+ox,80);
+slider17=snare_velocity.val_pos;
+
+p=4;
+snare_Duration.val_pos=slider18;
+snare_Duration.draw_pot_automate(18, 28+(xoffset*p)+ox,oy,1,250,1,20,90,9,2,4);
+drawmeterMap(snare_Duration.val_pos,1,250,28+(xoffset*p)+ox,80);
+slider18=snare_Duration.val_pos;
+
+
+//CLAP
+ox=440;
+oy=0;
+xoffset=40;
+p=0;
+clap_Dens.val_pos=slider19;
+clap_Dens.draw_pot_automate(19, 28+ox,oy,0,255,1,20,90,30,2,4);
+drawmeter(clap_Dens.val_pos,255,28+ox,80);
+slider19=clap_Dens.val_pos;
+
+p=1;
+clap_Div.val_pos=slider20;
+clap_Div.draw_pot_automate(20, 28+(xoffset*p)+ox,oy,0,9,1,20,90,9,2,4);
+drawmeter(clap_Div.val_pos,9,28+(xoffset*p)+ox,80);
+slider20=floor(clap_Div.val_pos);
+
+p=2;
+clap_Break.val_pos=slider21;
+clap_Break.draw_pot_automate(21, 28+(xoffset*p)+ox,oy,0,10,1,20,90,9,2,4);
+drawmeter(clap_Break.val_pos,10,28+(xoffset*p)+ox,80);
+slider21=floor(clap_Break.val_pos);
+
+p=3;
+clap_velocity.val_pos=slider22;
+clap_velocity.draw_pot_automate(22, 28+(xoffset*p)+ox,oy,0,127,1,20,90,9,2,4);
+drawmeter(clap_Velocity.val_pos,127,28+(xoffset*p)+ox,80);
+slider22=clap_velocity.val_pos;
+
+p=4;
+clap_Duration.val_pos=slider23;
+clap_Duration.draw_pot_automate(23, 28+(xoffset*p)+ox,oy,1,250,1,20,90,9,2,4);
+drawmeterMap(clap_Duration.val_pos,1,250,28+(xoffset*p)+ox,80);
+slider23=clap_Duration.val_pos;
+
+
+//HHCLOSED
+ox=0;
+oy=100;
+xoffset=40;
+p=0;
+hhclosed_Dens.val_pos=slider24;
+hhclosed_Dens.draw_pot_automate(24, 28+ox,oy,0,255,1,20,90,30,2,4);
+drawmeter(hhclosed_Dens.val_pos,255,28+ox,80+oy);
+slider24=hhclosed_Dens.val_pos;
+
+p=1;
+hhclosed_Div.val_pos=slider25;
+hhclosed_Div.draw_pot_automate(25, 28+(xoffset*p)+ox,oy,0,9,1,20,90,9,2,4);
+drawmeter(hhclosed_Div.val_pos,9,28+(xoffset*p)+ox,80+oy);
+slider25=floor(hhclosed_Div.val_pos);
+
+p=2;
+hhclosed_Break.val_pos=slider26;
+hhclosed_Break.draw_pot_automate(26, 28+(xoffset*p)+ox,oy,0,10,1,20,90,9,2,4);
+drawmeter(hhclosed_Break.val_pos,10,28+(xoffset*p)+ox,80+oy);
+slider26=floor(hhclosed_Break.val_pos);
+
+p=3;
+hhclosed_velocity.val_pos=slider27;
+hhclosed_velocity.draw_pot_automate(27, 28+(xoffset*p)+ox,oy,0,127,1,20,90,9,2,4);
+drawmeter(hhclosed_Velocity.val_pos,127,28+(xoffset*p)+ox,80+oy);
+slider27=hhclosed_velocity.val_pos;
+
+p=4;
+hhclosed_Duration.val_pos=slider28;
+hhclosed_Duration.draw_pot_automate(28, 28+(xoffset*p)+ox,oy,1,250,1,20,90,9,2,4);
+drawmeterMap(hhclosed_Duration.val_pos,1,250,28+(xoffset*p)+ox,80+oy);
+slider28=hhclosed_Duration.val_pos;
+
+//HHOPEN
+ox=220;
+oy=100;
+xoffset=40;
+p=0;
+hhopen_Dens.val_pos=slider29;
+hhopen_Dens.draw_pot_automate(29, 28+ox,oy,0,255,1,20,90,30,2,4);
+drawmeter(hhopen_Dens.val_pos,255,28+ox,80+oy);
+slider29=hhopen_Dens.val_pos;
+
+p=1;
+hhopen_Div.val_pos=slider30;
+hhopen_Div.draw_pot_automate(30, 28+(xoffset*p)+ox,oy,0,9,1,20,90,9,2,4);
+drawmeter(hhopen_Div.val_pos,9,28+(xoffset*p)+ox,80+oy);
+slider30=floor(hhopen_Div.val_pos);
+
+p=2;
+hhopen_Break.val_pos=slider31;
+hhopen_Break.draw_pot_automate(31, 28+(xoffset*p)+ox,oy,0,10,1,20,90,9,2,4);
+drawmeter(hhopen_Break.val_pos,10,28+(xoffset*p)+ox,80+oy);
+slider31=floor(hhopen_Break.val_pos);
+
+p=3;
+hhopen_velocity.val_pos=slider32;
+hhopen_velocity.draw_pot_automate(32, 28+(xoffset*p)+ox,oy,0,127,1,20,90,9,2,4);
+drawmeter(hhopen_Velocity.val_pos,127,28+(xoffset*p)+ox,80+oy);
+slider32=hhopen_velocity.val_pos;
+
+p=4;
+hhopen_Duration.val_pos=slider33;
+hhopen_Duration.draw_pot_automate(33, 28+(xoffset*p)+ox,oy,1,250,1,20,90,9,2,4);
+drawmeterMap(hhopen_Duration.val_pos,1,250,28+(xoffset*p)+ox,80+oy);
+slider33=hhopen_Duration.val_pos;
+
+
+//HITOM
+ox=440;
+oy=100;
+xoffset=40;
+p=0;
+hitom_Dens.val_pos=slider34;
+hitom_Dens.draw_pot_automate(34, 28+ox,oy,0,255,1,20,90,30,2,4);
+drawmeter(hitom_Dens.val_pos,255,28+ox,80+oy);
+slider34=hitom_Dens.val_pos;
+
+p=1;
+hitom_Div.val_pos=slider35;
+hitom_Div.draw_pot_automate(35, 28+(xoffset*p)+ox,oy,0,9,1,20,90,9,2,4);
+drawmeter(hitom_Div.val_pos,9,28+(xoffset*p)+ox,80+oy);
+slider35=floor(hitom_Div.val_pos);
+
+p=2;
+hitom_Break.val_pos=slider36;
+hitom_Break.draw_pot_automate(36, 28+(xoffset*p)+ox,oy,0,10,1,20,90,9,2,4);
+drawmeter(hitom_Break.val_pos,10,28+(xoffset*p)+ox,80+oy);
+slider36=floor(hitom_Break.val_pos);
+
+p=3;
+hitom_velocity.val_pos=slider37;
+hitom_velocity.draw_pot_automate(37, 28+(xoffset*p)+ox,oy,0,127,1,20,90,9,2,4);
+drawmeter(hitom_Velocity.val_pos,127,28+(xoffset*p)+ox,80+oy);
+slider37=hitom_velocity.val_pos;
+
+p=4;
+hitom_Duration.val_pos=slider38;
+hitom_Duration.draw_pot_automate(38, 28+(xoffset*p)+ox,oy,1,250,1,20,90,9,2,4);
+drawmeterMap(hitom_Duration.val_pos,1,250,28+(xoffset*p)+ox,80+oy);
+slider38=hitom_Duration.val_pos;
+
+//LOTOM
+ox=0;
+oy=200;
+xoffset=40;
+p=0;
+lotom_Dens.val_pos=slider39;
+lotom_Dens.draw_pot_automate(39, 28+ox,oy,0,255,1,20,90,30,2,4);
+drawmeter(lotom_Dens.val_pos,255,28+ox,80+oy);
+slider39=lotom_Dens.val_pos;
+
+p=1;
+lotom_Div.val_pos=slider40;
+lotom_Div.draw_pot_automate(40, 28+(xoffset*p)+ox,oy,0,9,1,20,90,9,2,4);
+drawmeter(lotom_Div.val_pos,9,28+(xoffset*p)+ox,80+oy);
+slider40=floor(lotom_Div.val_pos);
+
+p=2;
+lotom_Break.val_pos=slider41;
+lotom_Break.draw_pot_automate(41, 28+(xoffset*p)+ox,oy,0,10,1,20,90,9,2,4);
+drawmeter(lotom_Break.val_pos,10,28+(xoffset*p)+ox,80+oy);
+slider41=floor(lotom_Break.val_pos);
+
+p=3;
+lotom_velocity.val_pos=slider42;
+lotom_velocity.draw_pot_automate(42, 28+(xoffset*p)+ox,oy,0,127,1,20,90,9,2,4);
+drawmeter(lotom_Velocity.val_pos,127,28+(xoffset*p)+ox,80+oy);
+slider42=lotom_velocity.val_pos;
+
+p=4;
+lotom_Duration.val_pos=slider43;
+lotom_Duration.draw_pot_automate(43, 28+(xoffset*p)+ox,oy,1,250,1,20,90,9,2,4);
+drawmeterMap(lotom_Duration.val_pos,1,250,28+(xoffset*p)+ox,80+oy);
+slider43=lotom_Duration.val_pos;
+
+
+
+///REST
+// slider44:0<-100,100,1>-Xmap;
+// slider45:0<-100,100,1>-Ymap;
+// slider46:0<0,100,1>-basenote;
+// slider47:0<0,100,1>-basenoteMultiplier;
+
+// breakInterval.val_pos ? xmap.val_pos = 0;
+// breakDur.val_pos ? ymap.val_pos = 0;
+// breakOffset.val_pos ? basenote.val_pos = 36;
+// breakAmountRandom.val_pos ? basenoteMultiplier.val_pos = 1;
+
+ox=280;
+oy=200;
+breakInterval.val_pos=slider48;
+breakInterval.draw_pot_automate(48, 28+ox,oy,1,32,1,20,90,30,2,4);
+drawmeter(slider48,32,28+ox,80+oy);
+slider48=floor(breakInterval.val_pos);
+
+breakDur.val_pos=slider49;
+breakDur.draw_pot_automate(49, 28+47+ox,oy,1,32,1,20,90,9,2,4);
+drawmeterMap(slider49,1,32,28+47+ox,80+oy);
+slider49=floor(breakDur.val_pos);
+
+breakOffset.val_pos=slider51;
+breakOffset.draw_pot_automate(51, 28+95+ox,oy,0,32,1,20,90,9,2,4);
+drawmeter(slider51,32,28+95+ox,80+oy);
+slider51=floor(breakOffset.val_pos);
+
+breakAmountRandom.val_pos=slider50;
+breakAmountRandom.draw_pot_automate(50, 28+137+ox,oy,0,255,1,20,90,9,2,4);
+drawmeter(slider50,255,28+137+ox,80+oy);
+slider50=floor(breakAmountRandom.val_pos);
+
+
+
+ox=470;
+oy=200;
+xmap.val_pos=slider44;
+xmap.draw_pot_automate(44, 28+ox,oy,-100,100,1,20,90,30,2,4);
+drawmeterMap(slider44,-100,100,28+ox,80+oy);
+slider44=floor(xmap.val_pos);
+
+ymap.val_pos=slider45;
+ymap.draw_pot_automate(45, 28+47+ox,oy,-100,100,1,20,90,9,2,4);
+drawmeterMap(slider45,-100,100,28+47+ox,80+oy);
+slider45=floor(ymap.val_pos);
+
+basenote.val_pos=slider46;
+basenote.draw_pot_automate(46, 28+95+ox,oy,0,120,1,20,90,9,2,4);
+drawmeter(slider46,120,28+95+ox,80+oy);
+slider46=basenote.val_pos;
+basenoteMultiplier.val_pos=slider47;
+basenoteMultiplier.draw_pot_automate(47, 28+135+ox,oy,0,12,1,20,90,9,2,4);
+drawmeter(slider47,12,28+135+ox,80+oy);
+
+slider47=basenoteMultiplier.val_pos;
+xmap.val_pos < 0 && ymap.val_pos < 0 ?  sector = 1;
+xmap.val_pos < 0 && ymap.val_pos > 0 ?  sector = 2;
+xmap.val_pos >= 0 && ymap.val_pos >= 0 ?  sector = 3;
+xmap.val_pos >= 0 && ymap.val_pos <= 0 ?  sector = 4;
+Xmap=abs(xmap.val_pos/100);
+Ymap=abs(ymap.val_pos/100);
+
+
+drawSector(523,310);
+
+
+//GROOVE (tira inferior, panel dibujado en bg.png por tools/extend_bg.py)
+function drawLabelCentered(str, cx, y) local(sw, sh)(
+	gfx_measurestr(str, sw, sh);
+	gfx_x = cx - sw/2; gfx_y = y;
+	gfx_drawstr(str);
+);
+
+gfx_setfont(3, "Arial", 12, 'b');
+gfx_r = gfx_g = gfx_b = 1; gfx_a = 0.9;
+gfx_x = 26; gfx_y = 378; gfx_drawstr("GROOVE");
+drawLabelCentered("KICK", 137, 378);
+drawLabelCentered("SNARE", 217, 378);
+drawLabelCentered("CLAP", 297, 378);
+drawLabelCentered("HH CL", 377, 378);
+drawLabelCentered("HH OP", 457, 378);
+drawLabelCentered("HI TOM", 537, 378);
+drawLabelCentered("LO TOM", 617, 378);
+gfx_setfont(2, "Arial", 10);
+gfx_r = gfx_g = gfx_b = 0.55; gfx_a = 1;
+drawLabelCentered("SWING", 50, 393);
+drawLabelCentered("AMT", 120, 393); drawLabelCentered("SLIDE", 154, 393);
+drawLabelCentered("AMT", 200, 393); drawLabelCentered("SLIDE", 234, 393);
+drawLabelCentered("AMT", 280, 393); drawLabelCentered("SLIDE", 314, 393);
+drawLabelCentered("AMT", 360, 393); drawLabelCentered("SLIDE", 394, 393);
+drawLabelCentered("AMT", 440, 393); drawLabelCentered("SLIDE", 474, 393);
+drawLabelCentered("AMT", 520, 393); drawLabelCentered("SLIDE", 554, 393);
+drawLabelCentered("AMT", 600, 393); drawLabelCentered("SLIDE", 634, 393);
+gfx_setfont(1);
+
+oy=375;
+grooveSwing.val_pos=slider52;
+grooveSwing.draw_pot_automate(52, 40,oy,50,75,1,20,90,9,2,4);
+drawmeterMap(grooveSwing.val_pos,50,75,40,80+oy);
+slider52=floor(grooveSwing.val_pos);
+
+//KICK
+kick_SwingAmt.val_pos=slider53;
+kick_SwingAmt.draw_pot_automate(53, 110,oy,0,100,1,20,90,9,2,4);
+drawmeter(kick_SwingAmt.val_pos,100,110,80+oy);
+slider53=floor(kick_SwingAmt.val_pos);
+kick_Slide.val_pos=slider60;
+kick_Slide.draw_pot_automate(60, 144,oy,-30,30,1,20,90,9,2,4);
+drawmeterMap(kick_Slide.val_pos,-30,30,144,80+oy);
+slider60=floor(kick_Slide.val_pos);
+
+//SNARE
+snare_SwingAmt.val_pos=slider54;
+snare_SwingAmt.draw_pot_automate(54, 190,oy,0,100,1,20,90,9,2,4);
+drawmeter(snare_SwingAmt.val_pos,100,190,80+oy);
+slider54=floor(snare_SwingAmt.val_pos);
+snare_Slide.val_pos=slider61;
+snare_Slide.draw_pot_automate(61, 224,oy,-30,30,1,20,90,9,2,4);
+drawmeterMap(snare_Slide.val_pos,-30,30,224,80+oy);
+slider61=floor(snare_Slide.val_pos);
+
+//CLAP
+clap_SwingAmt.val_pos=slider55;
+clap_SwingAmt.draw_pot_automate(55, 270,oy,0,100,1,20,90,9,2,4);
+drawmeter(clap_SwingAmt.val_pos,100,270,80+oy);
+slider55=floor(clap_SwingAmt.val_pos);
+clap_Slide.val_pos=slider62;
+clap_Slide.draw_pot_automate(62, 304,oy,-30,30,1,20,90,9,2,4);
+drawmeterMap(clap_Slide.val_pos,-30,30,304,80+oy);
+slider62=floor(clap_Slide.val_pos);
+
+//HH CL
+hhclosed_SwingAmt.val_pos=slider56;
+hhclosed_SwingAmt.draw_pot_automate(56, 350,oy,0,100,1,20,90,9,2,4);
+drawmeter(hhclosed_SwingAmt.val_pos,100,350,80+oy);
+slider56=floor(hhclosed_SwingAmt.val_pos);
+hhclosed_Slide.val_pos=slider63;
+hhclosed_Slide.draw_pot_automate(63, 384,oy,-30,30,1,20,90,9,2,4);
+drawmeterMap(hhclosed_Slide.val_pos,-30,30,384,80+oy);
+slider63=floor(hhclosed_Slide.val_pos);
+
+//HH OP
+hhopen_SwingAmt.val_pos=slider57;
+hhopen_SwingAmt.draw_pot_automate(57, 430,oy,0,100,1,20,90,9,2,4);
+drawmeter(hhopen_SwingAmt.val_pos,100,430,80+oy);
+slider57=floor(hhopen_SwingAmt.val_pos);
+hhopen_Slide.val_pos=slider64;
+hhopen_Slide.draw_pot_automate(64, 464,oy,-30,30,1,20,90,9,2,4);
+drawmeterMap(hhopen_Slide.val_pos,-30,30,464,80+oy);
+slider64=floor(hhopen_Slide.val_pos);
+
+//HI TOM
+hitom_SwingAmt.val_pos=slider58;
+hitom_SwingAmt.draw_pot_automate(58, 510,oy,0,100,1,20,90,9,2,4);
+drawmeter(hitom_SwingAmt.val_pos,100,510,80+oy);
+slider58=floor(hitom_SwingAmt.val_pos);
+hitom_Slide.val_pos=slider65;
+hitom_Slide.draw_pot_automate(65, 544,oy,-30,30,1,20,90,9,2,4);
+drawmeterMap(hitom_Slide.val_pos,-30,30,544,80+oy);
+slider65=floor(hitom_Slide.val_pos);
+
+//LO TOM
+lotom_SwingAmt.val_pos=slider59;
+lotom_SwingAmt.draw_pot_automate(59, 590,oy,0,100,1,20,90,9,2,4);
+drawmeter(lotom_SwingAmt.val_pos,100,590,80+oy);
+slider59=floor(lotom_SwingAmt.val_pos);
+lotom_Slide.val_pos=slider66;
+lotom_Slide.draw_pot_automate(66, 624,oy,-30,30,1,20,90,9,2,4);
+drawmeterMap(lotom_Slide.val_pos,-30,30,624,80+oy);
+slider66=floor(lotom_Slide.val_pos);
+
+// ---------- BOTONES RANDOM STYLE ----------
+function drawButton(x, y, w, h, label) local(hover, sw, sh)(
+	hover = mx >= x && mx < x+w && my >= y && my < y+h;
+	hover ? (gfx_r=0.30; gfx_g=0.30; gfx_b=0.30) : (gfx_r=0.14; gfx_g=0.14; gfx_b=0.14);
+	gfx_a = 0.95;
+	gfx_rect(x, y, w, h);
+	gfx_r=0.5; gfx_g=0.5; gfx_b=0.5; gfx_a=1;           // borde
+	gfx_rect(x, y, w, 1);   gfx_rect(x, y+h-1, w, 1);
+	gfx_rect(x, y, 1, h);   gfx_rect(x+w-1, y, 1, h);
+	gfx_r=0.92; gfx_g=0.92; gfx_b=0.92;
+	gfx_measurestr(label, sw, sh);
+	gfx_x = x + (w-sw)/2; gfx_y = y + (h-sh)/2;
+	gfx_drawstr(label);
+	hover && (mouse_cap & 1) && !(lastCap & 1);          // 1 solo en el flanco de pulsacion
+);
+
+gfx_setfont(4, "Arial", 11, 'b');
+btnAll  = drawButton(16, 326, 76, 22, "ALL RND");    // un mismo estilo para las 7 voces
+btnEach = drawButton(98, 326, 76, 22, "EACH RND");   // un estilo distinto por voz
+gfx_setfont(1);
+
+// Un cambio de slider hecho desde codigo NO ejecuta @slider, asi que cargamos los patrones aqui
+function reloadAllStyles()(
+	loadStyle(1); old_slider1 = slider1;
+	loadStyle(2); old_slider2 = slider2;
+	loadStyle(3); old_slider3 = slider3;
+	loadStyle(4); old_slider4 = slider4;
+	loadStyle(5); old_slider5 = slider5;
+	loadStyle(6); old_slider6 = slider6;
+	loadStyle(7); old_slider7 = slider7;
+);
+
+btnAll ? (
+	bR = STYLE_FIRST + floor(rand(numStyles - STYLE_FIRST));
+	bI = 1;
+	loop(7, slider(bI) = bR; bI += 1;);
+	reloadAllStyles();
+	sliderchange(127);      // bits 0..6 = sliders 1..7 (actualiza la interfaz)
+	slider_automate(127);
+);
+
+btnEach ? (
+	bI = 1;
+	loop(7, slider(bI) = STYLE_FIRST + floor(rand(numStyles - STYLE_FIRST)); bI += 1;);
+	reloadAllStyles();
+	sliderchange(127);
+	slider_automate(127);
+);
+
+lastCap = mouse_cap;
+
+// ---- volcar el buffer a la ventana, reescalado y centrado ----
+gfx_dest = -1;
+gfx_set(0.07,0.07,0.07,1);
+gfx_rect(0,0,gfx_w,gfx_h);
+gfx_set(1,1,1,1);
+gfx_blit(UI_BUF, 1, 0, 0, 0, UI_W, UI_H, uiOffX, uiOffY, UI_W*uiScale, UI_H*uiScale);

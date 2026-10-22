@@ -1,0 +1,6 @@
+__pycache__/
+.DS_Store
+Icon
+Icon[\r]
+.graph-indexer/
+*.rar
