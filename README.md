@@ -4,6 +4,8 @@ A MIDI drum-pattern generator for REAPER, written as a JSFX plugin, plus the too
 
 The plugin plays 7 voices: kick, snare, clap, closed hat, open hat, high tom and low tom. Each style has 9 patterns (p0–p8). An XY pad blends between patterns. Per-voice controls set density, division, break, velocity and duration, and a GROOVE strip adds swing and slide.
 
+**[See every style's patterns →](https://toast3r.github.io/genderbender/fingerprints.html)** ([Style fingerprints](#style-fingerprints))
+
 ## Layout
 
 | Path | What it is |
@@ -15,7 +17,9 @@ The plugin plays 7 voices: kick, snare, clap, closed hat, open hat, high tom and
 | `styles_src/*.style` | Readable sources for the cumbia styles |
 | `tools/make_style.py` | Builds a `.style` into a `.txt`, or decodes a `.txt` back into a `.style` |
 | `tools/extend_bg.py` | Regenerates `bg.png` (needs Pillow) |
-| `tools/check_styles.py` | Checks that every style is valid and that every source matches its `.txt` |
+| `tools/check_styles.py` | Checks that every style is valid, that every source matches its `.txt` and that `docs/fingerprints.html` is current |
+| `tools/view_styles.py` | Regenerates `docs/fingerprints.html` |
+| `docs/fingerprints.html` | Style fingerprints page, served by GitHub Pages |
 | `tools/install.sh` | Copies the plugin and the styles into REAPER |
 | `editor/` | The original SuperCollider style editor (`Gender_bender_editor.scd`, plus the older `drummermenu*.scd`) |
 | `presets/` | The editor's presets (`.preset`, `.h`, `.txt` in the editor's own format, not the plugin's) |
@@ -118,9 +122,22 @@ python3 tools/check_styles.py
 The checker:
 
 - decodes every `drum_styles_v/*.txt` (7 voices × 9 patterns × 32 steps, values 0–255) and checks it writes back byte for byte;
-- builds every `styles_src/*.style` and checks it matches its `.txt` exactly (if not, run `make_style.py build` again).
+- builds every `styles_src/*.style` and checks it matches its `.txt` exactly (if not, run `make_style.py build` again);
+- checks that `docs/fingerprints.html` matches the current styles (if not, run `tools/view_styles.py`).
 
 It prints `ok`, or one line per problem and exits with code 1. Run it after any change to a style or to `tools/`, then listen to the style in REAPER.
+
+## Style fingerprints
+
+[`docs/fingerprints.html`](https://toast3r.github.io/genderbender/fingerprints.html) shows every style on one page: each style is a strip of its 9 patterns (rows are voices, columns are the 32 steps, colour is the value). A Density slider dims the steps that wouldn't play at that setting, and clicking a strip shows it at full size. Styles are grouped by the families in the table above; a style missing from the table goes under "Other".
+
+Regenerate it after any change to the styles, and commit it with them:
+
+```sh
+python3 tools/view_styles.py
+```
+
+GitHub Pages serves it from `main`, folder `/docs` (Settings → Pages).
 
 ## SuperCollider editor
 

@@ -6,6 +6,7 @@
 - Cada drum_styles_v/*.txt se decodifica (7 voces x 9 patrones x 32 pasos, 0-255)
   y se vuelve a escribir igual byte a byte.
 - Cada styles_src/*.style genera exactamente su .txt de drum_styles_v/.
+- docs/fingerprints.html coincide con lo que genera tools/view_styles.py.
 Sale con 1 si algo falla.
 """
 import glob
@@ -13,6 +14,7 @@ import os
 import sys
 
 from make_style import ROOT, StyleError, from_txt, parse_style, to_txt
+from view_styles import OUT, render
 
 
 def check():
@@ -37,6 +39,13 @@ def check():
             errors.append(f'{src}: falta drum_styles_v/{name}.txt')
         elif open(txt, encoding='utf-8', newline='').read() != to_txt(data):
             errors.append(f'{src}: no coincide con drum_styles_v/{name}.txt (vuelve a ejecutar build)')
+    try:
+        html = render()
+    except StyleError:
+        html = None  # el estilo corrupto ya tiene su error arriba
+    if html is not None and (not os.path.exists(OUT)
+                             or open(OUT, encoding='utf-8', newline='').read() != html):
+        errors.append('docs/fingerprints.html desfasado (ejecuta tools/view_styles.py)')
     return errors
 
 
