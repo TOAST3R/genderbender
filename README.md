@@ -48,12 +48,19 @@ There are 31 styles in `drum_styles_v/`, each with 9 patterns. The BPM comes fro
 
 ## Install in REAPER
 
-The plugin runs from REAPER's resource folder, not from this repo. Copy the files there after each change:
+The plugin runs from REAPER's resource folder, not from this repo. Run the installer after each change:
 
 ```sh
 sh tools/install.sh                                   # macOS
-REAPER_DIR="$APPDATA/REAPER" sh tools/install.sh     # elsewhere: point at REAPER's resource folder
+REAPER_DIR="$APPDATA/REAPER" sh tools/install.sh     # Windows (Git Bash), or any other resource folder
 ```
+
+It copies:
+
+- `GenderBender/*` → `<REAPER>/Effects/GenderBender/` (the plugin, its background and the preset library)
+- `drum_styles_v/*.txt` → `<REAPER>/Data/drum_styles_v/`
+
+Files with the same name are overwritten, and nothing is deleted, so styles you removed or renamed here stay in REAPER until you delete them there. If the REAPER folder doesn't exist, the script stops without copying anything. In REAPER, **Options → Show REAPER resource path** shows the folder to use for `REAPER_DIR`.
 
 Then add **MIDI GenderBender** (`genderbender.jsfx`) to a track, send its MIDI to a drum sampler (base note 36 by default), and press play. **ALL RND** gives every voice the same random style; **EACH RND** picks one per voice.
 
@@ -80,7 +87,18 @@ hhc    XXxX XXxX XXxX XXxX
 - Density decides which steps play. At the default (50), only `X` plays. Put the core rhythm on `X` and the ornaments on lower levels.
 - Cumbia pad layout: p4/p5 BASE (center), p2/p3 ENERGY, p6/p7 VARIATION, p0/p1 INTRO, p8 FILL.
 
-A malformed `.txt` makes the plugin go silent without showing an error. Run `python3 tools/check_styles.py` after any change to a style, then listen to it in REAPER.
+A malformed `.txt` makes the plugin go silent without showing an error, so check styles before installing them:
+
+```sh
+python3 tools/check_styles.py
+```
+
+The checker:
+
+- decodes every `drum_styles_v/*.txt` (7 voices × 9 patterns × 32 steps, values 0–255) and checks it writes back byte for byte;
+- builds every `styles_src/*.style` and checks it matches its `.txt` exactly (if not, run `make_style.py build` again).
+
+It prints `ok`, or one line per problem and exits with code 1. It currently reports 3 known errors, in `DUBSTEP140`, `RB` and `TekkChungo`. Any other error is new. Run it after any change to a style or to `tools/`, then listen to the style in REAPER.
 
 ## SuperCollider editor
 
