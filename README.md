@@ -34,15 +34,15 @@ There are 31 styles in `drum_styles_v/`, each with 9 patterns. The BPM comes fro
 | House | Chicago.Jouse 125 (125), JetoHouse 135 (135), MIAMI BEIGE 135 (135) |
 | UK garage / 2-step | Two-stepppo, uk_fungui, uk_garbage |
 | Grime | GRIME140 (140), Grimer140 (140) |
-| Dubstep | DUBSTEP140 (140) ⚠, DubSteppo |
+| Dubstep | DUBSTEP140 (140), DubSteppo |
 | Drum & bass | drumbass, DurumBass160 (160) |
-| Techno | techAXX, TekkBooooring, TekkChungo ⚠, TekkThump |
-| R&B / trap | RB ⚠, WCOAST R&B 110 (110), VAPORTRAP |
+| Techno | techAXX, TekkBooooring, TekkChungo, TekkThump |
+| R&B / trap | RB, WCOAST R&B 110 (110), VAPORTRAP |
 | Gqom | GQOM |
 | Other | ESTAIL, TEST2, ZZZZ BLACK |
 
 - Only the cumbias have readable sources in `styles_src/`; the rest were made with the SuperCollider editor, and most have a matching folder in `presets/`.
-- ⚠ `DUBSTEP140`, `RB` and `TekkChungo` contain non-numeric values (`i`, `-10.0`), and `make_style.py decode` rejects them. They may play wrong or partly silent.
+- `DUBSTEP140`, `RB` and `TekkChungo` had patterns the plugin couldn't read: an empty editor pattern saved as `i`, and `-10.0` values. Those voices kept playing whatever the previous style had loaded. They're now empty (all 0): DUBSTEP140 kick p1, TekkChungo kick p2, and RB open hat in every pattern except p1.
 - In `ZZZZ BLACK`, `ESTAIL`, `GQOM` and `TEST2`, the FILL pattern (p8) is empty.
 - `presets/` also has folders with no style in `drum_styles_v/`: `DURUMBASS_160` and `DURUMBREAK_160`, plus these newer grooves that still need exporting from the SuperCollider editor before the plugin can play them: 101 DANCEHALL, 101 FOOTWORK, 101 FUNK FAVELA, 101 SPARSE, 101 STEPPA, 101 ZOUK KIZOMBA, 102 JUKE, AFRO BEAT, AFRO BEAT & JU JU, BASS 101, BELLY DANCE, BOUNCE, CUMBION, ELECTRO CYBOTRON, ELECTRO UR 138, JERSEY BASICS, MOTOWN BREAKS, NEW ORLEANS, NEW ORLEANS BOUNCE, SOCA, TekkBooooring 2222 and ZOUK KIZOMBA 2.
 
@@ -98,7 +98,7 @@ The checker:
 - decodes every `drum_styles_v/*.txt` (7 voices × 9 patterns × 32 steps, values 0–255) and checks it writes back byte for byte;
 - builds every `styles_src/*.style` and checks it matches its `.txt` exactly (if not, run `make_style.py build` again).
 
-It prints `ok`, or one line per problem and exits with code 1. It currently reports 3 known errors, in `DUBSTEP140`, `RB` and `TekkChungo`. Any other error is new. Run it after any change to a style or to `tools/`, then listen to the style in REAPER.
+It prints `ok`, or one line per problem and exits with code 1. Run it after any change to a style or to `tools/`, then listen to the style in REAPER.
 
 ## SuperCollider editor
 

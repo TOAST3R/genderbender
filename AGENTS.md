@@ -20,6 +20,6 @@ Read `README.md` first for the layout and the style format.
 
 ## Checks
 
-- Run `python3 tools/check_styles.py` after any change to styles or `tools/`. It currently reports 3 known errors (`DUBSTEP140`, `RB`, `TekkChungo`). Any other error is new.
+- Run `python3 tools/check_styles.py` after any change to styles or `tools/`. It must print `ok`.
 - JSFX and timing changes can only be verified in REAPER. Install it with `sh tools/install.sh`, record the plugin's MIDI output, and check note positions against the spec. Past checks covered: no compile errors, all 66 sliders automatable, swing and slide offsets, loop wrap without double hits, no hung notes on stop or seek, and old presets loading with defaults.
 - No SuperCollider (`sclang`) is installed on this machine.
