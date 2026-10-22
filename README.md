@@ -15,8 +15,11 @@ The plugin plays 7 voices: kick, snare, clap, closed hat, open hat, high tom and
 | `styles_src/*.style` | Readable sources for the cumbia styles |
 | `tools/make_style.py` | Builds a `.style` into a `.txt`, or decodes a `.txt` back into a `.style` |
 | `tools/extend_bg.py` | Regenerates `bg.png` (needs Pillow) |
-| `Gender_bender_editor.scd`, `presets/` | The original SuperCollider style editor and its presets (`.preset`, `.h`, `.txt`) |
-| `backup/` | The original JSFX and background, before the GROOVE change |
+| `tools/check_styles.py` | Checks that every style is valid and that every source matches its `.txt` |
+| `tools/install.sh` | Copies the plugin and the styles into REAPER |
+| `editor/` | The original SuperCollider style editor (`Gender_bender_editor.scd`, plus the older `drummermenu*.scd`) |
+| `presets/` | The editor's presets (`.preset`, `.h`, `.txt` in the editor's own format, not the plugin's) |
+| `presets_archive/` | Test presets kept out of the editor's list |
 | `openspec/` | Specs and change proposals (OpenSpec workflow) |
 
 ## Included styles
@@ -41,16 +44,15 @@ There are 31 styles in `drum_styles_v/`, each with 9 patterns. The BPM comes fro
 - Only the cumbias have readable sources in `styles_src/`; the rest were made with the SuperCollider editor, and most have a matching folder in `presets/`.
 - ⚠ `DUBSTEP140`, `RB` and `TekkChungo` contain non-numeric values (`i`, `-10.0`), and `make_style.py decode` rejects them. They may play wrong or partly silent.
 - In `ZZZZ BLACK`, `ESTAIL`, `GQOM` and `TEST2`, the FILL pattern (p8) is empty.
-- `presets/` also has folders with no style in `drum_styles_v/`: `00 PRUEBAS`, `DURUMBASS_160`, `DURUMBREAK_160`, `QWERTYUIOP` and `TEST`, plus these newer grooves that still need exporting from the SuperCollider editor before the plugin can play them: 101 DANCEHALL, 101 FOOTWORK, 101 FUNK FAVELA, 101 SPARSE, 101 STEPPA, 101 ZOUK KIZOMBA, 102 JUKE, AFRO BEAT, AFRO BEAT & JU JU, BASS 101, BELLY DANCE, BOUNCE, CUMBION, ELECTRO CYBOTRON, ELECTRO UR 138, JERSEY BASICS, MOTOWN BREAKS, NEW ORLEANS, NEW ORLEANS BOUNCE, SOCA, TekkBooooring 2222 and ZOUK KIZOMBA 2.
+- `presets/` also has folders with no style in `drum_styles_v/`: `DURUMBASS_160` and `DURUMBREAK_160`, plus these newer grooves that still need exporting from the SuperCollider editor before the plugin can play them: 101 DANCEHALL, 101 FOOTWORK, 101 FUNK FAVELA, 101 SPARSE, 101 STEPPA, 101 ZOUK KIZOMBA, 102 JUKE, AFRO BEAT, AFRO BEAT & JU JU, BASS 101, BELLY DANCE, BOUNCE, CUMBION, ELECTRO CYBOTRON, ELECTRO UR 138, JERSEY BASICS, MOTOWN BREAKS, NEW ORLEANS, NEW ORLEANS BOUNCE, SOCA, TekkBooooring 2222 and ZOUK KIZOMBA 2.
 
-## Install in REAPER (macOS)
+## Install in REAPER
 
 The plugin runs from REAPER's resource folder, not from this repo. Copy the files there after each change:
 
 ```sh
-R="$HOME/Library/Application Support/REAPER"
-cp -R GenderBender "$R/Effects/"
-cp drum_styles_v/*.txt "$R/Data/drum_styles_v/"
+sh tools/install.sh                                   # macOS
+REAPER_DIR="$APPDATA/REAPER" sh tools/install.sh     # elsewhere: point at REAPER's resource folder
 ```
 
 Then add **MIDI GenderBender** (`genderbender.jsfx`) to a track, send its MIDI to a drum sampler (base note 36 by default), and press play. **ALL RND** gives every voice the same random style; **EACH RND** picks one per voice.
@@ -78,7 +80,11 @@ hhc    XXxX XXxX XXxX XXxX
 - Density decides which steps play. At the default (50), only `X` plays. Put the core rhythm on `X` and the ornaments on lower levels.
 - Cumbia pad layout: p4/p5 BASE (center), p2/p3 ENERGY, p6/p7 VARIATION, p0/p1 INTRO, p8 FILL.
 
-A malformed `.txt` makes the plugin go silent without showing an error. Check a new style by decoding it, then listening to it in REAPER.
+A malformed `.txt` makes the plugin go silent without showing an error. Run `python3 tools/check_styles.py` after any change to a style, then listen to it in REAPER.
+
+## SuperCollider editor
+
+Open `editor/Gender_bender_editor.scd` in SuperCollider. It lists the folders in `presets/` and, when you save, also writes the playable `.txt` straight into REAPER's `Data/drum_styles_v/`. That path is set once, near the top of the file. Copy new styles back into `drum_styles_v/` here so they're kept in the repo.
 
 ## Contributing with an AI agent
 
