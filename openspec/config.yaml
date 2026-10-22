@@ -1,20 +1,18 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  GenderBender: generador MIDI de patrones de bateria para REAPER (antes "Uranus Drumz V").
+  - Plugin: GenderBender/genderbender.jsfx (JSFX/EEL2). 66 sliders; nunca renumerar, solo anadir al final
+    (los presets y proyectos los guardan por indice). GUI disenada a 686x486 y reescalada a la ventana.
+  - Estilos: drum_styles_v/*.txt, una linea con formato exacto: 7 voces (bdrum sdrum clap hhclosed hhopen
+    hitom lotom) x 9 patrones (p0-p8) x 32 pasos, valores 0-255. Un archivo mal formado deja el plugin en
+    silencio sin dar error. Se generan desde styles_src/*.style con tools/make_style.py.
+  - Editor original en SuperCollider: editor/*.scd, que guarda en presets/ (formato propio, no el del plugin).
+  - Verificacion: python3 tools/check_styles.py, y sh tools/install.sh + prueba en REAPER para el plugin.
+  - Idioma: documentacion, comentarios y specs en espanol.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+rules:
+  design:
+    - Indicar como se verifica en REAPER cualquier cambio del plugin
+  tasks:
+    - Incluir ejecutar tools/check_styles.py si el cambio toca estilos o tools/
