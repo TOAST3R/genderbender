@@ -10,8 +10,11 @@ var buttons;
 // var seqs={{0}!size}!9;
 var sequences={{{0}!size}!clusters}!instruments.size;
 // var prstPth = PathName("/Volumes/Coochie/SOUND/presets/anushri/glacial");
-var folder = PathName(PathName(thisProcess.nowExecutingPath).pathOnly);
-var reaperFolder = PathName("C:/Program Files/[AUDIO]/REAPER (x64)/InstallData/Data/drum_styles_v").pathOnly.postln;
+var folder = PathName(PathName(thisProcess.nowExecutingPath).pathOnly ++ "../presets/");
+// carpeta de estilos de REAPER: cambiala aqui si tu REAPER esta en otro sitio
+var reaperFolder = if(thisProcess.platform.name == \windows,
+	{ "APPDATA".getenv ++ "/REAPER/Data/drum_styles_v/" },
+	{ Platform.userHomeDir ++ "/Library/Application Support/REAPER/Data/drum_styles_v/" });
 var presetNames= folder.folders;
 var itemsFolder = presetNames.collect{|i| i.folderName};
 var currentCluster=0;

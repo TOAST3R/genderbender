@@ -10,8 +10,11 @@ var buttons;
 // var seqs={{0}!size}!9;
 var sequences={{{0}!size}!clusters}!instruments.size;
 // var prstPth = PathName("/Volumes/Coochie/SOUND/presets/anushri/glacial");
-var folder = PathName(PathName(thisProcess.nowExecutingPath).pathOnly);
-var reaperFolder = PathName("/Users/SomeRandomer/Library/Application Support/REAPER/Data/drum_styles/").pathOnly.postln;
+var folder = PathName(PathName(thisProcess.nowExecutingPath).pathOnly ++ "../presets/");
+// carpeta de estilos de REAPER: cambiala aqui si tu REAPER esta en otro sitio
+var reaperFolder = if(thisProcess.platform.name == \windows,
+	{ "APPDATA".getenv ++ "/REAPER/Data/drum_styles_v/" },
+	{ Platform.userHomeDir ++ "/Library/Application Support/REAPER/Data/drum_styles_v/" });
 var presetNames= folder.folders;
 var itemsFolder = presetNames.collect{|i| i.folderName};
 var currentCluster=0;
@@ -66,22 +69,20 @@ var save={
 	// var kicks="",snares="",claps="",hatc="",hato="",hito="",loto="";
 	// setSeqs.value(0);
 	if(bool.postln==false,{File.mkdir(folder.fullPath++"/"++t.string);});
-	sequences.writeArchive((folder.fullPath++"/"++t.string++"/"++t.string++".h").standardizePath);
-	f = File.new((folder.fullPath++"/"++t.string++"/"++t.string++".h").standardizePath, "w");
+	sequences.writeArchive((folder.fullPath++"/"++t.string++"/"++t.string++".preset").standardizePath);
+	f = File.new((reaperFolder++"/"++t.string++".txt").standardizePath, "w");
 	// f = File.new((folder.fullPath++"/"++t.string++"/"++t.string++".txt").standardizePath, "w");
 
 
 	instruments.do{|ins, ii|
 		clusters.do{|cl,icl|
-			newString=newString++  "{"++sequences[ii][cl].asCompileString.drop(1).drop(-1).select{|i| i!=$\ }++" }, ";
+			newString=newString++ins++icl++"|"++sequences[ii][cl].asCompileString.drop(1).drop(-1).select{|i| i!=$\ }++"\t";
 
 		};
-		if(ii<(instruments.size-1),{newString=newString.drop(-1)});
+		if(ii<(instruments.size-1),{newString=newString.drop(-1)++"/"});
 
 	};
-	newString="Style "++t.string++" = { "++"\""++t.string.toUpper++"\""++" , {"++newString;
-	newString=newString.drop(-2)++" } };";
-	newString.postln;
+
 	/*clusters.do{|cluster,in|
 
 	cluster.postln;
@@ -112,7 +113,7 @@ var save={
 };
 var refresh={
 	presetNames= folder.folders;
-	itemsFolder = presetNames.collect{|i| i.folderName};
+	itemsFolder = presetNames.collect{|i| i.folderName}.postln;
 	pop.items=(itemsFolder);
 	pop.value(1);
 };
