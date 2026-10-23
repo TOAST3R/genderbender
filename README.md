@@ -70,4 +70,10 @@ This table also sets the families on the fingerprints page, so keep its format.
 
 ## Contributing
 
-Changes go through [OpenSpec](https://github.com/Fission-AI/OpenSpec) (`npm install -g @fission-ai/openspec@1.3.1`, then `/opsx:propose`, `/opsx:apply`, `/opsx:archive`). AI agents: read `AGENTS.md`.
+GenderBender is free software and contributions are welcome: new styles, bug fixes, ideas. Open an [issue](https://github.com/TOAST3R/genderbender/issues) to report a problem or suggest something, or fork the repo and send a pull request. For a new style, include its `.style` source and make sure `tools/check_styles.py` prints `ok`.
+
+Bigger changes go through [OpenSpec](https://github.com/Fission-AI/OpenSpec) (`npm install -g @fission-ai/openspec@1.3.1`, then `/opsx:propose`, `/opsx:apply`, `/opsx:archive`). AI agents: read `AGENTS.md`.
+
+## License
+
+Original version by Sergio Millán. Released under the [GNU GPL v3](LICENSE): you can use, study, modify and share it, and modified versions you distribute must stay under the GPL.
