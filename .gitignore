@@ -4,3 +4,4 @@ Icon
 Icon[\r]
 .graph-indexer/
 *.rar
+.playwright-mcp/
