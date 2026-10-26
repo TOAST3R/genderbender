@@ -1,0 +1,56 @@
+name: JUNGLE 165
+# Jungle (breakbeat troceado tipo amen). Tempo sugerido: 165 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  clap=rim  hhc=hat cerrado  hho=ride
+#        hitom/lotom=trozos del break
+# Groove: swing 54 · amount: hhc 100, kick 0 · slide: snare -2 ms (empuja)
+#         velocidad del snare algo baja: las fantasmas suenan igual de fuerte
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats, ride y trozos sueltos
+hhc    X.X. X.X. X.X. X.X.
+hho    X... .... X... ....
+hitom  .... ...o .... .x..
+[p1]
+snare  .... .... .... X...
+lotom  .... .... ..o. ...x
+
+[p2 p3]                         # ENERGIA: hats en semicorcheas, mas caja
+kick   X.X. ...x ..X. .o..
+snare  .,.X X..X .X.- X.oX
+hhc    XoXo XoXo XoXo XoXo
+hho    .... .... .... ..x.
+hitom  ...x ..o. ...x .o..
+lotom  .o.. ...x ..o. ....
+[p3]
+kick   X.X. .... ..X. X.x.
+snare  .,.X X..X .X.- XXoX
+
+[p4 p5]                         # BASE
+kick   X.X. .... ..X. ....
+snare  .,.. X..X .X., X.-.
+clap   .... .... .... ...-
+hhc    X.X. X.X. X.X. X.X.
+hitom  ...x ..o. ...- .o..
+lotom  .o.. ...x ..o. ...,
+[p5]
+kick   X.X. .... ..X. ..x.
+snare  .,.. X..X .X., X.-x
+hitom  ...x ..o. ...x oxox
+
+[p6 p7]                         # VARIACION: el break al frente, kick ralo
+kick   X... .... ..X. ....
+snare  .... X... .... X...
+hhc    ..X. ..X. ..X. ..X.
+hitom  x.ox .x.o x.ox .xox
+lotom  .x.. x.o. .x.. o.x.
+[p7]
+hitom  x.ox .x.o xxox XxXx
+
+[p8]                            # FILL: redoble de caja y toms
+kick   X... .... .... ....
+snare  X.xX .xXx XxXx XXXX
+hitom  .... .... x.x. ....
+lotom  .... .... .x.x xx..

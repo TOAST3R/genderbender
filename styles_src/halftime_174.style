@@ -1,0 +1,48 @@
+name: HALFTIME 174
+# Halftime (drum & bass a medio tiempo, caja en el 3). Tempo sugerido: 174 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  clap=clap  hhc=hat cerrado  hho=hat abierto
+#        hitom=perc  lotom=tom grave
+# Groove: swing 54 · amount: hhc 100, kick 0 · slide: snare +3 ms (arrastrado)
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats
+hhc    XXXX XXXX XXXX XXXX
+[p1]
+hho    .... .... .... ..o.
+lotom  .... .... .... .-.x
+
+[p2 p3]                         # ENERGIA
+kick   X... ..X. ...x .o..
+snare  .... .... X... ..-.
+clap   .... .... X... ....
+hhc    XXXX XXXX XXXX XXXX
+hho    ..o. .... ..o. ....
+hitom  .... ..,. .... .o..
+[p3]
+kick   X.x. ..X. ...x .o..
+
+[p4 p5]                         # BASE
+kick   X... .... ...- ..o.
+snare  .... .... X... ..,.
+hhc    XXXX XXXX XXXX XXXX
+hho    .... .... .... ..-.
+hitom  .... ..,. .... .-..
+[p5]
+kick   X... ..X. ...- ..o.
+snare  .... .... X... .-x.
+
+[p6 p7]                         # VARIACION: hats en corcheas, mas aire
+kick   X... .... .... ....
+snare  .... .... X... ....
+hhc    X.X. X.X. X.X. X.X.
+hitom  ..o. ...x ..o. .x.x
+[p7]
+kick   X... ..X. .... ....
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  .... .... X.xX XXXX
+lotom  .... ..x. .x.x ....

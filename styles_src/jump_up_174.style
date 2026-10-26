@@ -1,0 +1,50 @@
+name: JUMP-UP 174
+# Jump-up (two-step con caja y clap doblados). Tempo sugerido: 174 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  clap=clap (doblado con la caja)  hhc=hat cerrado
+#        hho=hat abierto  hitom=perc  lotom=tom grave
+# Groove: swing 50 (recto) · slide: snare -3 ms (empuja)
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats a contratiempo
+hhc    ..X. ..X. ..X. ..X.
+hitom  .... .... .... ...o
+[p1]
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA
+kick   X... ...o ..X. .x..
+snare  .... X..- ..,. X..x
+clap   .... X... .... X...
+hhc    .xX. .xX. .xX. .xX.
+hho    .... .... .... ..o.
+lotom  .... .... .... .o.x
+[p3]
+kick   X..X ...o ..X. x.x.
+
+[p4 p5]                         # BASE
+kick   X... ...- ..X. ....
+snare  .... X..- ..,. X...
+clap   .... X... .... X...
+hhc    ..X. ..X. ..X. ..X.
+hho    .... .... .... ...o
+lotom  .... .... .... .-..
+[p5]
+kick   X..X ...- ..X. ..o.
+
+[p6 p7]                         # VARIACION: bombo partido
+kick   X... .... ..X. ..X.
+snare  .... X... .... X...
+clap   .... X... .... X...
+hhc    XxXx XxXx XxXx XxXx
+hitom  ..o. ..o. ..o. .x..
+[p7]
+kick   X..X .... ..X. x.X.
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  .... X..x X.xX XXXX
+clap   .... X... .... X...
+lotom  .... .... ..x. x.x.

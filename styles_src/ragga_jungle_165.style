@@ -1,0 +1,53 @@
+name: RAGGA JUNGLE 165
+# Ragga jungle (break de jungle + clap de dancehall). Tempo sugerido: 165 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  clap=clap 3-3-2  hhc=hat cerrado  hho=ride
+#        hitom=bongo alto  lotom=bongo bajo
+# Groove: swing 54 · amount: hhc 100, kick 0 · slide: snare -2 ms (empuja)
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: clap 3-3-2 y bongos
+clap   X..X ..X. X..X ..X.
+hitom  ..o. .,.o ..o. .,.o
+[p1]
+hhc    X.X. X.X. X.X. X.X.
+lotom  ...- o... ...- o.x.
+
+[p2 p3]                         # ENERGIA
+kick   X.X. ...x ..X. .o..
+snare  .,.X X..X .X.- X.oX
+clap   X..X ..X. X..X ..X.
+hhc    XoXo XoXo XoXo XoXo
+hitom  ..o. .,.o ..o. .x.o
+lotom  ...- o... ...- o.-.
+[p3]
+kick   X.X. .... ..X. X.x.
+hho    .... .... .... ..x.
+
+[p4 p5]                         # BASE
+kick   X.X. .... ..X. ....
+snare  .... X..X .X., X.-.
+clap   X..X ..X. X..X ..X.
+hhc    X.X. X.X. X.X. X.X.
+hitom  ..o. .,.o ..o. .,.o
+lotom  ...- o... ...- o.-.
+[p5]
+kick   X.X. .... ..X. ..x.
+snare  .... X..X .X., X.-x
+
+[p6 p7]                         # VARIACION: bongos al frente
+kick   X... .... ..X. ....
+snare  .... X... .... X...
+clap   X..X ..X. X..X ..X.
+hitom  x.ox .xo. x.ox .xox
+lotom  .x.. o.x. .x.. x.o.
+[p7]
+hitom  x.ox .xo. xxox XxXx
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  X.xX .xXx XxXx XXXX
+clap   X..X ..X. .... ....
+lotom  .... .... .x.x xx..

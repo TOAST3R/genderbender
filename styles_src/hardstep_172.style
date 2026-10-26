@@ -1,0 +1,51 @@
+name: HARDSTEP 172
+# Hardstep (break pesado y seco). Tempo sugerido: 172 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  clap=rim  hhc=hat cerrado  hho=hat abierto
+#        hitom/lotom=trozos del break
+# Groove: swing 51 · slide: snare -1 ms
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y trozos
+hhc    X.X. X.X. X.X. X...
+hho    .... .... .... ..X.
+lotom  ..-. .... .... ..o.
+[p1]
+hitom  .... ...o .... .x..
+
+[p2 p3]                         # ENERGIA
+kick   X... ..X. ..X. .x..
+snare  .... X..o .x.. X.-x
+hhc    XxXx XxXx XxXx Xx..
+hho    .... .... .... ..X.
+hitom  .... ...o .... .-..
+lotom  ..-. .... .x.. ..o.
+[p3]
+kick   X..o ..X. ..X. x.x.
+
+[p4 p5]                         # BASE: caja seca, fantasmas solo con Density
+kick   X... ..X. ..X. ....
+snare  .... X..- .,.. X...
+hhc    X.X. X.X. X.X. X...
+hho    .... .... .... ..X.
+hitom  .... ...o .... .-..
+lotom  ..-. .... .... ..o.
+[p5]
+kick   X... ..X. ..X. ..x.
+snare  .... X..- .,.. X..o
+
+[p6 p7]                         # VARIACION: kick en el 1, el break troceado
+kick   X... .... .... ....
+snare  .... X... .... X...
+hhc    ..X. ..X. ..X. ..X.
+hitom  x..o .x.. x.o. .x..
+lotom  .x.. o..x .x.. x.o.
+[p7]
+hitom  x..o .x.. xxo. XxXx
+
+[p8]                            # FILL
+kick   X... ..X. .... ....
+snare  X... XxX. XxXx XXXX
+lotom  .... .... x.x. x.x.

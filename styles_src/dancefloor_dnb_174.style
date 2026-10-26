@@ -1,0 +1,49 @@
+name: DANCEFLOOR DNB 174
+# Dancefloor drum & bass (two-step brillante). Tempo sugerido: 174 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  clap=clap (doblado con la caja)  hhc=hat cerrado
+#        hho=hat abierto  hitom=shaker  lotom=tom
+# Groove: swing 52 · slide: snare -2 ms
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats
+hhc    XX.X XX.X XX.X XX.X
+[p1]
+hho    ..X. ..X. ..X. ..X.
+
+[p2 p3]                         # ENERGIA
+kick   X... ...o ..X. .x..
+snare  .... X..- .,.. X..x
+clap   .... X... .... X...
+hhc    XX.X XX.X XX.X XX.X
+hho    ..X. ..X. ..X. ..X.
+hitom  XoXo XoXo XoXo XoXo
+[p3]
+kick   X... ...o ..X. x.x.
+
+[p4 p5]                         # BASE
+kick   X... ...- ..X. ....
+snare  .... X..- .,.. X...
+clap   .... X... .... X...
+hhc    XX.X XX.X XX.X XX.X
+hho    ..X. ..X. ..X. ..X.
+hitom  .o.o .o.o .o.o .o.o
+[p5]
+kick   X... ...- ..X. ..o.
+snare  .... X..- .,.. X..o
+
+[p6 p7]                         # VARIACION: sin hats cerrados, shaker al frente
+kick   X... .... ..X. ....
+snare  .... X... .... X...
+hho    ..X. ..X. ..X. ..X.
+hitom  XxXx XxXx XxXx XxXx
+[p7]
+lotom  .... .... .... .x.x
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  .... X.x. XxXx XXXX
+clap   .... X... .... ....
+lotom  .... .... x.x. .x.x
