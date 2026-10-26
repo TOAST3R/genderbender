@@ -5,47 +5,47 @@ name: CUMBIA VILLERA 98
 # Groove: swing 56 · slide: clap -5 ms (empuja)
 # Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
 #      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
-# Escala: X=255 x=170 o=120 -=60 .=0
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0 · valores antiguos congelados como [170]/[120]/[60]
 # Density (por defecto 50) solo deja sonar X; x entra con Density>=87, o con >=137, - con >=197.
 # Regla: lo esencial del ritmo va en X; los adornos en x/o/- para que Density los vaya sumando.
 
 [p0 p1]                         # INTRO: guira
-hhc    XXxX XXxX XXxX XXxX
+hhc    XX[170]X XX[170]X XX[170]X XX[170]X
 [p1]
 clap   .... X... .... X...
 
 [p2 p3]                         # ENERGIA
-kick   X..o X... X..o X...
-snare  ..X. .xX. ..X. .xX.
+kick   X..[120] X... X..[120] X...
+snare  ..X. .[170]X. ..X. .[170]X.
 clap   .... X... .... X...
 hhc    XXXX XXXX XXXX XXXX
-hho    ..x. ..x. ..x. ..x.
-hitom  .... .... .... .oxX
+hho    ..[170]. ..[170]. ..[170]. ..[170].
+hitom  .... .... .... .[120][170]X
 [p3]
-hitom  .... .... ..o. xoxX
-lotom  .... .... .... o.o.
+hitom  .... .... ..[120]. [170][120][170]X
+lotom  .... .... .... [120].[120].
 
 [p4 p5]                         # BASE
 kick   X... .... X... ....
 snare  ..X. ..X. ..X. ..X.
 clap   .... X... .... X...
-hhc    XXxX XXxX XXxX XXxX
-hitom  .... .... .... .oxX
+hhc    XX[170]X XX[170]X XX[170]X XX[170]X
+hitom  .... .... .... .[120][170]X
 [p5]
-hitom  .... .... ..o. xoxX
-lotom  .... .... .... o.o.
+hitom  .... .... ..[120]. [170][120][170]X
+lotom  .... .... .... [120].[120].
 
 [p6 p7]                         # VARIACION: timbales al frente
 kick   X... .... X... ....
 clap   .... X... .... X...
 hhc    X.X. X.X. X.X. X.X.
-hitom  x.ox .x.o x.ox .xox
-lotom  ..o. o... ..o. o.o.
+hitom  [170].[120][170] .[170].[120] [170].[120][170] .[170][120][170]
+lotom  ..[120]. [120]... ..[120]. [120].[120].
 [p7]
-hitom  x.ox .x.o xxox XxXx
+hitom  [170].[120][170] .[170].[120] [170][170][120][170] X[170]X[170]
 
 [p8]                            # FILL
 kick   X... .... .... ....
 clap   .... X... .... X...
-hitom  x.x. xxx. xoxo XxXx
-lotom  .o.o ...o .x.x .xXX
+hitom  [170].[170]. [170][170][170]. [170][120][170][120] X[170]X[170]
+lotom  .[120].[120] ...[120] .[170].[170] .[170]XX

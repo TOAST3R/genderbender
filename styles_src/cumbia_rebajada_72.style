@@ -5,7 +5,7 @@ name: CUMBIA REBAJADA 72
 # Groove: swing 55 · slide: snare +12 ms (arrastrado)
 # Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
 #      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
-# Escala: X=255 x=170 o=120 -=60 .=0
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0 · valores antiguos congelados como [170]/[120]/[60]
 # Density (por defecto 50) solo deja sonar X; x entra con Density>=87, o con >=137, - con >=197.
 # Regla: lo esencial del ritmo va en X; los adornos en x/o/- para que Density los vaya sumando.
 
@@ -15,13 +15,13 @@ hhc    X.X. X.X. X.X. X.X.
 kick   X... .... X... ....
 
 [p2 p3]                         # ENERGIA
-kick   X... ...X X... ..o.
-snare  ..X. .-X. ..X. .-X.
+kick   X... ...X X... ..[120].
+snare  ..X. .[60]X. ..X. .[60]X.
 hhc    XXX. XXX. XXX. XXX.
 hho    X... X... X... X...
 lotom  .... .... X... ....
 [p3]
-hitom  .... .... .... .oxX
+hitom  .... .... .... .[120][170]X
 
 [p4 p5]                         # BASE: pesada y con espacio
 kick   X... .... X... ....
@@ -30,18 +30,18 @@ hhc    X.X. X.X. X.X. X.X.
 hho    X... .... X... ....
 lotom  .... .... X... ....
 [p5]
-kick   X... ...o X... ....
+kick   X... ...[120] X... ....
 
 [p6 p7]                         # VARIACION: timbal y conga
 kick   X... .... X... ....
 snare  ..X. ..X. ..X. ..X.
 hhc    X.X. X.X. X.X. X.X.
-hitom  ..x. .o.. ..x. .o.x
-lotom  o... ..o. o... ..o.
+hitom  ..[170]. .[120].. ..[170]. .[120].[170]
+lotom  [120]... ..[120]. [120]... ..[120].
 [p7]
-hitom  ..x. .o.. ..x. xoxX
+hitom  ..[170]. .[120].. ..[170]. [170][120][170]X
 
 [p8]                            # FILL: redoble lento
 kick   X... .... .... ....
-hitom  x... x... x.x. xxXX
-lotom  .... ..o. .o.. o.X.
+hitom  [170]... [170]... [170].[170]. [170][170]XX
+lotom  .... ..[120]. .[120].. [120].X.

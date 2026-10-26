@@ -5,7 +5,7 @@ name: CUMBIA SONIDERA 92
 # Groove: swing 54 · amount: kick 0 · slide: snare +4 ms
 # Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
 #      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
-# Escala: X=255 x=170 o=120 -=60 .=0
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0 · valores antiguos congelados como [170]/[120]/[60]
 # Density (por defecto 50) solo deja sonar X; x entra con Density>=87, o con >=137, - con >=197.
 # Regla: lo esencial del ritmo va en X; los adornos en x/o/- para que Density los vaya sumando.
 
@@ -16,36 +16,36 @@ kick   X... .... X... ....
 hho    X... X... X... X...
 
 [p2 p3]                         # ENERGIA
-kick   X..o ...X X..o ....
-snare  ..X. .-X. ..X. .-X.
+kick   X..[120] ...X X..[120] ....
+snare  ..X. .[60]X. ..X. .[60]X.
 clap   .... X... .... X...
-hhc    XXX- XXX- XXX- XXX-
-hho    X.x. X.x. X.x. X.x.
-lotom  ..o. ..o. ..o. ..o.
+hhc    XXX[60] XXX[60] XXX[60] XXX[60]
+hho    X.[170]. X.[170]. X.[170]. X.[170].
+lotom  ..[120]. ..[120]. ..[120]. ..[120].
 [p3]
-hitom  .... .... ..o. xxXX
+hitom  .... .... ..[120]. [170][170]XX
 
 [p4 p5]                         # BASE: anticipacion del bombo en la "a" del 2
 kick   X... ...X X... ....
 snare  ..X. ..X. ..X. ..X.
 hhc    XXX. XXX. XXX. XXX.
 hho    X... X... X... X...
-lotom  .... ..o. .... ..o.
+lotom  .... ..[120]. .... ..[120].
 [p5]
-kick   X... ...X X... ..o.
-hitom  .... .... .... .oxX
+kick   X... ...X X... ..[120].
+hitom  .... .... .... .[120][170]X
 
 [p6 p7]                         # VARIACION: tumbao de timbales
 kick   X... .... X... ....
 snare  ..X. ..X. ..X. ..X.
 hhc    XXX. XXX. XXX. XXX.
-hitom  ..x. .o.x ..x. .o.x
-lotom  o... ..o. o... ..o.
+hitom  ..[170]. .[120].[170] ..[170]. .[120].[170]
+lotom  [120]... ..[120]. [120]... ..[120].
 [p7]
-hitom  .x.o x.o. .x.o xxXX
+hitom  .[170].[120] [170].[120]. .[170].[120] [170][170]XX
 
 [p8]                            # FILL: redoble de timbal
 kick   X... .... .... ...X
 hhc    XXX. XXX. .... ....
-hitom  x.x. x.xx x.xx XxXx
-lotom  ...o ..o. .o.o o.X.
+hitom  [170].[170]. [170].[170][170] [170].[170][170] X[170]X[170]
+lotom  ...[120] ..[120]. .[120].[120] [120].X.

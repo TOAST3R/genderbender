@@ -33,7 +33,7 @@ kick   X... .... X... ....    # 16 chars = 16ths, 32 = 32nds; spaces ignored
 hhc    XXxX XXxX XXxX XXxX
 ```
 
-- Levels: `X=255 x=170 o=120 -=60 .=0`, or `[n]` for 0–255. At default density only `X` plays.
+- Levels: `X=255 x=204 o=153 -=102 ,=51 .=0`, or `[n]` for 0–255. `decode` snaps each value to the nearest level. At default density only `X` plays.
 - Voices: `kick`, `snare`, `clap`, `hhc`, `hho`, `hitom`, `lotom`.
 - Never edit `drum_styles_v/*.txt` by hand: a bad file silences the plugin with no error.
 

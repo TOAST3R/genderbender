@@ -10,7 +10,8 @@ Formato .style:
   [p4 p5]                         (las lineas siguientes se aplican a esos patrones)
   kick   X... .... X... ....      (16 caracteres = semicorcheas, 32 = fusas; espacios ignorados)
 
-  Escala: X=255 x=170 o=120 -=60 .=0, o [n] para un valor 0-255 exacto.
+  Escala: X=255 x=204 o=153 -=102 ,=51 .=0, o [n] para un valor 0-255 exacto.
+  decode ajusta cada valor al nivel mas cercano de la escala.
   Voces: bdrum|kick, sdrum|snare, clap, hhclosed|hhc, hhopen|hho, hitom, lotom.
   Un bloque posterior sobrescribe las voces que nombra; lo no definido queda a 0.
 """
@@ -19,7 +20,7 @@ import sys
 
 VOICES = ['bdrum', 'sdrum', 'clap', 'hhclosed', 'hhopen', 'hitom', 'lotom']
 ALIASES = {'kick': 'bdrum', 'snare': 'sdrum', 'hhc': 'hhclosed', 'hho': 'hhopen'}
-SCALE = {'X': 255, 'x': 170, 'o': 120, '-': 60, '.': 0}
+SCALE = {'X': 255, 'x': 204, 'o': 153, '-': 102, ',': 51, '.': 0}
 SYMBOL = {v: k for k, v in SCALE.items()}
 PATTERNS = 9
 STEPS = 32
@@ -127,6 +128,8 @@ def from_txt(text):
                 raise StyleError(f'{label}: valores no enteros "{nums[:30]}" (estilo corrupto)')
             if len(vals) != STEPS:
                 raise StyleError(f'{label}: {len(vals)} pasos')
+            if not all(0 <= v <= 255 for v in vals):
+                raise StyleError(f'{label}: valores fuera de 0-255')
             pats.append(vals)
         data.append(pats)
     return data
@@ -140,7 +143,7 @@ def to_style(name, data):
             continue
         lines.append(f'[p{p}]')
         for v, vals in rows:
-            cells = [SYMBOL.get(x, f'[{x}]') for x in vals]
+            cells = [SYMBOL[round(x / 51) * 51] for x in vals]  # niveles a 51: sin empates
             lines.append(f'{v:<9}' + ' '.join(''.join(cells[i:i + 4]) for i in range(0, STEPS, 4)))
         lines.append('')
     return '\n'.join(lines)

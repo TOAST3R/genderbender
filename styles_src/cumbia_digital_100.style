@@ -5,44 +5,44 @@ name: CUMBIA DIGITAL 100
 # Groove: swing 50 (recto) · slide: hhc +3 ms
 # Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
 #      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
-# Escala: X=255 x=170 o=120 -=60 .=0
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0 · valores antiguos congelados como [170]/[120]/[60]
 # Density (por defecto 50) solo deja sonar X; x entra con Density>=87, o con >=137, - con >=197.
 # Regla: lo esencial del ritmo va en X; los adornos en x/o/- para que Density los vaya sumando.
 
 [p0 p1]                         # INTRO: shaker
-hhc    -X-X -X-X -X-X -X-X
+hhc    [60]X[60]X [60]X[60]X [60]X[60]X [60]X[60]X
 [p1]
 hho    ..X. ..X. ..X. ..X.
 
 [p2 p3]                         # ENERGIA
-kick   X..o ...X ..X. .o..
-snare  ..o. .o.. ..o. .o..
+kick   X..[120] ...X ..X. .[120]..
+snare  ..[120]. .[120].. ..[120]. .[120]..
 clap   .... X... .... X...
-hhc    xXxX xXxX xXxX xXxX
+hhc    [170]X[170]X [170]X[170]X [170]X[170]X [170]X[170]X
 hho    ..X. ..X. ..X. ..X.
 [p3]
-hitom  .... .... .... o.x.
+hitom  .... .... .... [120].[170].
 
 [p4 p5]                         # BASE: 808 sincopado
 kick   X... ...X ..X. ....
 clap   .... X... .... X...
-hhc    -X-X -X-X -X-X -X-X
+hhc    [60]X[60]X [60]X[60]X [60]X[60]X [60]X[60]X
 hho    ..X. ..X. ..X. ..X.
-lotom  .... .... .... ..o.
+lotom  .... .... .... ..[120].
 [p5]
-kick   X... ...X ..X. ..o.
-hitom  .... .... .... o.x.
+kick   X... ...X ..X. ..[120].
+hitom  .... .... .... [120].[170].
 
 [p6 p7]                         # VARIACION: medio tiempo, dub
 kick   X... .... .... ....
 clap   .... .... X... ....
-hhc    -X-X -X-X -X-X -X-X
-hitom  ...x ..o. ...x .o..
-lotom  ..o. ...o ..o. .o..
+hhc    [60]X[60]X [60]X[60]X [60]X[60]X [60]X[60]X
+hitom  ...[170] ..[120]. ...[170] .[120]..
+lotom  ..[120]. ...[120] ..[120]. .[120]..
 [p7]
-kick   X... .... .... ..o.
+kick   X... .... .... ..[120].
 
 [p8]                            # FILL: redoble de 808 y clap
 kick   X... .... X.X. X.XX
-clap   .... X... ..X. XxXX
-hhc    -X-X -X-X .... ....
+clap   .... X... ..X. X[170]XX
+hhc    [60]X[60]X [60]X[60]X .... ....

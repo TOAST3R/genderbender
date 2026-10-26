@@ -5,7 +5,7 @@ name: CUMBIA COLOMBIANA 95
 # Groove: swing 52 · amount: hhc 100, kick 0 · slide: —
 # Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
 #      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
-# Escala: X=255 x=170 o=120 -=60 .=0
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0 · valores antiguos congelados como [170]/[120]/[60]
 # Density (por defecto 50) solo deja sonar X; x entra con Density>=87, o con >=137, - con >=197.
 # Regla: lo esencial del ritmo va en X; los adornos en x/o/- para que Density los vaya sumando. (los valores bajos caen antes al bajar Density)
 
@@ -14,41 +14,41 @@ hhc    X.XX X.XX X.XX X.XX
 kick   X... .... .... ....
 [p1]
 kick   X... .... X... ....
-hho    -.o. -.o. -.o. -.o.
+hho    [60].[120]. [60].[120]. [60].[120]. [60].[120].
 
 [p2 p3]                         # ENERGIA: guache a semicorcheas, palmas, alegre activo
-kick   X... ..o. X... ..o.
-snare  ..X. .-X. ..X. .-X.
+kick   X... ..[120]. X... ..[120].
+snare  ..X. .[60]X. ..X. .[60]X.
 clap   .... X... .... X...
 hhc    XXXX XXXX XXXX XXXX
-hho    -.o. -.o. -.o. -.o.
-hitom  o.Xo .oX. o.Xo X.xX
+hho    [60].[120]. [60].[120]. [60].[120]. [60].[120].
+hitom  [120].X[120] .[120]X. [120].X[120] X.[170]X
 [p3]
-lotom  .... .... .... ..xX
+lotom  .... .... .... ..[170]X
 
 [p4 p5]                         # BASE
 kick   X... .... X... ....
 snare  ..X. ..X. ..X. ..X.
 hhc    X.XX X.XX X.XX X.XX
-hho    -.o. -.o. -.o. -.o.
-hitom  -..o ..-. .o.. -.o.
-lotom  .... .... .... ..x.
+hho    [60].[120]. [60].[120]. [60].[120]. [60].[120].
+hitom  [60]..[120] ..[60]. .[120].. [60].[120].
+lotom  .... .... .... ..[170].
 [p5]
-kick   X... ...o X... ....
-hitom  .o.. o..- ..o. o.x.
+kick   X... ...[120] X... ....
+hitom  .[120].. [120]..[60] ..[120]. [120].[170].
 
 [p6 p7]                         # VARIACION: tambor alegre al frente
 kick   X... .... .... ....
 snare  ..X. ..X. ..X. ..X.
 hhc    X.XX X.XX X.XX X.XX
-hitom  X.o. x.oX .o.x X.x.
-lotom  ..o. .... ..o. ....
+hitom  X.[120]. [170].[120]X .[120].[170] X.[170].
+lotom  ..[120]. .... ..[120]. ....
 [p7]
-hitom  x.xX .o.x X.o. xxX.
+hitom  [170].[170]X .[120].[170] X.[120]. [170][170]X.
 
 [p8]                            # FILL: redoble de alegre y tambora
 kick   X... .... .... ....
 snare  ..X. .... .... ....
 hhc    X.XX X.XX .... ....
-hitom  X.x. x.xx X.xx XxXx
-lotom  ...o ..o. ..o. o.oX
+hitom  X.[170]. [170].[170][170] X.[170][170] X[170]X[170]
+lotom  ...[120] ..[120]. ..[120]. [120].[120]X
