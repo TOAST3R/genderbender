@@ -48,7 +48,8 @@ def grooves():
         pairs = dict(re.findall(r'(kick|snare|clap|hhc|hho|hitom|lotom|resto) (\d+)', amt.group(1))) if amt else {}
         rest = int(pairs.get('resto', 100))
         out[name.group(1)] = (int(sw.group(1)) if sw else 50,
-                              [int(pairs[v]) if v in pairs else rest for v in alias])
+                              [int(pairs[v]) if v in pairs else rest for v in alias],
+                              os.path.basename(path)[:-6])
     return out
 
 
@@ -88,7 +89,8 @@ def render():
         other[1] += rest
     groove = grooves()
     page = [{'family': f, 'styles': [{'name': n, 'bpm': bpm_of(n, tempo.get(n)),
-                                      'swing': groove.get(n, (50, None))[0], 'amt': groove.get(n, (50, None))[1],
+                                      'swing': groove.get(n, (50, None, None))[0], 'amt': groove.get(n, (50, None, None))[1],
+                                      'src': groove.get(n, (50, None, None))[2],
                                       'p': styles[n]} for n in names]}
             for f, names in groups if names]
     payload = json.dumps({'voices': VOICES, 'groups': page}, ensure_ascii=False,
@@ -114,7 +116,7 @@ label{display:flex;gap:8px;align-items:center;color:var(--muted)}
 input[type=range]{width:180px;accent-color:var(--ink)}
 select{font:inherit;color:var(--fg);background:var(--cell);border:1px solid var(--line);border-radius:4px;padding:2px 4px}
 output{color:var(--fg);min-width:3ch}
-main{padding:8px 16px 48px;max-width:1100px}
+main{padding:8px 16px 48px;max-width:1100px;margin:0 auto}
 h2{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin:28px 0 8px;border-bottom:1px solid var(--line);padding-bottom:4px}
 .style{padding:6px;margin:0 -6px 6px;border-radius:6px;cursor:pointer}
 .style:hover,.style:focus-visible{background:var(--cell);outline:none}
@@ -140,6 +142,11 @@ dialog h3{margin:0 0 12px;font-size:15px}
 .play:hover,.play:focus-visible{border-color:var(--ink);outline:none}
 .bpm{color:var(--muted);font-size:12px;margin-left:8px}
 .playing{outline:2px solid var(--ink);outline-offset:1px}
+.pat{min-width:96px;min-height:21px}
+.tools{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 12px;font-size:12px;color:var(--muted)}
+.tools a{color:var(--ink)}
+.drag{cursor:grab;user-select:none}
+.tools input[type=range]{width:140px}
 </style>
 </head>
 <body>
@@ -152,7 +159,7 @@ dialog h3{margin:0 0 12px;font-size:15px}
 <span class="hint" style="margin:0">color = valor 0–255 · atenuado = no suena con esta Density · clic para ampliar · ▶ preview sintetizado (no es el sonido de tu sampler) · Esc para</span>
 </header>
 <main id="main"></main>
-<dialog id="zoom"><h3 id="zname"></h3><div class="big" id="zbody"></div><p class="hint">Esc o clic fuera para cerrar</p></dialog>
+<dialog id="zoom"><h3 id="zname"></h3><div class="tools" id="ztools"></div><div class="big" id="zbody"></div><p class="hint">Esc o clic fuera para cerrar</p></dialog>
 <script>
 const DATA = /*DATA*/;
 const STEPS = 32, NV = DATA.voices.length;
@@ -177,10 +184,10 @@ function draw([c, hex, s]) {
   }
 }
 
-function pattern(hex, s) {
+function pattern(hex, s, list = canvases) {
   const c = document.createElement('canvas');
   c.width = STEPS * s; c.height = NV * s;
-  const item = [c, hex, s]; canvases.push(item); draw(item);
+  const item = [c, hex, s]; list.push(item); draw(item);
   return c;
 }
 
@@ -253,7 +260,8 @@ function start(btn, label, pats, marks, st, inZoom) {
   if (same) return;
   audio();
   swing.value = swingv.value = st.swing;  // la receta del estilo; se puede mover a mano mientras suena
-  play = {btn, label, pats, marks, bpm: st.bpm, amt: st.amt || Array(NV).fill(100), inZoom,
+  syncZoom();
+  play = {btn, label, pats, marks, st, bpm: st.bpm, amt: st.amt || Array(NV).fill(100), inZoom,
           bar: 0, step: 0, barStart: ac.currentTime + 0.05};
   btn.textContent = '■ Stop'; btn.setAttribute('aria-pressed', 'true');
   play.timer = setInterval(tick, 25); tick();
@@ -266,7 +274,7 @@ function playButton(label, onClick) {
   return b;
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !zoom.open) stop(); });
-swing.addEventListener('input', () => { swingv.value = swing.value; });
+swing.addEventListener('input', () => { swingv.value = swing.value; syncZoom(); });
 
 const main = document.getElementById('main'), zoom = document.getElementById('zoom');
 const zbody = document.getElementById('zbody');
@@ -274,10 +282,11 @@ let zoomed = [];
 
 function openZoom(st) {
   if (play && play.inZoom) stop();
-  canvases.splice(canvases.length - zoomed.length, zoomed.length);
+  zoomed.length = 0;
   zbody.textContent = '';
   document.getElementById('zname').textContent = st.name;
-  const before = canvases.length;
+  zoomTools(st);
+  current = st;
   st.p.forEach((hex, i) => {
     const f = document.createElement('figure'), cap = document.createElement('figcaption');
     cap.textContent = 'p' + i + (i === 8 ? ' FILL' : '');
@@ -285,14 +294,96 @@ function openZoom(st) {
     const row = document.createElement('div'); row.className = 'row';
     const names = document.createElement('div'); names.className = 'voices';
     DATA.voices.forEach(v => { const e = document.createElement('span'); e.textContent = v; names.append(e); });
-    row.append(names, pattern(hex, 10)); f.append(cap, row); zbody.append(f);
+    row.append(names, pattern(hex, 10, zoomed)); f.append(cap, row); zbody.append(f);
   });
-  zoomed = canvases.slice(before);
-  zoom.showModal();
+  if (!zoom.open) zoom.showModal();
+  writeHash();
 }
 zoom.addEventListener('click', e => { if (e.target === zoom) zoom.close(); });
+zoom.addEventListener('close', () => { current = null; writeHash(); });
+
+// ---- MIDI: dos compases de lo que se oye (Density y swing aplicados), SMF tipo 0
+const GM = [36, 38, 39, 42, 46, 50, 45];
+let useGM = false, current = null;
+function vlq(n) { const b = [n & 127]; while ((n >>= 7)) b.unshift((n & 127) | 128); return b; }
+function midiFile(st) {
+  const pats = play && play.st === st ? play.pats : [st.p[4], st.p[5]];
+  const amt = st.amt || Array(NV).fill(100), d = +dens.value, PPQ = 480, ev = [];
+  for (let bar = 0; bar < 2; bar++) {
+    const hex = pats[bar % pats.length];
+    for (let vi = 0; vi < NV; vi++) for (let i = 0; i < STEPS; i++) {
+      const v = parseInt(hex.substr((vi * STEPS + i) * 2, 2), 16);
+      if (!v || 256 - v >= d) continue;
+      const t = Math.round((bar * 4 + stepTime(i, 60, amt[vi])) * PPQ);  // stepTime a 60 BPM = negras
+      const note = useGM ? GM[vi] : 36 + vi;
+      ev.push([t, 0x99, note, 100], [t + PPQ / 8, 0x89, note, 0]);
+    }
+  }
+  ev.sort((a, b) => a[0] - b[0] || (a[1] === 0x89 ? -1 : 1));
+  const us = Math.round(60000000 / st.bpm), trk = [0, 0xff, 0x51, 3, us >> 16 & 255, us >> 8 & 255, us & 255];
+  let last = 0;
+  for (const [t, s, n, vel] of ev) { trk.push(...vlq(t - last), s, n, vel); last = t; }
+  trk.push(...vlq(Math.max(0, 8 * PPQ - last)), 0xff, 0x2f, 0);
+  const len = trk.length;
+  return new Uint8Array([0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 0, 0, 1, PPQ >> 8, PPQ & 255,
+                         0x4d, 0x54, 0x72, 0x6b, len >>> 24, len >> 16 & 255, len >> 8 & 255, len & 255, ...trk]);
+}
+const canDrag = /Chrome|Edg\\//.test(navigator.userAgent);  // DownloadURL solo existe en Chromium
+const GH = 'https://github.com/TOAST3R/genderbender/blob/main/';
+function zoomTools(st) {
+  const t = document.getElementById('ztools'); t.textContent = '';
+  const dl = playButton('⬇ .mid', () => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([midiFile(st)], {type: 'audio/midi'}));
+    a.download = st.name + '.mid'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  t.append(dl);
+  if (canDrag) {
+    const h = document.createElement('span'); h.className = 'play drag'; h.draggable = true;
+    h.textContent = '⠿ arrastrar MIDI'; h.title = 'Arrastra el .mid al escritorio o a tu DAW';
+    h.addEventListener('dragstart', e => {
+      const bytes = midiFile(st); let bin = '';
+      bytes.forEach(x => bin += String.fromCharCode(x));
+      e.dataTransfer.setData('DownloadURL', 'audio/midi:' + st.name + '.mid:data:audio/midi;base64,' + btoa(bin));
+    });
+    t.append(h);
+  }
+  const gm = document.createElement('label'), cb = document.createElement('input');
+  cb.type = 'checkbox'; cb.checked = useGM; cb.addEventListener('change', () => { useGM = cb.checked; });
+  gm.append(cb, ' GM'); gm.title = 'Notas de General MIDI en lugar de las del plugin (36 + voz)'; t.append(gm);
+  const slider = (label, id, src, min, max) => {
+    const l = document.createElement('label'), r = document.createElement('input'), o = document.createElement('output');
+    r.type = 'range'; r.id = id; r.min = min; r.max = max; r.value = src.value; o.id = id + 'v'; o.value = src.value;
+    r.addEventListener('input', () => { src.value = r.value; src.dispatchEvent(new Event('input')); });
+    l.append(label + ' ', r, o); t.append(l);
+  };
+  slider('Density', 'zdens', dens, 0, 260);
+  slider('Swing', 'zswing', swing, 50, 75);
+  const link = (txt, href) => { const a = document.createElement('a'); a.href = href; a.textContent = txt; a.target = '_blank'; a.rel = 'noopener'; t.append(a); };
+  link('.txt ↗', GH + 'drum_styles_v/' + encodeURIComponent(st.name) + '.txt');
+  if (st.src) link('.style ↗', GH + 'styles_src/' + encodeURIComponent(st.src) + '.style');
+}
+
+// ---- permalink: #style=…&density=…&fam=…
+function syncZoom() {  // los controles de la vista ampliada siguen a los de la cabecera
+  for (const [id, src] of [['zdens', dens], ['zswing', swing]]) {
+    const r = document.getElementById(id);
+    if (r) { r.value = src.value; document.getElementById(id + 'v').value = src.value; }
+  }
+}
+
+function writeHash() {
+  const q = new URLSearchParams();
+  if (fam.value) q.set('fam', fam.value);
+  if (+dens.value !== 50) q.set('density', dens.value);
+  if (current) q.set('style', current.name);
+  history.replaceState(null, '', q.toString() ? '#' + q.toString() : location.pathname + location.search);
+}
 
 const fam = document.getElementById('fam'), count = document.getElementById('count');
+const lazy = new IntersectionObserver(entries => entries.forEach(e => {
+  if (e.isIntersecting) { lazy.unobserve(e.target); e.target._paint(); }
+}), {rootMargin: '400px'});
 const total = DATA.groups.reduce((n, g) => n + g.styles.length, 0), sections = [];
 fam.append(new Option('Todos (' + total + ')', ''));
 for (const grp of DATA.groups) {
@@ -310,8 +401,11 @@ for (const grp of DATA.groups) {
     st.p.forEach((hex, i) => {
       const w = document.createElement('div'); w.className = 'pat'; w.title = 'p' + i;
       if (i === 8 && !/[^0]/.test(hex)) w.classList.add('empty');
-      w.append(pattern(hex, 3)); strip.append(w); pats.push(w);
+      strip.append(w); pats.push(w);
     });
+    // los canvas se crean al acercarse a la pantalla (render perezoso)
+    el._paint = () => st.p.forEach((hex, i) => pats[i].append(pattern(hex, 3)));
+    lazy.observe(el);
     // la BASE: p4 en el compas 1 y p5 en el 2, como el plugin
     n.append(bpm, playButton('▶ Play', b => start(b, '▶ Play', [st.p[4], st.p[5]], [pats[4], pats[5]], st, false)));
     el.append(n, strip); sec.append(el);
@@ -326,10 +420,18 @@ function filter() {
   const shown = f ? DATA.groups.find(g => g.family === f).styles.length : total;
   count.value = f ? shown + ' de ' + total + ' estilos' : total + ' estilos';
 }
-fam.addEventListener('change', filter); filter();
+fam.addEventListener('change', () => { filter(); writeHash(); }); filter();
 
-const redraw = () => canvases.forEach(draw);
-dens.addEventListener('input', () => { densv.value = dens.value; redraw(); });
+const redraw = () => { canvases.forEach(draw); zoomed.forEach(draw); };
+dens.addEventListener('input', () => { densv.value = dens.value; redraw(); writeHash(); syncZoom(); });
+{  // aplicar el permalink al cargar: genero, Density y estilo
+  const q = new URLSearchParams(location.hash.slice(1));
+  if (q.has('fam') && DATA.groups.some(g => g.family === q.get('fam'))) { fam.value = q.get('fam'); filter(); }
+  const d = parseInt(q.get('density'), 10);
+  if (d >= 0 && d <= 260) { dens.value = densv.value = d; redraw(); }
+  const st = DATA.groups.flatMap(g => g.styles).find(s => s.name === q.get('style'));
+  if (st) openZoom(st);
+}
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
 </script>
 </body>
