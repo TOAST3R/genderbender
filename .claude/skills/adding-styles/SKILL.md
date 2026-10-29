@@ -7,7 +7,7 @@ description: Use when adding, renaming or deleting a GenderBender style (drum_st
 
 ## Principio
 
-Un estilo no está terminado hasta que tiene fila en la tabla "Included styles" del `README.md` y sale en `docs/fingerprints.html`. La página saca las familias de esa tabla: un estilo que no aparece en ella cae en "Other" sin ningún aviso, y `check_styles.py` no lo detecta.
+Un estilo no está terminado hasta que tiene fila en la tabla "Included styles" del `README.md` y sale en `docs/fingerprints.html`. La página saca las familias de esa tabla: un estilo que no aparece en ella cae en "Other". `check_styles.py` falla si la tabla y la carpeta no coinciden.
 
 ## Pasos
 
@@ -18,26 +18,12 @@ Un estilo no está terminado hasta que tiene fila en la tabla "Included styles" 
    - Si no tiene familia, ponerlo por su nombre en la fila `Other`.
    - Si se borra o se renombra un estilo, quitar o corregir su entrada.
 3. `python3 tools/view_styles.py` para regenerar la página.
-4. Cruzar tabla y carpeta. No debe imprimir nada:
-   ```bash
-   cd tools && python3 -c "
-   import glob, os, view_styles as v
-   files = {os.path.basename(p)[:-4] for p in glob.glob('../drum_styles_v/*.txt')}
-   listed = set()
-   for fam, entries in v.families():
-       for base, bpm in entries:
-           m = {n for n in files if n == base or (bpm and n == f'{base} {bpm}')}
-           listed |= m
-           if not m: print('en la tabla sin archivo:', fam, '/', base)
-   for n in sorted(files - listed): print('sin fila en la tabla:', n)
-   "
-   ```
-5. `python3 tools/check_styles.py` debe imprimir `ok`.
+4. `python3 tools/check_styles.py` debe imprimir `ok`. Falla si un estilo no tiene entrada en la tabla, si una entrada no tiene estilo, si la BASE (p4/p5) está vacía o si la página está desfasada.
 
 ## Errores habituales
 
 | Error | Qué pasa |
 |---|---|
-| Añadir el `.txt` sin tocar el README | El estilo cae en "Other" y `check_styles.py` sigue diciendo `ok` |
+| Añadir el `.txt` sin tocar el README | `check_styles.py` falla: "no esta en la tabla" |
 | Tocar el README y no regenerar la página | `check_styles.py` falla: `docs/fingerprints.html desfasado` |
-| Dejar en la tabla un estilo que ya no existe | La tabla miente. El paso 4 lo muestra como "en la tabla sin archivo" |
+| Dejar en la tabla un estilo que ya no existe | `check_styles.py` falla: "no corresponde a ningun estilo" |
