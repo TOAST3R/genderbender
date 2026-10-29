@@ -1,0 +1,43 @@
+name: BALTIMORE CLUB 130
+# Baltimore club (break "Think" troceado, kicks en corcheas). Tempo sugerido: 130 BPM. Div por defecto (4).
+# Es el origen del Jersey club (JERSEY BASICS).
+# Voces: kick=bombo  snare=golpes del break  clap=palmas  hhc=hat cerrado  hho=hat abierto
+#        hitom=percusion
+# Groove: swing 50 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats
+hhc    X.X. X.X. X.X. X.X.
+[p1]
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: mas kicks y hats
+kick   X..x X... X.X. ..X.
+clap   .... X... .... X...
+snare  .... ..x. .... ..x.
+hhc    X.XX X.XX X.XX X.XX
+hho    .... .... .... X...
+[p3]
+kick   X..x X... X.X. X.X.
+
+[p4 p5]                         # BASE
+kick   X... X... X.X. ..X.
+clap   .... X... .... X...
+snare  .... ..o. .... ..o.
+hhc    X.X. X.X. X.X. X.X.
+[p5]
+kick   X... X... X.X. .xX.
+
+[p6 p7]                         # VARIACION: hat abierto y percusion
+kick   X... X... X.X. ..X.
+clap   .... X... .... X...
+hho    ..X. ..X. ..X. ..X.
+hitom  ...X .... ...X ....
+
+[p8]                            # FILL: redoble de kicks
+kick   X.X. X.X. X.X. XXXX
+clap   .... X... .... X...
+snare  .... .... ..X. X.XX

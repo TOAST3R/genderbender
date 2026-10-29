@@ -1,0 +1,50 @@
+name: BREAKCORE 190
+# Breakcore (amen troceado y redobles en fusas). Tempo sugerido: 190 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  hhc=hat cerrado  hho=ride  hitom/lotom=trozos del break
+# Groove: swing 50 · slide: snare -2 ms (empuja)
+# Redobles: lo esencial en X y fusas extra en o - , para que Density lo vuelva cada vez mas caotico.
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y trozos
+hhc    X.X. X.X. X.X. X.X.
+hitom  ..X. .... ..X. ....
+[p1]
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA
+kick   X.X. .... .X.. ..x.
+snare  .... X..X .... X.oX
+hhc    XoXo XoXo XoXo XoXo
+hitom  ...x ..o. ...x .o..
+lotom  .o.. ...x ..o. ....
+[p3]
+kick   X.X. .... .X.. X...
+snare  ........ X.....X. ........ XoXoXXXX
+
+[p4 p5]                         # BASE
+kick   X.X. .... .X.. ....
+snare  .,.. X..X .x., X.-.
+hhc    X.X. X.X. X.X. X.X.
+hitom  ...x ..o. ...- .o..
+lotom  .o.. ...x ..o. ...,
+[p5]
+kick   X.X. .... .X.. ..x.
+snare  ..,..... X.....X. ..x.o-,. XXXXXXXX
+
+[p6 p7]                         # VARIACION: break desordenado
+kick   X... ..X. .X.. X...
+snare  .... X... ..X. X..X
+hhc    X.X. X.X. X.X. X.X.
+hitom  X..X ..X. .... ..X.
+lotom  .X.. .X.. X.X. ....
+[p7]
+snare  .... X... ..X. XXXX
+
+[p8]                            # FILL: fusas
+kick   X... .... .... ....
+snare  X.X.X.X. XXXXXXXX XoXoXoXo XXXXXXXX
+hitom  .... .... X.X. ....
+lotom  .... .... .X.X ....

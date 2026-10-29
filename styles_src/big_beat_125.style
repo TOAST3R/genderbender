@@ -1,0 +1,47 @@
+name: BIG BEAT 125
+# Big beat (Reino Unido, finales de los 90: breakbeat pesado a tempo medio). Tempo sugerido: 125 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  clap=capa sobre la caja  hhc=hat cerrado  hho=hat abierto
+#        hitom/lotom=trozos del break
+# Groove: swing 54 · amount: hhc 100, resto 0 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats
+hhc    XxXx XxXx XxXx XxXx
+[p1]
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hat abierto a contratiempo y fantasmas
+kick   X..x .... X..X ..x.
+snare  .... X..o .x.. X.o.
+clap   .... X... .... X...
+hhc    XXXX XXXX XXXX XXXX
+hho    ..X. ..X. ..X. ..X.
+[p3]
+snare  .... X..o .x.. XXXX
+
+[p4 p5]                         # BASE
+kick   X... .... X..X ....
+snare  .... X... ..,. X...
+clap   .... X... .... X...
+hhc    XXXX XXXX XXXX XXXX
+hho    .... ..X. .... ....
+[p5]
+snare  .... X... ..,. X.X.
+clap   .... X... .... X.X.
+
+[p6 p7]                         # VARIACION: hats en corcheas y toms
+kick   X... ..X. X... ..X.
+snare  .... X... .... X...
+hhc    X.X. X.X. X.X. X.X.
+hho    ..X. .... ..X. ....
+hitom  ...o .... ...o ....
+lotom  .... ..o. .... ..o.
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  .... X.X. XXXX XXXX
+clap   .... X... .... X...
+lotom  .... .... .... X.X.

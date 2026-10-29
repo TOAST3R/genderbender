@@ -70,7 +70,8 @@ hhc    XXxX XXxX XXxX XXxX
 | Afro / Latin club | AMAPIANO 112 (112), AFRO HOUSE 122 (122), KUDURO 135 (135), GUARACHA 130 (130) |
 | Electro / Miami bass | ELECTRO CYBOTRON, ELECTRO UR 138 (138), BASS 101 |
 | Funk / New Orleans | MOTOWN BREAKS, NEW ORLEANS, NEW ORLEANS BOUNCE |
-| Other | ESTAIL, 101 SPARSE, BELLY DANCE, JERSEY BASICS, ZZZ BLACK |
+| Breaks | BIG BEAT 125 (125), BALTIMORE CLUB 130 (130), BREAKCORE 190 (190), JERSEY BASICS |
+| Other | ESTAIL, 101 SPARSE, BELLY DANCE, ZZZ BLACK |
 
 This table also sets the families on the fingerprints page, so keep its format.
 
