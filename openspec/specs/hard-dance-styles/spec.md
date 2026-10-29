@@ -52,7 +52,7 @@ Con Density por defecto, la base (p4/p5) de cada estilo SHALL tocar el ritmo que
 - **THEN** MAKINA marca 2 y 4 con el snare y TRANCE con el clap
 
 ### Requirement: Familia en el README y en la página de huellas
-La tabla "Included styles" del README SHALL listar los estilos nuevos así: una fila nueva "Hard dance" con TRANCE 138 y MAKINA 170. `docs/fingerprints.html` SHALL estar regenerado con esa tabla.
+La tabla "Included styles" del README SHALL listar TRANCE 138 y MAKINA 170 en la fila "Hardcore / hard dance" (antes "Hard dance"), junto a los estilos de hardcore. `docs/fingerprints.html` SHALL estar regenerado con esa tabla.
 
 #### Scenario: Página al día
 - **WHEN** se ejecuta `python3 tools/check_styles.py`
@@ -60,7 +60,7 @@ La tabla "Included styles" del README SHALL listar los estilos nuevos así: una 
 
 #### Scenario: Agrupación
 - **WHEN** se abre `docs/fingerprints.html`
-- **THEN** cada estilo nuevo aparece bajo la familia que le asigna la tabla, y no en "Other"
+- **THEN** TRANCE 138 y MAKINA 170 aparecen bajo la familia "Hardcore / hard dance", y no en "Other"
 
 ### Requirement: Estilos existentes intactos
 El cambio SHALL NOT modificar ningún `.txt` existente de `drum_styles_v/`.

@@ -1,0 +1,42 @@
+name: PROGRESSIVE PSY 138
+# Progressive psytrance. Tempo sugerido: 138 BPM. Div por defecto (4).
+# Voces: kick=bombo  clap=rim  hhc=hat cerrado
+# Groove: swing 50 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    .X.X .X.X .X.X .X.X
+[p1]
+kick   X... .... .... ....
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   X... X... X... X..o
+clap   .... ...X .... ...X
+hhc    xXxX xXxX xXxX xXxX
+hitom  .... .... ...- ....
+[p3]
+clap   ........ ......X. ........ xox-xoX-
+
+[p4 p5]                         # BASE
+kick   X... X... X... X...
+clap   .... ...X .... ...X
+hhc    .X.X .X.X .X.X .X.X
+
+[p6 p7]                         # VARIACION: menos hats, toms
+kick   X... X... X... X...
+clap   .... ...X .... ...X
+hhc    X... X... X... X...
+hitom  ...X .... ...X ....
+lotom  .... ..X. .... ..x.
+[p7]
+clap   .... ...X .... ..XX
+
+[p8]                            # FILL
+kick   X... .... .... ....
+clap   ........ X....... X...X... XoXoXoXo
+hitom  .... .... .X.X ....
+lotom  .... .... .... X.X.

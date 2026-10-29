@@ -1,0 +1,43 @@
+name: DRILL N BASS 175
+# Drill 'n' bass (Aphex Twin, Squarepusher, Luke Vibert): drum & bass al doble con redobles imposibles. Tempo sugerido: 175 BPM. Div por defecto (4).
+# Fuente del ritmo: Wikipedia ("Drill 'n' bass"): "drum 'n' bass al doble con ritmos imposibles de bailar".
+# Voces: kick=bombo  snare=caja  hhc=hat cerrado  hitom/lotom=trozos del break
+# Groove: swing 50 · slide: snare -2 ms
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    X.X. .... XX.. ....
+[p1]
+kick   X... .... .... ....
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   XX....X. ........ ....X.XX ......o.
+snare  ........ XXXXXXXX ........ XXXXXXXX
+hhc    XxXx xxxx XXxx xxxx
+hitom  .... .... ...- ....
+[p3]
+kick   X.....XX ........ X...X... .....Xo.
+
+[p4 p5]                         # BASE
+kick   XX....X. ........ ....X.XX ........
+snare  ........ XXXXXXXX ........ XXXXXXXX
+hhc    X.X. .... XX.. ....
+[p5]
+kick   X.....XX ........ X...X... .....X..
+
+[p6 p7]                         # VARIACION: menos hats, toms
+kick   XX....X. ........ ....X.XX ........
+snare  ........ XXXXXXXX ........ XXXXXXXX
+hhc    X.X. .... X... ....
+hitom  ...X .... ...X ....
+lotom  .... ..X. .... ..x.
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  ........ X....... X...X... XoXoXoXo
+hitom  .... .... .X.X ....
+lotom  .... .... .... X.X.

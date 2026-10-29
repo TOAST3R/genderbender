@@ -1,0 +1,48 @@
+name: UK TECHNO 135
+# UK techno, sonido Birmingham (Regis, Surgeon): duro, en bucle, sin el funk de Detroit. Tempo sugerido: 135 BPM. Div por defecto (4).
+# Fuente del ritmo: Wikipedia ("Birmingham sound"); reseñas de Regis (Juno, PopMatters): bucles duros, bateria metalica.
+# Voces: kick=bombo  snare=rim metalico  hhc=hat cerrado  hitom/lotom=toms en bucle
+# Groove: swing 52 · amount: hhc 100, resto 0 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    ..X. ..X. ..X. ..X.
+hitom  .X.. .X.. .X.. .X..
+lotom  ...X .... ...X ....
+[p1]
+kick   X... .... .... ....
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   X... X... X... X..o
+snare  ..X. ...X ..X. ...X
+hhc    xxXx xxXx xxXx xxXx
+hitom  .X.. .X.. .X.- .X..
+lotom  ...X .... ...X ....
+[p3]
+snare  ....X... ......X. ....X... xox-xoX-
+
+[p4 p5]                         # BASE
+kick   X... X... X... X...
+snare  ..X. ...X ..X. ...X
+hhc    ..X. ..X. ..X. ..X.
+hitom  .X.. .X.. .X.. .X..
+lotom  ...X .... ...X ....
+
+[p6 p7]                         # VARIACION: menos hats, toms
+kick   X... X... X... X...
+snare  ..X. ...X ..X. ...X
+hhc    ..X. ..X. ..X. ..X.
+hitom  .X.. .X.. .X.. .X..
+lotom  ...X .... ...X ....
+[p7]
+snare  ..X. ...X ..X. ..XX
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  ........ X....... X...X... XoXoXoXo
+hitom  .... .... .X.X ....
+lotom  .... .... .... X.X.
