@@ -56,7 +56,7 @@ Con Density por defecto, la base (p4/p5) de cada estilo SHALL tocar el ritmo que
 - **THEN** ITALO marca 2 y 4 con el clap y toca toms en el compás 2, y DISCO no
 
 ### Requirement: Familia en el README y en la página de huellas
-La tabla "Included styles" del README SHALL listar los estilos nuevos así: una fila nueva "Synth / disco" con SYNTHWAVE 100, DISCO 118 e ITALO DISCO 120. `docs/fingerprints.html` SHALL estar regenerado con esa tabla.
+La tabla "Included styles" del README SHALL listar DISCO 118 e ITALO DISCO 120 en la fila "Synth / disco", y SYNTHWAVE 100 en la fila "Electro". `docs/fingerprints.html` SHALL estar regenerado con esa tabla.
 
 #### Scenario: Página al día
 - **WHEN** se ejecuta `python3 tools/check_styles.py`
@@ -64,7 +64,7 @@ La tabla "Included styles" del README SHALL listar los estilos nuevos así: una 
 
 #### Scenario: Agrupación
 - **WHEN** se abre `docs/fingerprints.html`
-- **THEN** cada estilo nuevo aparece bajo la familia que le asigna la tabla, y no en "Other"
+- **THEN** DISCO 118 e ITALO DISCO 120 aparecen bajo "Synth / disco" y SYNTHWAVE 100 bajo "Electro"
 
 ### Requirement: Estilos existentes intactos
 El cambio SHALL NOT modificar ningún `.txt` existente de `drum_styles_v/`.

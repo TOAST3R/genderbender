@@ -1,0 +1,43 @@
+name: DARKWAVE 120
+# Darkwave (finales de los 70 y 80): caja de ritmos fria y hats en semicorcheas. Tempo sugerido: 120 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja o rim  clap=palmas  hhc=hat cerrado  hho=hat abierto  hitom/lotom=toms
+# Groove: swing 50 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    XXXX XXXX XXXX XXXX
+[p1]
+kick   X... .... .... ....
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   X... ..X. X... ...o
+snare  .... X..o .... X...
+hhc    XXXX XXXX XXXX XXXX
+hitom  .... .... ...- ....
+[p3]
+snare  ........ X.....o. ........ Xox-xox-
+
+[p4 p5]                         # BASE
+kick   X... ..X. X... ....
+snare  .... X... .... X...
+hhc    XXXX XXXX XXXX XXXX
+
+[p6 p7]                         # VARIACION: los toms toman el ritmo de los hats
+kick   X... ..X. X... ....
+snare  .... X... .... X...
+hhc    x... x... x... x...
+hitom  XXXX XXXX .... ....
+lotom  .... .... XXXX XXXX
+[p7]
+kick   X... ..X. X... ...x
+snare  .... X... .... X.X.
+
+[p8]                            # FILL: redoble que acentua los golpes de la base
+kick   X... ..X. .... ....
+snare  ........ X....... X.x.x.x. Xoxoxoxo
+hitom  .... .... XXXX ....
+lotom  .... .... .... XXXX

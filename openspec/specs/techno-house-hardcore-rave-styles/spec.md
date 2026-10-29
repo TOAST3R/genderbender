@@ -92,7 +92,7 @@ Con Density por defecto, la base (p4/p5) de cada estilo SHALL tocar el ritmo que
 - **THEN** TRANCE 138, MAKINA 170, GABBER 180, GABBER ROLL 180 y HAPPY HARDCORE 170 aparecen bajo "Hardcore / hard dance", y los de psytrance, hard house y EBM bajo sus filas nuevas
 
 ### Requirement: Familia en el README y en la página de huellas
-La tabla "Included styles" del README SHALL listar los estilos nuevos así: los cinco de techno añadidos a la fila "Techno", los cinco de house a la fila "House", GABBER 180, GABBER ROLL 180 y HAPPY HARDCORE 170 a la fila "Hardcore / hard dance" (antes "Hard dance"), DRILL N BASS 175 a la fila "Breaks", filas nuevas "Psytrance" (13 estilos), "Hard house" (5) y "EBM / industrial" (6), y RAVE 91 130, HARDCORE TECHNO 145, BREAKBEAT HARDCORE 145 y DARKCORE 155 en una fila nueva "Rave / oldskool". `docs/fingerprints.html` SHALL estar regenerado con esa tabla.
+La tabla "Included styles" del README SHALL listar los estilos de este cambio así: los cinco de techno en la fila "Techno"; DEEP HOUSE 122, TECH HOUSE 126, ACID HOUSE 124 e ITALO HOUSE 122 en la fila "House"; GHETTOTECH 150 en la fila "Electro"; GABBER 180, GABBER ROLL 180 y HAPPY HARDCORE 170 en la fila "Hardcore / hard dance"; DRILL N BASS 175 en la fila "Breaks"; los 13 de psytrance en la fila "Psytrance"; los 5 de hard house en la fila "Hard house"; EBM 120, BELGIAN EBM 118, NEW BEAT 110, AGGROTECH 140 y EBM TECHNO 130 en la fila "EBM / industrial"; DARK ELECTRO 125 en la fila "Electro"; y RAVE 91 130, HARDCORE TECHNO 145, BREAKBEAT HARDCORE 145 y DARKCORE 155 en la fila "Rave / oldskool". `docs/fingerprints.html` SHALL estar regenerado con esa tabla.
 
 #### Scenario: Página al día
 - **WHEN** se ejecuta `python3 tools/check_styles.py`
@@ -100,7 +100,7 @@ La tabla "Included styles" del README SHALL listar los estilos nuevos así: los 
 
 #### Scenario: Agrupación
 - **WHEN** se abre `docs/fingerprints.html`
-- **THEN** cada estilo nuevo aparece bajo la familia que le asigna la tabla, y no en "Other"
+- **THEN** cada estilo aparece bajo la familia que le asigna la tabla, con GHETTOTECH 150 y DARK ELECTRO 125 bajo "Electro", y ninguno en "Other"
 
 ### Requirement: Estilos existentes intactos
 El cambio SHALL NOT modificar ningún `.txt` existente de `drum_styles_v/`.

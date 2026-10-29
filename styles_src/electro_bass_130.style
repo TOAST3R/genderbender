@@ -1,0 +1,47 @@
+name: ELECTRO BASS 130
+# Electro-bass / Miami bass (mediados de los 80): 808 de cola larga y hats rapidos. Tempo sugerido: 130 BPM. Div por defecto (4).
+# Fuente del ritmo: Attack Magazine ("Miami bass, beat dissected"): siempre 808, bombo con cola larga, semicorcheas rapidas de hi-hat; 100-140 BPM.
+# Voces: kick=bombo 808 de cola larga  clap=palmas 808  hhc=hat cerrado
+# Groove: swing 54 · amount: hhc 100, resto 0 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    XXXX XXXX XXXX XXXX
+[p1]
+kick   X... .... .... ....
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   X... ...X ..X. ..Xo
+clap   .... X..o .... X...
+hhc    XXXX XXXX XXXX XXXX
+hitom  .... .... ...- ....
+[p3]
+clap   ........ X.....o. ........ Xox-xox-
+hhc    X.X.X.X. X.X.X.X. X.X.X.X. XoXoXoXo
+
+[p4 p5]                         # BASE
+kick   X... ...X ..X. ..X.
+clap   .... X... .... X...
+hhc    XXXX XXXX XXXX XXXX
+[p5]
+hhc    X.X.X.X. X.X.X.X. X.X.X.X. XoXoXoXo
+
+[p6 p7]                         # VARIACION: los toms toman el ritmo de los hats
+kick   X... ...X ..X. ..X.
+clap   .... X... .... X...
+hhc    x... x... x... x...
+hitom  XXXX XXXX .... ....
+lotom  .... .... XXXX XXXX
+[p7]
+kick   X... ...X ..X. ..Xx
+clap   .... X... .... X.X.
+
+[p8]                            # FILL: redoble que acentua los golpes de la base
+kick   X... ...X .... ....
+clap   ........ X....... X.x.X.x. XoxoXoxo
+hitom  .... .... XXXX ....
+lotom  .... .... .... XXXX
