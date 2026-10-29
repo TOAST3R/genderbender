@@ -5,7 +5,7 @@ Read `README.md` first for the layout and the style format.
 ## Conventions
 
 - The code, comments, specs and commit text in this repo are in **Spanish**. Write new ones in Spanish too.
-- Changes go through OpenSpec: `openspec/changes/<name>/` (proposal, design, tasks, specs). Use the `/opsx:propose`, `/opsx:apply` and `/opsx:archive` commands. Finished specs live in `openspec/specs/`. The skills need the `openspec` CLI 1.3.1. There is one copy, in `.claude/skills/`; `.opencode/`, `.codex/`, `.cursor/`, `.github/` and `.gemini/` each have a `skills` symlink to it. Don't edit the skills by hand. `openspec update --force .` writes through the links and leaves OpenCode's `/opsx-…` wording in the shared copy, so run `openspec init --tools claude .` after it.
+- Changes go through OpenSpec: `openspec/changes/<name>/` (proposal, design, tasks, specs). Use the `/opsx:propose`, `/opsx:apply` and `/opsx:archive` commands. Finished specs live in `openspec/specs/`. The skills need the `openspec` CLI 1.3.1. There is one copy, in `.claude/skills/`; `.opencode/`, `.codex/`, `.cursor/`, `.github/` and `.gemini/` each have a `skills` symlink to it. Don't edit the skills by hand. `openspec update --force .` writes through the links and leaves OpenCode's `/opsx-…` wording in the shared copy, so run `openspec init --tools claude .` after it. `adding-styles` is the one skill written by hand: it is not OpenSpec's, so edit it directly.
 - The repo is on git (`origin` is https://github.com/TOAST3R/genderbender). Earlier versions of the plugin are in its history, not in a backup folder. Don't push without the user's go-ahead.
 
 ## Hard rules
