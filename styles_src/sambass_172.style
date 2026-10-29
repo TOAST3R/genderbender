@@ -1,0 +1,48 @@
+name: SAMBASS 172
+# Sambass (drum & bass con bateria de samba brasilena). Tempo sugerido: 172 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  clap=rim  hhc=ganza  hho=hat abierto
+#        hitom=tamborim (teleco-teco)  lotom=surdo
+# Groove: swing 50 · slide: snare -2 ms (empuja)
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: tamborim y ganza
+hitom  X.X. .X.X .X.. X.X.
+hhc    xxxx xxxx xxxx xxxx
+[p1]
+lotom  .... X... .... X...
+
+[p2 p3]                         # ENERGIA: ganza al frente y fantasmas
+kick   X... .... ..X. ..x.
+snare  .... X..o .... X.o.
+clap   .... .... .... ...x
+hhc    XxXx XxXx XxXx XxXx
+hitom  X.X. .X.X .X.. X.X.
+lotom  .... X... .... X...
+[p3]
+kick   X... .... ..X. X.x.
+snare  .... X..o .... XXoX
+
+[p4 p5]                         # BASE
+kick   X... .... ..X. ....
+snare  .... X... ..,. X..-
+hhc    xxxx xxxx xxxx xxxx
+hitom  X.X. .X.X .X.. X.X.
+lotom  .... X... .... X...
+[p5]
+kick   X... .... ..X. ..x.
+
+[p6 p7]                         # VARIACION: surdo de terceira y hat abierto
+kick   X... .... ..X. ....
+snare  .... X... .... X...
+hho    ..X. ..X. ..X. ..X.
+hitom  ..X. .X.. ..X. .X..
+lotom  X... X..X X... X...
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  .... X.X. XXXX XXXX
+hitom  .... .... .X.X .X..
+lotom  .... .... X.X. X.XX

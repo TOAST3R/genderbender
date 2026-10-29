@@ -30,19 +30,19 @@
   | Estilo | Kick | Snare / clap | Hats / toms |
   |---|---|---|---|
   | SAMBASS 172 | 1 y "&" del 3 (two-step) | snare en 2 y 4 | lotom (surdo) en 2 y 4; hitom (tamborim) en teleco-teco `X.X..X.X.X..X.X.`; hhc (ganzá) en semicorcheas en `x` |
-  | SCHAFFEL 125 | las cuatro negras | clap en 2 y 4 | hhc en cada negra y en su "a" (con swing 66 cae en el tercer tresillo) |
+  | SCHAFFEL 125 | las cuatro negras | clap en 2 y 4 | hhc en cada negra y en la fusa siguiente al "&" (paso 5 de 8 de cada negra) |
 
   En la tabla, "&" es la corchea a contratiempo, y "e" y "a" son la 2.ª y la 4.ª semicorchea de la negra.
 - **Receta de groove** (cabecera de cada fuente): SAMBASS swing 50, slide del snare entre −3 y 0 ms. SCHAFFEL swing global 66 con amount 100 en hhc y hho, y 0 en el resto.
 - **SAMBASS en la fila "Drum & bass" y SCHAFFEL en "Techno"**: no se crea familia nueva.
-- **Schaffel con swing:** la "a" de cada negra es la 2.ª semicorchea de su corchea, así que el swing global la retrasa. Con 66 % cae casi en el tercer tresillo, que da el pulso de 12/8.
+- **Schaffel con swing:** el swing del plugin solo mueve la 2.ª semicorchea de cada corchea, así que la "a" de la negra iría a 0,83 de la negra con swing 66, no al tercer tresillo (0,667). En su lugar, la nota del shuffle va en la fusa siguiente al "&" (paso 5 de 8): recta cae a 0,625 de la negra, y con swing 66 la deformación lineal a trozos de `groove-swing` la lleva a 0,665, casi el tresillo exacto. La primera versión del diseño usaba la "a" y no funcionaba.
 
 ## Risks / Trade-offs
 
 - [Sin dinámica] Las fantasmas suenan a la velocidad de la voz. → Van en niveles bajos (`-`, `,`) para que solo entren con Density alta.
 - [Parecido entre estilos] → Lo detecta la comprobación de distancia antes de escribir, y la escucha en REAPER después. Se retocan las fuentes, sin cambiar el plugin.
 - [Interpretación musical] Se toma la gramática del género, no una grabación concreta. Las fuentes son texto plano y se regeneran en segundos.
-- [SCHAFFEL sin swing] Con swing 50 suena como techno recto con hats en semicorcheas. → La receta lo indica, y el nombre de la cabecera dice "pide swing 66".
+- [SCHAFFEL sin swing] Con swing 50 la nota del shuffle cae a 0,625 en vez de 0,667: suena a shuffle, pero algo apretado. → La receta lo indica, y el nombre de la cabecera dice "pide swing 66".
 - [SAMBASS ≈ DANCEFLOOR DNB 174] Mismo kick y snare. → En `X` lo distinguen el surdo y el tamborim.
 
 ## Verificación en REAPER

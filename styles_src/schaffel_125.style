@@ -1,0 +1,42 @@
+name: SCHAFFEL 125
+# Schaffel (techno con pulso de 12/8, Colonia). Tempo sugerido: 125 BPM. Div por defecto (4).
+# El shuffle va en la fusa siguiente al "&" (paso 5 de 8 de cada negra): recta cae a 0,625 de la negra,
+#   y con swing global 66 se mueve a 0,665, casi el tercer tresillo. Con swing 50 suena algo apretado.
+# Voces: kick=bombo  snare=caja (solo en el fill)  clap=palmas  hhc=hat cerrado  hho=hat abierto
+#        hitom=tom
+# Groove: swing global 66 · amount: hhc 100, hho 100, snare 100, hitom 100, resto 0 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats en shuffle
+hhc    X....X.. X....X.. X....X.. X....X..
+[p1]
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hat abierto en el shuffle del 2 y del 4
+kick   X... X... X... X...
+clap   .... X... .... X...
+hhc    X....X.. X....X.. X....X.. X....X..
+hho    ........ .....X.. ........ .....X..
+[p3]
+kick   X....... X....... X....... X....x..
+
+[p4 p5]                         # BASE
+kick   X... X... X... X...
+clap   .... X... .... X...
+hhc    X....X.. X....X.. X....X.. X....X..
+hho    ........ .....o.. ........ .....o..
+[p5]
+kick   X....... X....... X....... X....o..
+
+[p6 p7]                         # VARIACION: solo las notas del shuffle y tom
+kick   X... X... X... X...
+clap   .... X... .... X...
+hhc    .....X.. .....X.. .....X.. .....X..
+hitom  X....X.. ........ X....X.. ........
+
+[p8]                            # FILL
+kick   X... X... X... X...
+snare  ........ X....X.. X....X.. X....X..

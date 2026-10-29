@@ -61,8 +61,8 @@ hhc    XXxX XXxX XXxX XXxX
 | UK garage / 2-step | Two-stepppo, uk_fungui, uk_garbage, garage_2step, garage_uk_4x4 |
 | Grime | GRIME140 (140), Grimer140 (140) |
 | Dubstep | DUBSTEP140 (140), DubSteppo, 101 STEPPA |
-| Drum & bass | JUNGLE 165 (165), RAGGA JUNGLE 165 (165), HARDSTEP 172 (172), JUMP-UP 174 (174), DANCEFLOOR DNB 174 (174), TECHSTEP 172 (172), HALFTIME 174 (174), drumbass, DurumBass160 (160), DURUMBREAK_160 (160) |
-| Techno | techAXX, TekkBooooring, TekkChungo, TekkThump |
+| Drum & bass | JUNGLE 165 (165), RAGGA JUNGLE 165 (165), HARDSTEP 172 (172), JUMP-UP 174 (174), DANCEFLOOR DNB 174 (174), TECHSTEP 172 (172), HALFTIME 174 (174), drumbass, DurumBass160 (160), DURUMBREAK_160 (160), SAMBASS 172 (172) |
+| Techno | techAXX, TekkBooooring, TekkChungo, TekkThump, SCHAFFEL 125 (125) |
 | Hip-hop | BOOM BAP 90 (90), LOFI HIPHOP 82 (82), TRIP HOP 88 (88), NEW JACK SWING 104 (104) |
 | R&B / trap | RB, WCOAST R&B 110 (110), VAPORTRAP, TRAP 140 (140), UK DRILL 142 (142) |
 | Gqom | GQOM |
