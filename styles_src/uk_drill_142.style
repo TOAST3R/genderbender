@@ -1,0 +1,46 @@
+name: UK DRILL 142
+# UK drill (Londres, medio tiempo con caja tardia). Tempo sugerido: 142 BPM. Div por defecto (4).
+# Voces: kick=808  snare=caja  clap=rim  hhc=hat cerrado  hho=hat abierto  lotom=tom grave
+# Groove: swing 50 · slide: 0
+# Los hats del drill van en tresillos de semicorchea, que el plugin no tiene:
+# aqui se aproximan con grupos 3-3-2 de semicorcheas.
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats
+hhc    X..X ..X. X..X ..X.
+[p1]
+snare  .... .... X... ....
+
+[p2 p3]                         # ENERGIA: hats mas densos
+kick   X... ..X. .X.. .x..
+snare  .... .... X... ..o.
+clap   .... .... X... ....
+hhc    X.XX .XX. X.XX .XXX
+hho    .... .... .... X...
+[p3]
+snare  .... .... X... ...X
+
+[p4 p5]                         # BASE
+kick   X... ..X. .o.. ..,.
+snare  .... .... X... ....
+clap   .... .... .... ..o.
+hhc    X..X ..X. X..X .xX.
+[p5]
+kick   X... ..X. .x.. ....
+snare  .... .... X... ...X
+
+[p6 p7]                         # VARIACION: kick desplazado
+kick   X... .... ..X. X...
+snare  .... .... X... ....
+hhc    X..X ..X. X... X.X.
+[p7]
+snare  .... .... X... ...X
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  .... .... X..X .XXX
+hhc    X..X ..X. .... ....
+lotom  .... .... .... X...

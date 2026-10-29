@@ -1,0 +1,49 @@
+name: TRIP HOP 88
+# Trip hop (Bristol, break lento y pesado). Tempo sugerido: 88 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  hhc=hat cerrado  hho=hat abierto
+#        hitom/lotom=toms del break
+# Groove: swing 54 · amount: hhc 100, hho 100, resto 0 · slide: snare +3 ms
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats
+hhc    X... X... X... X...
+hho    .... ..X. .... ..X.
+[p1]
+lotom  .... .... .... ...X
+
+[p2 p3]                         # ENERGIA: hats en corcheas y toms
+kick   X... ..x. .XX. ....
+snare  .... X..o ..,. X.o.
+hhc    X.X. X.X. X.X. X.X.
+hho    .... ..X. .... ..X.
+hitom  .... .o.. .... ..o.
+lotom  ...o .... ..o. ...X
+[p3]
+kick   X... ..x. .XX. .x..
+
+[p4 p5]                         # BASE
+kick   X... .... .XX. ....
+snare  .... X... ..,. X..-
+hhc    X.o. X.o. X.o. X...
+hho    .... ..X. .... ..X.
+hitom  .... .... .... ..o.
+lotom  .... .... .... ...X
+[p5]
+kick   X... .... .XX. ..x.
+hitom  .... .... .... ..-.
+
+[p6 p7]                         # VARIACION: ride y toms del break
+kick   X... ...X ..X. ....
+snare  .... X... .... X...
+hho    X.o. X.o. X.o. X.o.
+hitom  ..X. .... ..X. ....
+lotom  .... .... .... ...X
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  .... X... .... ....
+hitom  .... .... X.X. X...
+lotom  .... .... .X.X .XXX

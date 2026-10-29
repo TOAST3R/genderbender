@@ -1,0 +1,48 @@
+name: TRAP 140
+# Trap (Atlanta, medio tiempo con redobles de hat). Tempo sugerido: 140 BPM. Div por defecto (4).
+# Voces: kick=808  snare=caja  clap=palmas dobladas  hhc=hat cerrado  hho=hat abierto
+# Groove: swing 50 · slide: 0 · velocidad del hhc algo baja
+# Redobles: corcheas en X, semicorcheas en x y fusas en o, asi que subir Density llena el redoble.
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats
+hhc    XxXx XxXx XxXx XxXx
+[p1]
+clap   .... .... X... ....
+
+[p2 p3]                         # ENERGIA: redobles en las negras 2 y 4
+kick   X... ...X .X.. ..o.
+snare  .... .... X... ...o
+clap   .... .... X... ....
+hhc    X.x.X.x. XoxoXoxo X.x.X.x. XoxoXoxo
+hho    .... .... .... ..x.
+[p3]
+kick   X... ...X .X.. X.X.
+hhc    X.x.X.x. X.x.X.x. XoxoXoxo XXXXXXXX
+
+[p4 p5]                         # BASE
+kick   X... ...X .... ..o.
+snare  .... .... X... ....
+clap   .... .... X... ....
+hhc    XxXx XxXx XxXx XxXx
+[p5]
+kick   X... ...X .... ..X.
+hhc    X.x.X.x. X.x.X.x. X.x.X.x. XoxoXoxo
+
+[p6 p7]                         # VARIACION: hats a negras y hat abierto
+kick   X..X .... ..X. ....
+snare  .... .... X... ....
+clap   .... .... X... ..o.
+hhc    X...X... X...X... X.o.X.o. X.x.XoXo
+hho    .... ..X. .... ..X.
+[p7]
+hhc    X.x.X.x. X.x.X.x. X.x.X.x. X.x.X.x.
+
+[p8]                            # FILL: redoble de caja en fusas
+kick   X... .... .... ....
+snare  ........ ........ X.x.X.x. XoXoXoXo
+clap   .... .... X... ....
+hhc    X.X. X.X. .... ....

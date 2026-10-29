@@ -1,0 +1,49 @@
+name: BOOM BAP 90
+# Boom bap (hip-hop de los 90, break de vinilo). Tempo sugerido: 90 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  clap=capa sobre la caja  hhc=hat cerrado  hho=hat abierto
+#        hitom/lotom=trozos del break (solo en el fill)
+# Groove: swing 58 · amount: hhc 100, hho 100, kick 100, resto 0 · slide: snare +4 ms (caja tarde)
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y rim
+hhc    X.X. X.X. X.X. X.X.
+kick   X... .... .... ....
+[p1]
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: kicks extra y fantasmas
+kick   X..x ...X ..X. .o..
+snare  .... X..o .x.. X..x
+clap   .... X... .... X...
+hhc    XoXo XoXo XoXo XoXo
+hho    .... .... .... ..X.
+[p3]
+kick   X..x ...X ..X. X.x.
+snare  .... X..o .x.. X.XX
+
+[p4 p5]                         # BASE
+kick   X... ...X ..X. ....
+snare  .... X..- .,.. X...
+clap   .... x... .... x...
+hhc    X.X. X.X. X.X. X,X,
+hho    .... .... .... ..o.
+[p5]
+kick   X... ...X ..X. ..x.
+snare  .... X..- .,.. X..o
+
+[p6 p7]                         # VARIACION: kick desplazado
+kick   X... ..X. .X.. ....
+snare  .... X... .... X...
+hhc    X.X. X.X. X.X. X.X.
+hho    ..o. .... ..o. ....
+[p7]
+snare  .... X... .... X.x.
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  .... X... X.X. XXXX
+hitom  .... .... ..x. x...
+lotom  .... .... .... ..xx

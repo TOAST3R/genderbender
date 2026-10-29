@@ -1,0 +1,45 @@
+name: LOFI HIPHOP 82
+# Lofi hip-hop (boom bap perezoso, rim en vez de caja). Tempo sugerido: 82 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja (solo en adornos)  clap=rim  hhc=hat cerrado  hho=hat abierto
+#        lotom=tom grave (solo en el fill)
+# Groove: swing 60 · amount: hhc 100, kick 60, resto 0 · slide: clap +6 ms (arrastrado)
+#         velocidad del clap baja: el rim tiene que sonar suave
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats
+hhc    X.X. X.X. X.X. X...
+[p1]
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: entra la caja
+kick   X..o ...X ..x. ....
+snare  .... X... .... X...
+clap   .... X... .... X...
+hhc    X.Xo X.X. X.Xo X.X.
+[p3]
+kick   X..o ...X ..x. .X..
+
+[p4 p5]                         # BASE
+kick   X... ...X ..o. ....
+snare  .... -... .... -...
+clap   .... X... .... X...
+hhc    X.X. X.X. X.X. X.o.
+[p5]
+kick   X... ...X ..o. .x..
+
+[p6 p7]                         # VARIACION: hats a negras y hat abierto
+kick   X... .... ..X. ...o
+clap   .... X... .... X...
+hhc    X... X... X... X...
+hho    ..o. ..o. ..o. ..o.
+[p7]
+clap   .... X... .... X.o.
+
+[p8]                            # FILL
+kick   X... .... .... ....
+clap   .... X... .... X...
+snare  .... .... X.X. X.XX
+lotom  .... .... .... x.x.

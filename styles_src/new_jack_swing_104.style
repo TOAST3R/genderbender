@@ -1,0 +1,48 @@
+name: NEW JACK SWING 104
+# New jack swing (finales de los 80, semicorcheas con swing). Tempo sugerido: 104 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  clap=palmas dobladas  hhc=hat cerrado  hho=hat abierto
+#        hitom/lotom=toms (solo en el fill)
+# Groove: swing 64 (pide swing: con 50 suena recto) · amount: hhc 100, hho 100, kick 50, resto 0
+#         slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats
+hhc    XXXX XXXX XXXX XXXX
+[p1]
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: mas kick y hat abierto
+kick   X..X ..X. X.X. ..x.
+snare  .... X..o ..o. X.o.
+clap   .... X... .... X...
+hhc    XXXX XXXX XXXX XXXX
+hho    ..x. ..x. ..x. ..x.
+[p3]
+kick   X..X ..X. X.X. .xX.
+
+[p4 p5]                         # BASE
+kick   X..X ..X. ..X. ....
+snare  .... X... ..o. X..-
+clap   .... X... .... X...
+hhc    XXXX XXXX XXXX XXXX
+hho    .... .... .... ..x.
+[p5]
+kick   X..X ..X. ..X. .x..
+
+[p6 p7]                         # VARIACION: hats en corcheas
+kick   X... ..X. ..X. ..X.
+snare  .... X... .... X...
+clap   .... X... .... X..o
+hhc    X.X. X.X. X.X. X.X.
+[p7]
+hho    .... .... .... ..X.
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  .... X... XXXX X.XX
+clap   .... X... .... X...
+hitom  .... .... .... ..x.
+lotom  .... .... .... ...x

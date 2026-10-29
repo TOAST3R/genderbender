@@ -62,7 +62,8 @@ hhc    XXxX XXxX XXxX XXxX
 | Dubstep | DUBSTEP140 (140), DubSteppo |
 | Drum & bass | JUNGLE 165 (165), RAGGA JUNGLE 165 (165), HARDSTEP 172 (172), JUMP-UP 174 (174), DANCEFLOOR DNB 174 (174), TECHSTEP 172 (172), HALFTIME 174 (174), drumbass, DurumBass160 (160), DURUMBREAK_160 (160) |
 | Techno | techAXX, TekkBooooring, TekkChungo, TekkThump |
-| R&B / trap | RB, WCOAST R&B 110 (110), VAPORTRAP |
+| Hip-hop | BOOM BAP 90 (90), LOFI HIPHOP 82 (82), TRIP HOP 88 (88), NEW JACK SWING 104 (104) |
+| R&B / trap | RB, WCOAST R&B 110 (110), VAPORTRAP, TRAP 140 (140), UK DRILL 142 (142) |
 | Gqom | GQOM |
 | Other | ESTAIL, TEST2, ZZZZ BLACK |
 
