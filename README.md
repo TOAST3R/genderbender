@@ -71,6 +71,7 @@ hhc    XXxX XXxX XXxX XXxX
 | Electro / Miami bass | ELECTRO CYBOTRON, ELECTRO UR 138 (138), BASS 101 |
 | Funk / New Orleans | MOTOWN BREAKS, NEW ORLEANS, NEW ORLEANS BOUNCE |
 | Breaks | BIG BEAT 125 (125), BALTIMORE CLUB 130 (130), BREAKCORE 190 (190), JERSEY BASICS |
+| Hard dance | TRANCE 138 (138), MAKINA 170 (170) |
 | Other | ESTAIL, 101 SPARSE, BELLY DANCE, ZZZ BLACK |
 
 This table also sets the families on the fingerprints page, so keep its format.

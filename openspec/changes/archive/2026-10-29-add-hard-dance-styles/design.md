@@ -31,7 +31,7 @@
   | Estilo | Kick | Snare / clap | Hats / toms |
   |---|---|---|---|
   | TRANCE 138 | las cuatro negras | clap en 2 y 4; snare vacío en la BASE | hho en cada "&"; hhc en semicorcheas en `x` |
-  | MAKINA 170 | las cuatro negras, más la "a" del 4 en el compás 2 | snare en 2 y 4 y en el "&" del 4 | hho en cada "&" |
+  | MAKINA 170 | las cuatro negras, más la "a" del 4 en el compás 2 | snare en 2 y 4, en la "e" del 3 y en el "&" del 4 | hho en cada "&"; hhc en las "e" y las "a" |
 
   En la tabla, "&" es la corchea a contratiempo, y "e" y "a" son la 2.ª y la 4.ª semicorchea de la negra.
 - **Receta de groove** (cabecera de cada fuente): swing 50 en los dos. Slide 0.
@@ -44,7 +44,7 @@
 - [Sin dinámica] Las fantasmas suenan a la velocidad de la voz. → Van en niveles bajos (`-`, `,`) para que solo entren con Density alta.
 - [Parecido entre estilos] → Lo detecta la comprobación de distancia antes de escribir, y la escucha en REAPER después. Se retocan las fuentes, sin cambiar el plugin.
 - [Interpretación musical] Se toma la gramática del género, no una grabación concreta. Las fuentes son texto plano y se regeneran en segundos.
-- [Cuatro negras como el techno] → TRANCE se distingue por el hho a contratiempo y el clap; MAKINA, por la caja en el "&" del 4. La comprobación de distancia los compara con `techAXX`, `TekkThump` y el resto de techno.
+- [Cuatro negras como el techno] → TRANCE se distingue por el hho a contratiempo y el clap; MAKINA, por la caja en la "e" del 3 y el "&" del 4 y por el hhc en las "e" y "a". Con solo la caja en 2, 4 y el "&" del 4, la primera versión quedaba a 3 pasos de DISCO 118. La comprobación de distancia los compara con `techAXX`, `TekkThump` y el resto de techno.
 
 ## Verificación en REAPER
 

@@ -1,0 +1,47 @@
+name: MAKINA 170
+# Makina (Cataluna y Valencia, anos 90): bombo a negras, hat abierto a contratiempo y caja. Tempo sugerido: 170 BPM.
+# Div por defecto (4). Sin tilde en el nombre del archivo.
+# Voces: kick=bombo  snare=caja y redobles  clap=palmas  hhc=hat cerrado  hho=hat abierto
+#        hitom=tom (solo adornos)
+# Groove: swing 50 (recto) · slide: 0
+# Subida con Density: en p3 y p8 el snare va en corcheas (X), semicorcheas (x) y fusas (o).
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats
+hho    ..X. ..X. ..X. ..X.
+hhc    .X.X .X.X .X.X .X.X
+[p1]
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA
+kick   X... X... X... X...
+clap   .... x... .... x...
+hhc    .X.X .X.X .X.X .X.X
+hho    ..X. ..X. ..X. ..X.
+snare  .... X... .X.. X.X.
+[p3]
+snare  ........ X....... X.x.X.x. XoxoXoxo
+
+[p4 p5]                         # BASE
+kick   X... X... X... X...
+snare  .... X... .X.. X.X.
+clap   .... o... .... o...
+hhc    .X.X .X.X .X.X .X.X
+hho    ..X. ..X. ..X. ..X.
+[p5]
+kick   X... X... X... X..X
+
+[p6 p7]                         # VARIACION: palmas al frente
+kick   X... X... X... X...
+snare  .... X... .... X...
+clap   .... X... .X.. X.X.
+hhc    .X.X .X.X .X.X .X.X
+hho    ..X. ..X. ..X. ..X.
+hitom  .... .... .... .xx.
+
+[p8]                            # FILL: redoble de subida
+kick   X... X... X... X...
+snare  X.x.X.x. X.x.X.x. XoxoXoxo XoxoXoxo
