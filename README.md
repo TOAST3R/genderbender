@@ -80,7 +80,7 @@ hhc    XXxX XXxX XXxX XXxX
 | Synth / disco | SYNTHWAVE 100 (100), DISCO 118 (118), ITALO DISCO 120 (120), BOOGIE 110 (110), MOTORIK 120 (120) |
 | Techno | techAXX, TekkBooooring, TekkChungo, TekkThump, SCHAFFEL 125 (125), DETROIT TECHNO 128 (128), MINIMAL TECHNO 126 (126), HARD TECHNO 145 (145), ACID TECHNO 140 (140), UK TECHNO 135 (135), DUB TECHNO 118 (118), SCHRANZ 150 (150), HARDGROOVE 135 (135) |
 | UK garage / 2-step | Two-stepppo, uk_fungui, uk_garbage, garage_2step, garage_uk_4x4, FUTURE GARAGE 130 (130) |
-| Other | ESTAIL, 101 SPARSE, BELLY DANCE, ZZZ BLACK |
+| Other | 101 SPARSE, BELLY DANCE, ZZZ BLACK |
 
 This table also sets the families on the fingerprints page, so keep its format.
 

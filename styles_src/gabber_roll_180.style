@@ -7,6 +7,8 @@ name: GABBER ROLL 180
 # Escala: X=255 x=204 o=153 -=102 ,=51 .=0
 # Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
 
+# p6/p7 (VARIACION) vacios: repetirian los de otro estilo
+
 [p0 p1]                         # INTRO: hats y percusion
 hho    ..X. ..X. ..X. ..X.
 [p1]
@@ -28,14 +30,4 @@ hho    ..X. ..X. ..X. ..X.
 [p5]
 kick   X... X... X... XXXX
 
-[p6 p7]                         # VARIACION: menos hats, toms
-kick   X... X... X... X...
-hho    ..X. ..X. ..X. ..X.
-hitom  ...X .... ...X ....
-lotom  .... ..X. .... ..x.
-[p7]
-snare  .... .... .... ..X.
-
-[p8]                            # FILL
-kick   X....... X....... X...X... XoXoXoXo
-clap   .... X... .... X...
+# p8 (FILL) vacio: repetiria el de otro estilo
