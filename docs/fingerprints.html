@@ -14,6 +14,7 @@ header{position:sticky;top:0;z-index:2;background:var(--bg);border-bottom:1px so
 h1{font-size:16px;margin:0;letter-spacing:.08em}
 label{display:flex;gap:8px;align-items:center;color:var(--muted)}
 input[type=range]{width:180px;accent-color:var(--ink)}
+select{font:inherit;color:var(--fg);background:var(--cell);border:1px solid var(--line);border-radius:4px;padding:2px 4px}
 output{color:var(--fg);min-width:3ch}
 main{padding:8px 16px 48px;max-width:1100px}
 h2{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin:28px 0 8px;border-bottom:1px solid var(--line);padding-bottom:4px}
@@ -40,6 +41,7 @@ dialog h3{margin:0 0 12px;font-size:15px}
 <body>
 <header>
 <h1>GENDERBENDER · FINGERPRINTS</h1>
+<label>Género <select id="fam"></select></label><output id="count"></output>
 <label>Density <input id="dens" type="range" min="0" max="260" value="50"><output id="densv">50</output></label>
 <span class="hint" style="margin:0">color = valor 0–255 · atenuado = no suena con esta Density · clic para ampliar</span>
 </header>
@@ -98,8 +100,13 @@ function openZoom(st) {
 }
 zoom.addEventListener('click', e => { if (e.target === zoom) zoom.close(); });
 
+const fam = document.getElementById('fam'), count = document.getElementById('count');
+const total = DATA.groups.reduce((n, g) => n + g.styles.length, 0), sections = [];
+fam.append(new Option('Todos (' + total + ')', ''));
 for (const grp of DATA.groups) {
-  const h = document.createElement('h2'); h.textContent = grp.family; main.append(h);
+  fam.append(new Option(grp.family + ' (' + grp.styles.length + ')', grp.family));
+  const sec = document.createElement('section'); sec.dataset.fam = grp.family; sections.push(sec);
+  const h = document.createElement('h2'); h.textContent = grp.family; sec.append(h); main.append(sec);
   for (const st of grp.styles) {
     const el = document.createElement('div');
     el.className = 'style'; el.tabIndex = 0; el.setAttribute('role', 'button');
@@ -111,11 +118,19 @@ for (const grp of DATA.groups) {
       if (i === 8 && !/[^0]/.test(hex)) w.classList.add('empty');
       w.append(pattern(hex, 3)); strip.append(w);
     });
-    el.append(n, strip); main.append(el);
+    el.append(n, strip); sec.append(el);
     el.addEventListener('click', () => openZoom(st));
     el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); openZoom(st); } });
   }
 }
+
+function filter() {
+  const f = fam.value;
+  sections.forEach(sec => { sec.hidden = !!f && sec.dataset.fam !== f; });
+  const shown = f ? DATA.groups.find(g => g.family === f).styles.length : total;
+  count.value = f ? shown + ' de ' + total + ' estilos' : total + ' estilos';
+}
+fam.addEventListener('change', filter); filter();
 
 const redraw = () => canvases.forEach(draw);
 dens.addEventListener('input', () => { densv.value = dens.value; redraw(); });
