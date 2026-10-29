@@ -168,7 +168,10 @@ body:has(#visbar.on){padding-bottom:60px}
 .pad::before,.pad::after{content:'';position:absolute;background:var(--line)}
 .pad::before{left:50%;top:0;bottom:0;width:1px}.pad::after{top:50%;left:0;right:0;height:1px}
 .dot{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--ink);z-index:1}
-.mix{display:grid;grid-template-columns:auto auto auto;gap:2px 6px;align-items:center}
+.mix{display:grid;grid-template-columns:repeat(7,auto);gap:2px 6px;align-items:center}
+.smp{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+input.sgain{width:70px}
+.drop{outline:2px dashed var(--ink);outline-offset:2px}
 .play.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 #scene{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none}
 main section{background:color-mix(in srgb,var(--bg) 92%,transparent);border-radius:8px;padding:2px 12px 10px;margin:0 -12px 16px}
@@ -185,6 +188,7 @@ main section h2{margin-top:14px}
 <label>Swing <input id="swing" type="range" min="50" max="75" value="50"><output id="swingv">50</output></label>
 <span><label style="display:inline-flex">BPM <input id="bpm" type="range" min="40" max="240" value="120"><output id="bpmv">120</output></label><button class="play" id="bpmreset" title="Volver al BPM del estilo">↺</button></span>
 <label>Kit <select id="kit"></select></label>
+<span id="snote" class="hint" style="margin:0" hidden></span>
 <label class="knob">Distortion <input id="dist" type="range" min="0" max="100" value="0"><span class="disc"></span><output id="distv">0</output></label>
 <label class="knob">Delay <input id="dly" type="range" min="0" max="100" value="0"><span class="disc"></span><output id="dlyv">0</output></label>
 <label class="knob">Reverb <input id="rev" type="range" min="0" max="100" value="0"><span class="disc"></span><output id="revv">0</output></label>
@@ -342,9 +346,8 @@ function applyFx() {  // mueve parametros, no reconstruye nodos
     for (let i = 0; i < 1024; i++) c[i] = Math.tanh(k * (i / 511.5 - 1)) / Math.tanh(k);
     FXB.ws.curve = c; FXB.ws.oversample = '2x';
   } else { FXB.ws.curve = null; FXB.ws.oversample = 'none'; }  // a 0, la señal pasa intacta
-  FXB.mk.gain.setTargetAtTime(1 - 0.5 * dist, t, 0.02);
-  FXB.dsend.gain.setTargetAtTime(0.6 * dly, t, 0.02);
-  FXB.rsend.gain.setTargetAtTime(0.8 * rev, t, 0.02);
+  const set = (prm, v) => ac instanceof OfflineAudioContext ? prm.value = v : prm.setTargetAtTime(v, t, 0.02);
+  set(FXB.mk.gain, 1 - 0.5 * dist); set(FXB.dsend.gain, 0.6 * dly); set(FXB.rsend.gain, 0.8 * rev);
 }
 const delayBpm = bpm => { if (FXB) FXB.dl.delayTime.setTargetAtTime(0.75 * 60 / bpm, ac.currentTime, 0.02); };  // corchea con puntillo
 function knob(r) {  // disco que se gira arrastrando en vertical o con la rueda; el range da el teclado
@@ -372,8 +375,8 @@ FXI.forEach(r => {
 
 const choke = {};  // el hho de cada kit, para que el hhc lo corte
 const hh = (kit, t, open, make) => {
-  if (choke[kit]) { try { choke[kit].stop(t); } catch (e) {} choke[kit] = null; }
-  const n = make(); if (open) choke[kit] = n;
+  if (choke.hh) { try { choke.hh.stop(t); } catch (e) {} choke.hh = null; }
+  const n = make(); if (open) choke.hh = n;
 };
 // acustico: tambien lo usa el Lo-fi a traves de su salida con crush
 const acoustic = o => [
@@ -472,7 +475,16 @@ const FAMILY = {};
 DATA.groups.forEach(g => g.styles.forEach(st => { FAMILY[st.name] = g.family; }));
 let kitChoice = 'auto';
 const kitOf = st => kitChoice !== 'auto' ? kitChoice : (FAM_KIT[FAMILY[st.name]] || 'actual');
-const playVoice = (st, vi, t) => KITS[kitOf(st)].v[vi](t);
+const SAMPLES = Array(NV).fill(null);  // {name, buf, gainDb, bytes} por voz
+const playVoice = (st, vi, t, v = 255) => SAMPLES[vi] ? playSample(vi, t, v) : KITS[kitOf(st)].v[vi](t);
+function playSample(vi, t, v) {
+  const smp = SAMPLES[vi], make = () => {
+    const src = ac.createBufferSource(), g = ac.createGain();
+    src.buffer = smp.buf; g.gain.value = Math.pow(10, smp.gainDb / 20) * v / 255;
+    src.connect(g).connect(bus()); src.start(t); return src;
+  };
+  vi === 3 || vi === 4 ? hh(null, t, vi === 4, make) : make();
+}
 function stepTime(i, bpm, amt = 100) {
   // deformacion de groove-swing: dentro de cada corchea, [0, 0.25) -> [0, p) y [0.25, 0.5) -> [p, 0.5)
   // con el swing de la voz: S_voz = 50 + (S - 50) * amount / 100
@@ -535,7 +547,7 @@ function tick() {
       if (!audible(vi)) continue;
       const v = P.cur.val(vi, P.step);
       // misma regla que el plugin; cada voz con su amount de swing
-      if (v && 256 - v < d) { playVoice(P.cur.st, vi, Math.max(P.barStart + stepTime(P.step, P.bpm, P.amt[vi]), ac.currentTime)); hits.push(vi); }
+      if (v && 256 - v < d) { playVoice(P.cur.st, vi, Math.max(P.barStart + stepTime(P.step, P.bpm, P.amt[vi]), ac.currentTime), v); hits.push(vi); }
     }
     P.q.push({t: P.barStart + stepTime(P.step, P.bpm), mark: P.cur.mark, step: P.step, hits, st: P.cur.st});
     if (++P.step === STEPS) { P.step = 0; P.bar++; P.barStart += 240 / P.bpm; }
@@ -873,17 +885,20 @@ function openZoom(st) {
   current = st;
   mute.fill(false); solo.fill(false);
   const figs = [];
+  wavCache = []; wavUI = [];
   st.p.forEach((hex, i) => {
     const f = document.createElement('figure'), cap = document.createElement('figcaption');
     figs.push(f);
     cap.textContent = 'p' + i + (i === 8 ? ' FILL' : '');
     cap.append(playButton('▶', b => start(b, '▶', [hex], [f], st, true)));
+    if (!isEmpty(hex)) wavButtons(st, i, cap);
     const row = document.createElement('div'); row.className = 'row';
     const names = document.createElement('div'); names.className = 'voices';
-    DATA.voices.forEach(v => { const e = document.createElement('span'); e.textContent = v; names.append(e); });
+    DATA.voices.forEach((v, vi) => { const e = document.createElement('span'); e.textContent = v; dropTarget(e, vi); names.append(e); });
     row.append(names, pattern(hex, 10, zoomed)); f.append(cap, row); zbody.append(f);
   });
   zoomPlay(st, figs);
+  scheduleCache();
   if (!zoom.open) zoom.showModal();
   writeHash();
 }
@@ -925,12 +940,192 @@ function zoomPlay(st, figs) {
   DATA.voices.forEach((v, vi) => {
     const tg = (arr, txt) => playButton(txt, b => { arr[vi] = !arr[vi]; b.classList.toggle('on', arr[vi]); b.textContent = txt; });
     const name = document.createElement('span'); name.textContent = v;
-    mix.append(name, tg(mute, 'M'), tg(solo, 'S'));
+    dropTarget(name, vi);
+    const lab = document.createElement('span'); lab.className = 'smp';
+    const up = playButton('⇪', () => { pickFor = vi; picker.click(); }); up.title = 'Cargar un sample de tu equipo (o suéltalo sobre el nombre de la voz)';
+    const x = playButton('✕', () => clearSample(vi)); x.title = 'Volver al kit';
+    const gn = document.createElement('input'); gn.type = 'range'; gn.min = -24; gn.max = 6; gn.className = 'sgain'; gn.title = 'Ganancia del sample (dB)';
+    gn.addEventListener('input', () => { if (SAMPLES[vi]) { SAMPLES[vi].gainDb = +gn.value; saveSample(vi); sampleVer++; } });
+    sampleUI[vi] = {lab, gn};
+    mix.append(name, tg(mute, 'M'), tg(solo, 'S'), lab, up, x, gn);
   });
   z.append(box, col, mix);
+  refreshSamples();
 }
 zoom.addEventListener('click', e => { if (e.target === zoom) zoom.close(); });
 zoom.addEventListener('close', () => { current = null; writeHash(); });
+
+// ---- samples propios: archivo local -> AudioBuffer; se guardan en IndexedDB, nunca salen del navegador
+const sampleUI = [], picker = Object.assign(document.createElement('input'), {type: 'file', accept: 'audio/*', hidden: true});
+let pickFor = 0, sampleVer = 0;
+document.body.append(picker);
+picker.addEventListener('change', () => { if (picker.files[0]) loadSample(pickFor, picker.files[0]); picker.value = ''; });
+addEventListener('dragover', e => e.preventDefault());  // soltar un archivo fuera de una voz no abre el archivo
+addEventListener('drop', e => e.preventDefault());
+function notice(msg) {
+  const n = document.getElementById('snote'); n.hidden = false; n.textContent = msg;
+  clearTimeout(notice.t); notice.t = setTimeout(refreshSamples, 5000);
+}
+function dropTarget(el, vi) {
+  el.addEventListener('dragover', e => { if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); el.classList.add('drop'); } });
+  el.addEventListener('dragleave', () => el.classList.remove('drop'));
+  el.addEventListener('drop', e => { e.preventDefault(); el.classList.remove('drop'); if (e.dataTransfer.files[0]) loadSample(vi, e.dataTransfer.files[0]); });
+}
+function idb(mode, fn) {
+  return new Promise((ok, ko) => {
+    const r = indexedDB.open('gb-samples', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('voices');
+    r.onerror = () => ko(r.error);
+    r.onsuccess = () => {
+      const tx = r.result.transaction('voices', mode), q = fn(tx.objectStore('voices'));
+      tx.oncomplete = () => ok(q && q.result); tx.onerror = () => ko(tx.error);
+    };
+  });
+}
+const decode = bytes => new OfflineAudioContext(1, 1, 44100).decodeAudioData(bytes.slice(0));
+async function loadSample(vi, file) {
+  if (file.size > 10e6) return notice(file.name + ': más de 10 MB');  // shortcut: limite fijo, subirlo si hace falta
+  const bytes = await file.arrayBuffer();
+  let buf; try { buf = await decode(bytes); } catch (e) { return notice('No se puede leer ' + file.name + ' como audio'); }
+  SAMPLES[vi] = {name: file.name, buf, bytes, gainDb: SAMPLES[vi] ? SAMPLES[vi].gainDb : 0};
+  saveSample(vi); sampleVer++; refreshSamples(); scheduleCache();
+}
+function saveSample(vi) {
+  const x = SAMPLES[vi];
+  idb('readwrite', o => o.put({vi, name: x.name, bytes: x.bytes, gainDb: x.gainDb}, vi))
+    .catch(() => notice('Sin IndexedDB: el sample no se guardará al recargar'));
+}
+function clearSample(vi) {
+  SAMPLES[vi] = null; sampleVer++; refreshSamples(); scheduleCache();
+  idb('readwrite', o => o.delete(vi)).catch(() => {});
+}
+function refreshSamples() {
+  sampleUI.forEach(({lab, gn}, vi) => {
+    const x = SAMPLES[vi];
+    lab.textContent = x ? x.name : 'kit'; lab.title = x ? x.name : ''; gn.disabled = !x; gn.value = x ? x.gainDb : 0;
+  });
+  const n = document.getElementById('snote'), on = DATA.voices.filter((v, vi) => SAMPLES[vi]);
+  n.hidden = !on.length; n.textContent = on.length ? 'samples propios: ' + on.join(', ') : '';
+}
+idb('readonly', o => o.getAll()).then(async rows => {
+  for (const r of rows || []) { try { SAMPLES[r.vi] = {name: r.name, bytes: r.bytes, gainDb: r.gainDb, buf: await decode(r.bytes)}; } catch (e) {} }
+  sampleVer++; refreshSamples();
+}).catch(() => {});
+
+// ---- exportar WAV: render offline con la misma logica que tick
+const exp = {bars: 2, wrap: true}, PART = ['INTRO', 'INTRO', 'ENERGIA', 'ENERGIA', 'BASE', 'BASE', 'VARIACION', 'VARIACION', 'FILL'];
+function inContext(ctx, fn) {
+  // los ladrillos de sintesis usan los globales del contexto en directo; se cambian solo durante esta
+  // llamada sincrona (el planificador en directo no puede ejecutarse en medio) y se restauran siempre
+  const saved = [ac, noiseBuf, FXB], fx0 = {...FX}, ch0 = {...choke};
+  for (const k in FX) delete FX[k]; for (const k in choke) delete choke[k];
+  ac = ctx; FXB = null; noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+  const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  try { fn(); } finally {
+    [ac, noiseBuf, FXB] = saved;
+    for (const k in FX) delete FX[k]; Object.assign(FX, fx0);
+    for (const k in choke) delete choke[k]; Object.assign(choke, ch0);
+  }
+}
+const bpmOf = (st, s) => bpmFor === st && bpmOverride || s.bpm;
+async function renderWav(st, getBar, nBars, wrap) {
+  const SR = 44100;
+  let len = 0; for (let b = 0; b < nBars; b++) len += 240 / bpmOf(st, getBar(b).st);
+  const frames = Math.round(len * SR), extra = wrap ? Math.round(240 / bpmOf(st, st) * SR) : 0;
+  const off = new OfflineAudioContext(2, frames + extra, SR);
+  inContext(off, () => {
+    bus(); FXB.dl.delayTime.value = 0.75 * 60 / bpmOf(st, st);
+    const d = +dens.value; let t0 = 0;
+    for (let b = 0; b < nBars; b++) {
+      const cur = getBar(b), bpm = bpmOf(st, cur.st), amt = cur.st.amt || Array(NV).fill(100);
+      for (let i = 0; i < STEPS; i++) for (let vi = 0; vi < NV; vi++) {
+        const v = cur.val(vi, i);
+        if (audible(vi) && v && 256 - v < d) playVoice(cur.st, vi, t0 + stepTime(i, bpm, amt[vi]), v);
+      }
+      t0 += 240 / bpm;
+    }
+  });
+  const buf = await off.startRendering();
+  return [0, 1].map(c => {  // colas envueltas: lo que pasa del final se suma al principio
+    const d = buf.getChannelData(c), o = d.slice(0, frames);
+    for (let i = frames; i < d.length; i++) o[(i - frames) % frames] += d[i];
+    return o;
+  });
+}
+function wav(ch) {  // PCM 16 bits, 44,1 kHz, estereo, con dither triangular
+  const n = ch[0].length, buf = new ArrayBuffer(44 + n * 4), v = new DataView(buf);
+  const str = (o, x) => [...x].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+  str(0, 'RIFF'); v.setUint32(4, 36 + n * 4, true); str(8, 'WAVE'); str(12, 'fmt '); v.setUint32(16, 16, true);
+  v.setUint16(20, 1, true); v.setUint16(22, 2, true); v.setUint32(24, 44100, true); v.setUint32(28, 44100 * 4, true);
+  v.setUint16(32, 4, true); v.setUint16(34, 16, true); str(36, 'data'); v.setUint32(40, n * 4, true);
+  for (let i = 0, o = 44; i < n; i++) for (let c = 0; c < 2; c++, o += 2)
+    v.setInt16(o, Math.max(-32768, Math.min(32767, Math.round(ch[c][i] * 32767 + Math.random() - Math.random()))), true);
+  return new Uint8Array(buf);
+}
+const CRC = Uint32Array.from({length: 256}, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+const crc32 = b => { let c = 0xffffffff; for (let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+function zip(files) {  // ZIP sin compresion (store); nombres en UTF-8
+  const enc = new TextEncoder(), out = [], cen = []; let off = 0;
+  for (const f of files) {
+    const nm = enc.encode(f.name), crc = crc32(f.data), n = f.data.length, h = new DataView(new ArrayBuffer(30)), c = new DataView(new ArrayBuffer(46));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(12, 33, true);
+    h.setUint32(14, crc, true); h.setUint32(18, n, true); h.setUint32(22, n, true); h.setUint16(26, nm.length, true);
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(14, 33, true);
+    c.setUint32(16, crc, true); c.setUint32(20, n, true); c.setUint32(24, n, true); c.setUint16(28, nm.length, true); c.setUint32(42, off, true);
+    out.push(new Uint8Array(h.buffer), nm, f.data); cen.push(new Uint8Array(c.buffer), nm);
+    off += 30 + nm.length + n;
+  }
+  const size = cen.reduce((a, b) => a + b.length, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, size, true); e.setUint32(16, off, true);
+  return new Blob([...out, ...cen, new Uint8Array(e.buffer)], {type: 'application/zip'});
+}
+const bpmTag = st => bpmFor === st && bpmOverride && bpmOverride !== st.bpm ? ' ' + bpmOverride + ' BPM' : '';
+const wavName = (st, k) => st.name + ' p' + k + ' ' + PART[k] + bpmTag(st) + '.wav';
+function save(blob, name) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+// cache por parte: DownloadURL necesita los datos en dragstart y el render es asincrono, asi que se prepara antes
+let wavCache = [], wavUI = [], cacheTimer = 0, filling = false, refill = false;
+const settingsKey = (st, k) => JSON.stringify([st.name, k, exp.bars, exp.wrap, dens.value, swing.value, bpmFor === st && bpmOverride,
+                                               kitOf(st), mute, solo, FXI.map(r => r.value), sampleVer]);
+const partWav = async (st, k) => new Blob([wav(await renderWav(st, () => barOf(st, st.p[k], null), exp.bars, exp.wrap))], {type: 'audio/wav'});
+const partBlob = (st, k) => wavCache[k] && wavCache[k].key === settingsKey(st, k) ? wavCache[k].blob : partWav(st, k);
+function scheduleCache() {
+  clearTimeout(cacheTimer); cacheTimer = setTimeout(fillCache, 300);
+  if (current) wavUI.forEach((h, k) => { if (h && !(wavCache[k] && wavCache[k].key === settingsKey(current, k))) { h.textContent = '…'; h.draggable = false; } });
+}
+async function fillCache() {
+  if (filling) { refill = true; return; }
+  filling = true;
+  try {
+    for (let k = 0; k < 9; k++) {
+      const st = current, ui = wavUI[k];
+      if (!st || !zoom.open || !ui) continue;
+      const key = settingsKey(st, k);
+      if (wavCache[k] && wavCache[k].key === key) continue;
+      ui.textContent = '…'; ui.draggable = false;
+      const blob = await partWav(st, k);
+      if (current !== st || settingsKey(st, k) !== key) { refill = true; break; }  // cambio mientras renderizaba
+      const url = await new Promise(ok => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.readAsDataURL(blob); });
+      wavCache[k] = {key, blob, url}; ui.textContent = '⠿ WAV'; ui.draggable = true;
+    }
+  } finally { filling = false; if (refill) { refill = false; scheduleCache(); } }
+}
+function wavButtons(st, k, cap) {
+  const dl = playButton('⬇', async () => save(await partBlob(st, k), wavName(st, k))); dl.title = 'Descargar el WAV de esta parte';
+  const h = document.createElement('span'); h.className = 'play drag'; h.textContent = '…'; h.draggable = false;
+  h.title = 'Arrastra el WAV de esta parte al escritorio o a tu DAW';
+  h.addEventListener('dragstart', e => {
+    const c = wavCache[k];
+    if (!c || c.key !== settingsKey(st, k)) { e.preventDefault(); scheduleCache(); return; }
+    e.dataTransfer.setData('DownloadURL', 'audio/wav:' + wavName(st, k) + ':' + c.url);
+  });
+  cap.append(dl);
+  if (canDrag) { wavUI[k] = h; cap.append(h); }
+}
+for (const ev of ['input', 'change', 'click']) document.addEventListener(ev, () => { if (zoom.open) scheduleCache(); });
+zoom.addEventListener('close', () => { wavCache = []; });
 
 // ---- MIDI: dos compases de lo que se oye (Density y swing aplicados), SMF tipo 0
 const GM = [36, 38, 39, 42, 46, 50, 45];
@@ -1001,6 +1196,24 @@ function zoomTools(st) {
   }
   const kl = document.createElement('label'), ks = document.createElement('select');
   ks.id = 'zkit'; fillKits(ks); kl.append('Kit ', ks); t.append(kl); showAuto(st);
+  const bl = document.createElement('label'), bs = document.createElement('select');
+  [1, 2, 4, 8].forEach(n => bs.append(new Option(n, n))); bs.value = exp.bars;
+  bs.addEventListener('change', () => { exp.bars = +bs.value; });
+  bl.append('WAV: compases ', bs); bl.title = 'Compases de cada parte al exportar WAV (16 bits, 44,1 kHz)'; t.append(bl);
+  const wl = document.createElement('label'), wc = document.createElement('input');
+  wc.type = 'checkbox'; wc.checked = exp.wrap; wc.addEventListener('change', () => { exp.wrap = wc.checked; });
+  wl.append(wc, ' colas envueltas'); wl.title = 'Suma la cola de reverb y delay al principio para que el loop empalme'; t.append(wl);
+  const busy = (b, fn) => async () => { const txt = b.textContent; b.textContent = '…'; b.disabled = true; try { await fn(); } finally { b.textContent = txt; b.disabled = false; } };
+  const sq = playButton('⬇ secuencia .wav', () => {}); sq.onclick = busy(sq, async () => {
+    const seq = [0, 1, 4, 5, 2, 3, 6, 7, 8, 8].filter(k => !isEmpty(st.p[k]));
+    save(new Blob([wav(await renderWav(st, b => barOf(st, st.p[seq[b]], null), seq.length, exp.wrap))], {type: 'audio/wav'}), st.name + ' secuencia' + bpmTag(st) + '.wav');
+  });
+  const zp = playButton('⬇ partes .zip', () => {}); zp.onclick = busy(zp, async () => {
+    const files = [];
+    for (let k = 0; k < 9; k++) if (!isEmpty(st.p[k])) files.push({name: wavName(st, k), data: new Uint8Array(await (await partBlob(st, k)).arrayBuffer())});
+    save(zip(files), st.name + bpmTag(st) + '.zip');
+  });
+  t.append(sq, zp);
   const link = (txt, href) => { const a = document.createElement('a'); a.href = href; a.textContent = txt; a.target = '_blank'; a.rel = 'noopener'; t.append(a); };
   link('.txt ↗', GH + 'drum_styles_v/' + encodeURIComponent(st.name) + '.txt');
   if (st.src) link('.style ↗', GH + 'styles_src/' + encodeURIComponent(st.src) + '.style');
