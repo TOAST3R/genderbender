@@ -1,0 +1,42 @@
+name: JOTA ARAGONESA 60
+# Jota aragonesa (3/4): cuatro compases por patron; una negra del plugin = un compas de 3/4 (60 = 180 negras por minuto). Tempo sugerido: 60 BPM. Div por defecto (4).
+# Fuente del ritmo: PIDE SWING GLOBAL 67 (todas las voces al 100 %): los pasos 0, 2 y 5 de cada negra caen entonces en tresillo exacto. Con swing 50 suena desfigurado.
+# Voces: kick=bombo / tambor grave  snare=tamboril / tarola  clap=palmas / castañuelas  hhc=pandereta  hho=pandereta abierta  hitom/lotom=redobles
+# Groove: swing global 67 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    X.X..X.. X.X..X.. X.X..X.. X.X..X..
+[p1]
+kick   X... .... .... ....
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   X....... X....... X....... X....o..
+clap   ..X..X.. ..X..X.. ..X..X.. ..X..X..
+hhc    X.X..X.. X.X..X.. X.X..X.. X.X..X..
+[p3]
+clap   ..X..X.. ..X..X.. ..X..X.. x.X..X..
+
+[p4 p5]                         # BASE
+kick   X... X... X... X...
+clap   ..X..X.. ..X..X.. ..X..X.. ..X..X..
+hhc    X.X..X.. X.X..X.. X.X..X.. X.X..X..
+
+[p6 p7]                         # VARIACION: los toms toman el ritmo de los hats
+kick   X... X... X... X...
+clap   ..X..X.. ..X..X.. ..X..X.. ..X..X..
+hhc    x... x... x... x...
+hitom  X.X..X.. X.X..X.. ........ ........
+lotom  ........ ........ X.X..X.. X.X..X..
+[p7]
+kick   X... X... X... Xx..
+
+[p8]                            # FILL: redoble que acentua los golpes de la base
+kick   X... X... .... ....
+clap   ..X..X.. ..X..X.. X.X..X.. X.X..X..
+hitom  ........ ........ X.X..X.. ........
+lotom  ........ ........ ........ X.X..X..

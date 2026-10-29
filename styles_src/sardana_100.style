@@ -1,0 +1,42 @@
+name: SARDANA 100
+# Sardana (Cataluña, 6/8): dos compases por patron. Tempo sugerido: 100 BPM. Div por defecto (4).
+# Fuente del ritmo: no se encontro una fuente escrita sobre el ritmo del tamborí; se sigue el diseño. PIDE SWING GLOBAL 67 (todas las voces al 100 %): los pasos 0, 2 y 5 de cada negra caen entonces en tresillo exacto. Con swing 50 suena desfigurado.
+# Voces: kick=bombo  snare=tamborí  hhc=hat
+# Groove: swing global 67 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    X... X... X... X...
+[p1]
+kick   X... .... .... ....
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   X....... ........ X....... .....o..
+snare  .....X.. .....X.. .....X.. .....X..
+hhc    X.x..x.. X.x..x.. X.x..x.. X.x..x..
+[p3]
+snare  .....X.. .....X.. .....X.. x.x..X..
+
+[p4 p5]                         # BASE
+kick   X... .... X... ....
+snare  .....X.. .....X.. .....X.. .....X..
+hhc    X... X... X... X...
+
+[p6 p7]                         # VARIACION: los toms toman el ritmo de los hats
+kick   X... .... X... ....
+snare  .....X.. .....X.. .....X.. .....X..
+hhc    x... x... x... x...
+hitom  X... X... .... ....
+lotom  .... .... X... X...
+[p7]
+kick   X... .... X... .x..
+
+[p8]                            # FILL: redoble que acentua los golpes de la base
+kick   X... .... .... ....
+snare  .....X.. .....X.. X.x..X.. X.x..X..
+hitom  .... .... X... ....
+lotom  .... .... .... X...

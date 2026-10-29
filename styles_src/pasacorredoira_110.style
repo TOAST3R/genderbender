@@ -1,0 +1,42 @@
+name: PASACORREDOIRA 110
+# Pasacorredoira (Galicia, pasacalles en 2/4): dos compases por patron. Tempo sugerido: 110 BPM. Div por defecto (4).
+# Voces: kick=bombo / tambor grave  snare=tamboril / tarola  clap=palmas / castañuelas  hhc=pandereta  hho=pandereta abierta  hitom/lotom=redobles
+# Groove: swing 50 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    X.X. X.X. X.X. X.X.
+[p1]
+kick   X... .... .... ....
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   X... .... X... ...o
+snare  ...X X.Xo ...X X.X.
+hhc    XxXx XxXx XxXx XxXx
+hitom  .... .... ...- ....
+[p3]
+snare  ......X. X...X.o. ......X. Xox-Xox-
+
+[p4 p5]                         # BASE
+kick   X... .... X... ....
+snare  ...X X.X. ...X X.X.
+hhc    X.X. X.X. X.X. X.X.
+
+[p6 p7]                         # VARIACION: los toms toman el ritmo de los hats
+kick   X... .... X... ....
+snare  ...X X.X. ...X X.X.
+hhc    x... x... x... x...
+hitom  X.X. X.X. .... ....
+lotom  .... .... X.X. X.X.
+[p7]
+kick   X... .... X... ...x
+
+[p8]                            # FILL: redoble que acentua los golpes de la base
+kick   X... .... .... ....
+snare  ......X. X...X... X.x.x.X. XoxoXoxo
+hitom  .... .... X.X. ....
+lotom  .... .... .... X.X.
