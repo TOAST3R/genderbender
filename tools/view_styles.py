@@ -147,6 +147,13 @@ dialog h3{margin:0 0 12px;font-size:15px}
 .tools a{color:var(--ink)}
 .drag{cursor:grab;user-select:none}
 .tools input[type=range]{width:140px}
+.zplay{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-start;margin:0 0 14px;font-size:12px;color:var(--muted)}
+.pad{width:160px;height:160px;position:relative;background:var(--cell);border:1px solid var(--line);border-radius:4px;touch-action:none;cursor:crosshair}
+.pad::before,.pad::after{content:'';position:absolute;background:var(--line)}
+.pad::before{left:50%;top:0;bottom:0;width:1px}.pad::after{top:50%;left:0;right:0;height:1px}
+.dot{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--ink);z-index:1}
+.mix{display:grid;grid-template-columns:auto auto auto;gap:2px 6px;align-items:center}
+.play.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 </style>
 </head>
 <body>
@@ -159,7 +166,7 @@ dialog h3{margin:0 0 12px;font-size:15px}
 <span class="hint" style="margin:0">color = valor 0–255 · atenuado = no suena con esta Density · clic para ampliar · ▶ preview sintetizado (no es el sonido de tu sampler) · Esc para</span>
 </header>
 <main id="main"></main>
-<dialog id="zoom"><h3 id="zname"></h3><div class="tools" id="ztools"></div><div class="big" id="zbody"></div><p class="hint">Esc o clic fuera para cerrar</p></dialog>
+<dialog id="zoom"><h3 id="zname"></h3><div class="tools" id="ztools"></div><div class="zplay" id="zplay"></div><div class="big" id="zbody"></div><p class="hint">Esc o clic fuera para cerrar</p></dialog>
 <script>
 const DATA = /*DATA*/;
 const STEPS = 32, NV = DATA.voices.length;
@@ -232,18 +239,59 @@ function stepTime(i, bpm, amt = 100) {
   const w = x < 0.25 ? x * p / 0.25 : p + (x - 0.25) * (0.5 - p) / 0.25;
   return (Math.floor(i / 4) * 0.5 + w) * 60 / bpm;
 }
+// valores 0-255 de un patron (cache por hex)
+const VALS = new Map();
+function vals(hex) {
+  let v = VALS.get(hex);
+  if (!v) {
+    v = Array.from({length: NV}, (_, vi) => Array.from({length: STEPS}, (_, i) => parseInt(hex.substr((vi * STEPS + i) * 2, 2), 16)));
+    VALS.set(hex, v);
+  }
+  return v;
+}
+const isEmpty = hex => !/[^0]/.test(hex);
+// mute / solo por voz: con algun solo activo suenan solo los solos
+const mute = Array(NV).fill(false), solo = Array(NV).fill(false);
+const audible = vi => solo.some(Boolean) ? solo[vi] : !mute[vi];
+
+// ---- pad XY: la mezcla del plugin (genderbender.jsfx, lineas 766-772 y 501-504)
+let padX = 0, padY = 0, padSector = 4;
+function padValue(st, vi, i, sb) {
+  const x = padX, y = padY;
+  // mismo orden que el plugin: gana la ultima condicion que se cumple (en (0,0), el sector 4)
+  if (x < 0 && y < 0) padSector = 1;
+  if (x < 0 && y > 0) padSector = 2;
+  if (x >= 0 && y >= 0) padSector = 3;
+  if (x >= 0 && y <= 0) padSector = 4;
+  const X = Math.abs(x) / 100, Y = Math.abs(y) / 100, P = n => vals(st.p[n])[vi][i];
+  switch (padSector) {
+    case 1: return (P(0 + sb) * X + P(2 + sb) * (1 - X)) * Y + (P(4 + sb) * X + P(6 + sb) * (1 - X)) * (1 - Y);
+    case 2: return (P(0 + sb) * X + P(4 + sb) * (1 - X)) * Y + (P(6 + sb) * X + P(8) * (1 - X)) * (1 - Y);
+    case 3: return (P(0 + sb) * (1 - X) + P(2 + sb) * X) * (1 - Y) + (P(8) * (1 - X) + P(6 + sb) * X) * Y;
+    default: return (P(0 + sb) * (1 - X) + P(8) * X) * Y + (P(4 + sb) * (1 - X) + P(2 + sb) * X) * (1 - Y);
+  }
+}
+const barOf = (st, hex, mark) => { const v = vals(hex); return {st, val: (vi, i) => v[vi][i], mark}; };
+
 function tick() {
   const P = play;
   while (P.barStart + stepTime(P.step, P.bpm) < ac.currentTime + 0.1) {
-    const t = Math.max(P.barStart + stepTime(P.step, P.bpm), ac.currentTime);
-    const k = P.bar % P.pats.length, hex = P.pats[k], d = +dens.value;
+    if (P.step === 0) {
+      P.cur = P.getBar(P.bar);
+      if (P.cur.st !== P.lastSt) {  // A/B: cada estilo con su BPM y su swing
+        if (P.lastSt) { swing.value = swingv.value = P.cur.st.swing; syncZoom(); }
+        P.lastSt = P.cur.st; P.bpm = P.cur.st.bpm; P.amt = P.cur.st.amt || Array(NV).fill(100);
+      }
+      const t0 = Math.max(P.barStart, ac.currentTime), mark = P.cur.mark;
+      setTimeout(() => { if (play === P) P.marks.forEach(m => m.classList.toggle('playing', m === mark)); }, (t0 - ac.currentTime) * 1000);
+    }
+    const d = +dens.value;
     for (let vi = 0; vi < NV; vi++) {
-      const v = parseInt(hex.substr((vi * STEPS + P.step) * 2, 2), 16);
+      if (!audible(vi)) continue;
+      const v = P.cur.val(vi, P.step);
       // misma regla que el plugin; cada voz con su amount de swing
       if (v && 256 - v < d) VOICE[vi](Math.max(P.barStart + stepTime(P.step, P.bpm, P.amt[vi]), ac.currentTime));
     }
-    if (P.step === 0) setTimeout(() => { if (play === P) P.marks.forEach((m, j) => m.classList.toggle('playing', j === k)); },
-                                 (t - ac.currentTime) * 1000);
     if (++P.step === STEPS) { P.step = 0; P.bar++; P.barStart += 240 / P.bpm; }
   }
 }
@@ -254,14 +302,15 @@ function stop() {
   play.marks.forEach(m => m.classList.remove('playing'));
   play = null;
 }
-function start(btn, label, pats, marks, st, inZoom) {
+function start(btn, label, pats, marks, st, inZoom, getBar) {
   const same = play && play.btn === btn;
   stop();
   if (same) return;
   audio();
   swing.value = swingv.value = st.swing;  // la receta del estilo; se puede mover a mano mientras suena
   syncZoom();
-  play = {btn, label, pats, marks, st, bpm: st.bpm, amt: st.amt || Array(NV).fill(100), inZoom,
+  getBar = getBar || (b => barOf(st, pats[b % pats.length], marks[b % marks.length]));
+  play = {btn, label, getBar, marks, st, bpm: st.bpm, amt: st.amt || Array(NV).fill(100), inZoom,
           bar: 0, step: 0, barStart: ac.currentTime + 0.05};
   btn.textContent = '■ Stop'; btn.setAttribute('aria-pressed', 'true');
   play.timer = setInterval(tick, 25); tick();
@@ -287,8 +336,11 @@ function openZoom(st) {
   document.getElementById('zname').textContent = st.name;
   zoomTools(st);
   current = st;
+  mute.fill(false); solo.fill(false);
+  const figs = [];
   st.p.forEach((hex, i) => {
     const f = document.createElement('figure'), cap = document.createElement('figcaption');
+    figs.push(f);
     cap.textContent = 'p' + i + (i === 8 ? ' FILL' : '');
     cap.append(playButton('▶', b => start(b, '▶', [hex], [f], st, true)));
     const row = document.createElement('div'); row.className = 'row';
@@ -296,8 +348,51 @@ function openZoom(st) {
     DATA.voices.forEach(v => { const e = document.createElement('span'); e.textContent = v; names.append(e); });
     row.append(names, pattern(hex, 10, zoomed)); f.append(cap, row); zbody.append(f);
   });
+  zoomPlay(st, figs);
   if (!zoom.open) zoom.showModal();
   writeHash();
+}
+
+function zoomPlay(st, figs) {
+  const z = document.getElementById('zplay'); z.textContent = '';
+  // pad XY
+  const box = document.createElement('div'), pad = document.createElement('div'), dot = document.createElement('div');
+  const pos = document.createElement('output'), note = document.createElement('div');
+  pad.className = 'pad'; dot.className = 'dot'; pad.append(dot);
+  pad.title = 'Pad XY del plugin: arrastra mientras suena; doble clic para volver al centro';
+  const place = () => { dot.style.left = (padX + 100) / 2 + '%'; dot.style.top = (100 - padY) / 2 + '%'; pos.value = 'x ' + padX + ' · y ' + padY; };
+  const move = e => {
+    const r = pad.getBoundingClientRect(), c = v => Math.max(-100, Math.min(100, Math.round(v)));
+    padX = c(((e.clientX - r.left) / r.width * 2 - 1) * 100); padY = c((1 - (e.clientY - r.top) / r.height * 2) * 100); place();
+  };
+  pad.addEventListener('pointerdown', e => { pad.setPointerCapture(e.pointerId); move(e); });
+  pad.addEventListener('pointermove', e => { if (e.buttons) move(e); });
+  pad.addEventListener('dblclick', () => { padX = padY = 0; place(); });
+  padX = padY = 0; place();
+  note.textContent = 'como en el plugin: justo encima del centro cambia de sector';
+  const padBtn = playButton('▶ pad', b => start(b, '▶ pad', null, [], st, true, n => ({st, val: (vi, i) => padValue(st, vi, i, n % 2), mark: null})));
+  box.append(padBtn, ' ', pos, pad, note);
+  // secuencia: INTRO -> BASE -> ENERGIA -> VARIACION -> FILL, sin partes vacias
+  const seq = [0, 1, 4, 5, 2, 3, 6, 7, 8, 8].filter(k => !isEmpty(st.p[k]));
+  const seqBtn = playButton('▶ secuencia', b => start(b, '▶ secuencia', null, figs, st, true, n => barOf(st, st.p[seq[n % seq.length]], figs[seq[n % seq.length]])));
+  // A/B con otro estilo
+  const all = DATA.groups.flatMap(g => g.styles), sel = document.createElement('select');
+  all.forEach(o => { if (o !== st) sel.append(new Option(o.name, o.name)); });
+  const abBtn = playButton('▶ A/B', b => {
+    const other = all.find(o => o.name === sel.value);
+    start(b, '▶ A/B', null, [], st, true, n => { const s2 = Math.floor(n / 2) % 2 ? other : st; return barOf(s2, s2.p[4 + n % 2], null); });
+  });
+  const col = document.createElement('div'); col.style.display = 'grid'; col.style.gap = '8px';
+  const ab = document.createElement('label'); ab.append('B: ', sel);
+  col.append(seqBtn, abBtn, ab);
+  // mute / solo por voz
+  const mix = document.createElement('div'); mix.className = 'mix';
+  DATA.voices.forEach((v, vi) => {
+    const tg = (arr, txt) => playButton(txt, b => { arr[vi] = !arr[vi]; b.classList.toggle('on', arr[vi]); b.textContent = txt; });
+    const name = document.createElement('span'); name.textContent = v;
+    mix.append(name, tg(mute, 'M'), tg(solo, 'S'));
+  });
+  z.append(box, col, mix);
 }
 zoom.addEventListener('click', e => { if (e.target === zoom) zoom.close(); });
 zoom.addEventListener('close', () => { current = null; writeHash(); });
@@ -307,13 +402,13 @@ const GM = [36, 38, 39, 42, 46, 50, 45];
 let useGM = false, current = null;
 function vlq(n) { const b = [n & 127]; while ((n >>= 7)) b.unshift((n & 127) | 128); return b; }
 function midiFile(st) {
-  const pats = play && play.st === st ? play.pats : [st.p[4], st.p[5]];
+  const getBar = play && play.st === st ? play.getBar : (b => barOf(st, st.p[4 + b % 2], null));
   const amt = st.amt || Array(NV).fill(100), d = +dens.value, PPQ = 480, ev = [];
   for (let bar = 0; bar < 2; bar++) {
-    const hex = pats[bar % pats.length];
+    const cur = getBar(bar);
     for (let vi = 0; vi < NV; vi++) for (let i = 0; i < STEPS; i++) {
-      const v = parseInt(hex.substr((vi * STEPS + i) * 2, 2), 16);
-      if (!v || 256 - v >= d) continue;
+      const v = cur.val(vi, i);
+      if (!audible(vi) || !v || 256 - v >= d) continue;
       const t = Math.round((bar * 4 + stepTime(i, 60, amt[vi])) * PPQ);  // stepTime a 60 BPM = negras
       const note = useGM ? GM[vi] : 36 + vi;
       ev.push([t, 0x99, note, 100], [t + PPQ / 8, 0x89, note, 0]);
