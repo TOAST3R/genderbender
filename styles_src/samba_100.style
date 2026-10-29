@@ -1,0 +1,42 @@
+name: SAMBA 100
+# Samba: surdo en el 2 de cada 2/4, tamborim en teleco-teco y ganza. Tempo sugerido: 100 BPM. Div por defecto (4).
+# Voces: kick=bombo / contrabajo / surdo / tambora  snare=caja / escobillas / tamborim / caixa  clap=palmas / clave  hhc=hat / ride / guira / ganza  hho=hat abierto / ride  hitom/lotom=congas / toms
+# Groove: swing 56 · amount: hhc 100, snare 100, resto 0 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    XXXX XXXX XXXX XXXX
+[p1]
+kick   X... .... .... ....
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   .... X... .... X..o
+snare  X.X. .X.X .X.. X.X.
+hhc    XXXX XXXX XXXX XXXX
+hitom  .... .... ...- ....
+[p3]
+snare  X...X... ..X...X. ..X..... Xox-Xox-
+
+[p4 p5]                         # BASE
+kick   .... X... .... X...
+snare  X.X. .X.X .X.. X.X.
+hhc    XXXX XXXX XXXX XXXX
+
+[p6 p7]                         # VARIACION: los toms toman el ritmo de los hats
+kick   .... X... .... X...
+snare  X.X. .X.X .X.. X.X.
+hhc    x... x... x... x...
+hitom  XXXX XXXX .... ....
+lotom  .... .... XXXX XXXX
+[p7]
+kick   .... X... .... X..x
+
+[p8]                            # FILL: redoble que acentua los golpes de la base
+kick   .... X... .... ....
+snare  X...X... ..X...X. X.X.x.x. XoxoXoxo
+hitom  .... .... XXXX ....
+lotom  .... .... .... XXXX

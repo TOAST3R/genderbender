@@ -1,0 +1,43 @@
+name: BACHATA 130
+# Bachata: guira y bongo, golpe en el 4. Tempo sugerido: 130 BPM. Div por defecto (4).
+# Voces: kick=bombo / contrabajo / surdo / tambora  snare=caja / escobillas / tamborim / caixa  clap=palmas / clave  hhc=hat / ride / guira / ganza  hho=hat abierto / ride  hitom/lotom=congas / toms
+# Groove: swing 54 · amount: hhc 100, resto 0 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    X... X.X. X... X.X.
+[p1]
+kick   X... .... .... ....
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   X... X... X... ...o
+snare  .... ...o .... X...
+hhc    Xxxx XxXx Xxxx XxXx
+hitom  .... .... ...- ....
+[p3]
+snare  ........ ......o. ........ Xox-xox-
+
+[p4 p5]                         # BASE
+kick   X... X... X... ....
+snare  .... .... .... X...
+hhc    X... X.X. X... X.X.
+
+[p6 p7]                         # VARIACION: los toms toman el ritmo de los hats
+kick   X... X... X... ....
+snare  .... .... .... X...
+hhc    x... x... x... x...
+hitom  X... X.X. .... ....
+lotom  .... .... X... X.X.
+[p7]
+kick   X... X... X... ...x
+snare  .... .... .... X.X.
+
+[p8]                            # FILL: redoble que acentua los golpes de la base
+kick   X... X... .... ....
+snare  ........ ........ X.x.x.x. Xoxoxoxo
+hitom  .... .... X... ....
+lotom  .... .... .... X.X.
