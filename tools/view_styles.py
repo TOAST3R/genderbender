@@ -127,7 +127,7 @@ h2{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.12
 .pat canvas{display:block;image-rendering:pixelated}
 .empty::after{content:"FILL vacío";position:absolute;inset:0;display:grid;place-items:center;font-size:10px;color:var(--muted);border:1px dashed var(--line)}
 dialog{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:16px;max-width:calc(100vw - 32px);max-height:calc(100vh - 32px)}
-dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog::backdrop{background:rgba(0,0,0,.3)}
 dialog h3{margin:0 0 12px;font-size:15px}
 .big{display:flex;flex-wrap:wrap;gap:12px 20px}
 .big figure{margin:0}
@@ -170,15 +170,20 @@ body:has(#visbar.on){padding-bottom:60px}
 .dot{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--ink);z-index:1}
 .mix{display:grid;grid-template-columns:auto auto auto;gap:2px 6px;align-items:center}
 .play.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#scene{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none}
+main section{background:color-mix(in srgb,var(--bg) 92%,transparent);border-radius:8px;padding:2px 12px 10px;margin:0 -12px 16px}
+main section h2{margin-top:14px}
 </style>
 </head>
 <body>
+<canvas id="scene" aria-hidden="true"></canvas>
 <header>
 <h1>GENDERBENDER · FINGERPRINTS</h1>
 <a class="src" href="https://github.com/TOAST3R/genderbender">Código fuente ↗</a>
 <label>Género <select id="fam"></select></label><output id="count"></output>
 <label>Density <input id="dens" type="range" min="0" max="260" value="50"><output id="densv">50</output></label>
 <label>Swing <input id="swing" type="range" min="50" max="75" value="50"><output id="swingv">50</output></label>
+<span><label style="display:inline-flex">BPM <input id="bpm" type="range" min="40" max="240" value="120"><output id="bpmv">120</output></label><button class="play" id="bpmreset" title="Volver al BPM del estilo">↺</button></span>
 <label>Kit <select id="kit"></select></label>
 <label class="knob">Distortion <input id="dist" type="range" min="0" max="100" value="0"><span class="disc"></span><output id="distv">0</output></label>
 <label class="knob">Delay <input id="dly" type="range" min="0" max="100" value="0"><span class="disc"></span><output id="dlyv">0</output></label>
@@ -221,6 +226,28 @@ function pattern(hex, s, list = canvases) {
 
 // ---- preview de audio: voces sintetizadas con Web Audio, sin recursos externos
 const swing = document.getElementById('swing'), swingv = document.getElementById('swingv');
+// BPM: el del estilo salvo que se mueva el slider; bpmFor = estilo al que pertenece el cambio
+const bpmI = document.getElementById('bpm'), bpmv = document.getElementById('bpmv');
+let bpmOverride = null, bpmFor = null;
+const setBpmSlider = v => { bpmI.value = bpmv.value = v; syncZoom(); };
+function setTempo(P, nb) {  // sin saltos: el siguiente paso por programar no se mueve
+  if (nb === P.bpm) return;
+  const tNext = P.barStart + stepTime(P.step, P.bpm);
+  P.barStart = tNext - stepTime(P.step, nb); P.bpm = nb; delayBpm(nb);
+}
+bpmI.addEventListener('input', () => {
+  bpmv.value = bpmI.value; bpmOverride = +bpmI.value; bpmFor = play ? play.st : (current || bpmFor);
+  if (play) setTempo(play, bpmOverride);
+  syncZoom(); writeHash();
+});
+function resetBpm() {
+  bpmOverride = null;
+  const st = play ? (play.cur ? play.cur.st : play.st) : (current || bpmFor);
+  if (st) setBpmSlider(st.bpm);
+  if (play && play.cur) setTempo(play, play.cur.st.bpm);
+  writeHash();
+}
+document.getElementById('bpmreset').addEventListener('click', resetBpm);
 let ac = null, noiseBuf = null, play = null;
 function audio() {
   if (!ac) {
@@ -495,7 +522,8 @@ function tick() {
       P.cur = P.getBar(P.bar);
       if (P.cur.st !== P.lastSt) {  // A/B: cada estilo con su BPM y su swing
         if (P.lastSt) { swing.value = swingv.value = P.cur.st.swing; syncZoom(); }
-        P.lastSt = P.cur.st; P.bpm = P.cur.st.bpm; P.amt = P.cur.st.amt || Array(NV).fill(100);
+        P.lastSt = P.cur.st; P.bpm = bpmOverride ?? P.cur.st.bpm; P.amt = P.cur.st.amt || Array(NV).fill(100);
+        if (bpmOverride == null) setBpmSlider(P.bpm);
         delayBpm(P.bpm);
       }
       showAuto(P.cur.st);
@@ -509,7 +537,7 @@ function tick() {
       // misma regla que el plugin; cada voz con su amount de swing
       if (v && 256 - v < d) { playVoice(P.cur.st, vi, Math.max(P.barStart + stepTime(P.step, P.bpm, P.amt[vi]), ac.currentTime)); hits.push(vi); }
     }
-    P.q.push({t: P.barStart + stepTime(P.step, P.bpm), mark: P.cur.mark, step: P.step, hits});
+    P.q.push({t: P.barStart + stepTime(P.step, P.bpm), mark: P.cur.mark, step: P.step, hits, st: P.cur.st});
     if (++P.step === STEPS) { P.step = 0; P.bar++; P.barStart += 240 / P.bpm; }
   }
 }
@@ -520,6 +548,7 @@ function stop() {
   play.marks.forEach(m => m.classList.remove('playing'));
   play = null;
   cursor.remove();
+  S.last = null; drawScene(0, true);
   document.querySelectorAll('.vis, #visbar').forEach(e => e.classList.toggle('on', e.id === 'fvis'));
 }
 function start(btn, label, pats, marks, st, inZoom, getBar) {
@@ -530,9 +559,12 @@ function start(btn, label, pats, marks, st, inZoom, getBar) {
   swing.value = swingv.value = st.swing;  // la receta del estilo; se puede mover a mano mientras suena
   syncZoom();
   getBar = getBar || (b => barOf(st, pats[b % pats.length], marks[b % marks.length]));
-  play = {btn, label, getBar, marks, st, bpm: st.bpm, amt: st.amt || Array(NV).fill(100), inZoom,
+  if (st !== bpmFor && bpmOverride != null) { bpmOverride = null; bpmFor = st; writeHash(); }  // otro estilo: vuelve a su BPM, como el Swing
+  bpmFor = st; setBpmSlider(bpmOverride ?? st.bpm);
+  play = {btn, label, getBar, marks, st, bpm: bpmOverride ?? st.bpm, amt: st.amt || Array(NV).fill(100), inZoom,
           bar: 0, step: 0, barStart: ac.currentTime + 0.05, q: []};
   btn.textContent = '■ Stop'; btn.setAttribute('aria-pressed', 'true');
+  S.last = null; S.hitAt.fill(-1e9); S.ev.length = 0;
   play.timer = setInterval(tick, 25); tick();
   if (!raf) raf = requestAnimationFrame(frame);
 }
@@ -547,7 +579,7 @@ document.querySelectorAll('.vis').forEach(c => c.addEventListener('click', () =>
   try { localStorage.setItem('gb-vis', visMode); } catch (e) {}
 }));
 function showStep(e) {
-  const row = e.mark.querySelector && e.mark.querySelector('.row');
+  const row = e.mark && e.mark.querySelector && e.mark.querySelector('.row');
   if (!row) return;  // en la lista no hay cursor: solo se marca el patron
   const c = row.querySelector('canvas'), w = c.offsetWidth / STEPS;
   if (cursor.parentNode !== row) row.append(cursor);
@@ -573,17 +605,251 @@ function drawVis(c) {
     }
   }
 }
-function frame() {
+function frame(ts) {
   if (!play) { raf = 0; return; }
   const now = ac.currentTime - (ac.outputLatency || 0);
-  let e; while (play.q.length && play.q[0].t <= now) e = play.q.shift();
+  let e;
+  while (play.q.length && play.q[0].t <= now) {
+    e = play.q.shift(); S.last = e;
+    e.hits.forEach(vi => { S.hitAt[vi] = e.t; S.ev.push({vi, t: e.t}); });
+  }
+  if (S.ev.length > 64) S.ev.splice(0, S.ev.length - 64);
   if (e) showStep(e);
   const vis = [document.getElementById('zvis')], bar = document.getElementById('visbar');
   vis[0].classList.toggle('on', !still.matches && zoom.open);
   bar.classList.toggle('on', !still.matches && !play.inZoom);
   if (!still.matches && FXB) { if (zoom.open) drawVis(vis[0]); if (!play.inZoom) drawVis(document.getElementById('fvis')); }
+  drawScene(ts);
   raf = requestAnimationFrame(frame);
 }
+
+// ---- escenas de fondo: una por grupo de kit; se mueven al tempo y con los golpes
+const sceneC = document.getElementById('scene'), sg = sceneC.getContext('2d'), snap = document.createElement('canvas');
+const S = {id: null, fade0: 0, last: null, hitAt: Array(NV).fill(-1e9), ev: [], lastDraw: 0, w: 0, h: 0, pal: null, fbuf: null};
+function sceneSize() {
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  S.w = innerWidth; S.h = innerHeight;
+  sceneC.width = snap.width = Math.round(S.w * dpr); sceneC.height = snap.height = Math.round(S.h * dpr);
+  sg.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+function scenePal() {
+  const cs = getComputedStyle(document.documentElement), v = n => cs.getPropertyValue(n).trim(), bg = v('--bg');
+  S.pal = {bg, fg: v('--fg'), muted: v('--muted'), cell: v('--cell'), ink: v('--ink'), line: v('--line'), dark: parseInt(bg.slice(1, 3), 16) < 128};
+}
+function sceneId() {  // el estilo que suena; si no, el genero del filtro
+  const f = play && S.last ? FAMILY[S.last.st.name] : fam.value;
+  return (f && FAM_KIT[f]) || 'actual';
+}
+function sceneState(calm) {
+  const s = {w: S.w, h: S.h, pal: S.pal, t: 0, pos: 0, beat: 0, bpm: 120, age: Array(NV).fill(Infinity),
+             lo: 0, mid: 0, hi: 0, spec: Array(16).fill(0), ev: [], calm};
+  if (calm || !play) return s;
+  const now = ac.currentTime - (ac.outputLatency || 0);
+  s.t = now; s.bpm = play.bpm;
+  if (S.last) { s.pos = (S.last.step / 8 + Math.max(0, now - S.last.t) * play.bpm / 60) % 4; s.beat = s.pos % 1; }
+  s.age = S.hitAt.map(t => now - t);
+  s.ev = S.ev.filter(e => now - e.t < 1.5).map(e => ({vi: e.vi, age: now - e.t, seed: e.t + e.vi * 0.37}));
+  if (FXB) {
+    if (!S.fbuf) S.fbuf = new Uint8Array(FXB.an.frequencyBinCount);
+    FXB.an.getByteFrequencyData(S.fbuf);
+    const n = S.fbuf.length, bin = f => Math.min(n - 1, Math.round(f / (ac.sampleRate / 2) * n));
+    const avg = (a, b) => { let x = 0, k = 0; for (let i = bin(a); i <= bin(b); i++) { x += S.fbuf[i]; k++; } return x / k / 255; };
+    s.lo = avg(30, 150); s.mid = avg(300, 2000); s.hi = avg(5000, 12000);
+    s.spec = s.spec.map((_, i) => avg(40 * Math.pow(300, i / 16), 40 * Math.pow(300, (i + 1) / 16)));
+  }
+  return s;
+}
+function drawScene(ts, force) {
+  if (!S.pal) scenePal();
+  const id = sceneId(), now = performance.now(), animate = play && !still.matches;
+  if (id !== S.id) {
+    if (S.id && animate) { const c = snap.getContext('2d'); c.clearRect(0, 0, snap.width, snap.height); c.drawImage(sceneC, 0, 0); S.fade0 = now; }
+    else S.fade0 = 0;
+    S.id = id; force = true;
+  }
+  const fade = animate && S.fade0 ? (now - S.fade0) / 400 : 1;  // fundido de 400 ms
+  if (!force && (!animate || now - S.lastDraw < 33)) return;  // fondo a <= 30 fps; fijo sin reproduccion
+  S.lastDraw = now;
+  sg.save(); SCENES[S.id](sg, sceneState(!animate)); sg.restore();
+  if (fade < 1) { sg.save(); sg.setTransform(1, 0, 0, 1, 0, 0); sg.globalAlpha = 1 - fade; sg.drawImage(snap, 0, 0); sg.restore(); }
+  else S.fade0 = 0;
+}
+const dec = (age, tau) => age >= 0 ? Math.exp(-age / tau) : 0;  // envolvente de un golpe
+const hash = i => { const x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.floor(x); };
+const back = (g, s) => { g.fillStyle = s.pal.bg; g.fillRect(0, 0, s.w, s.h); };
+const grain = (g, s, n, a) => {
+  g.fillStyle = s.pal.fg; g.globalAlpha = a;
+  for (let i = 0; i < n; i++) g.fillRect(Math.random() * s.w, Math.random() * s.h, 1.5, 1.5);
+  g.globalAlpha = 1;
+};
+const SCENES = {
+  // 909: panel en perspectiva con potes y la tira de 16 pasos; el panel respira con el bombo
+  '909'(g, s) {
+    back(g, s);
+    const {w, h, pal} = s, b = 1 + 0.03 * dec(s.age[0], 0.15), pw = Math.min(w * 0.9, 1300), ph = Math.min(h * 0.34, 320);
+    g.translate(w / 2, h * 0.62); g.scale(b, b);
+    g.globalAlpha = 0.55; g.fillStyle = pal.dark ? '#202020' : '#d4d0c8';
+    g.beginPath(); g.moveTo(-pw * 0.4, -ph / 2); g.lineTo(pw * 0.4, -ph / 2); g.lineTo(pw / 2, ph / 2); g.lineTo(-pw / 2, ph / 2); g.fill();
+    g.globalAlpha = 0.6; g.strokeStyle = pal.line; g.lineWidth = 2;
+    for (let i = 0; i < 12; i++) {  // potes
+      const x = (-0.5 + (i + 0.5) / 12) * pw * 0.78, y = -ph * 0.22, r = ph * 0.06;
+      g.fillStyle = pal.cell; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); g.stroke();
+      const a = -2.4 + hash(i) * 4.8; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r); g.stroke();
+    }
+    const lit = s.calm ? -1 : Math.floor(s.pos * 4) % 16, TR = ['#c0392b', '#e67e22', '#f1c40f', '#ecf0f1'];
+    for (let i = 0; i < 16; i++) {
+      const bw = pw * 0.92 / 16, x = -pw * 0.46 + i * bw, y = ph * 0.18;
+      g.globalAlpha = i === lit ? 1 : 0.3; g.fillStyle = TR[i >> 2];
+      g.shadowBlur = i === lit ? 18 : 0; g.shadowColor = TR[i >> 2];
+      g.fillRect(x + bw * 0.12, y, bw * 0.76, ph * 0.16);
+    }
+  },
+  // 808: tunel de anillos que avanzan al tempo; el bombo lanza una onda larga y los graves lo hacen ondular
+  '808'(g, s) {
+    back(g, s);
+    const {w, h, pal} = s, cx = w / 2 + s.lo * 14 * Math.sin(s.t * 7), cy = h / 2 + s.lo * 14 * Math.cos(s.t * 5), R = Math.hypot(w, h) / 2;
+    g.strokeStyle = '#8b5cf6';
+    for (let i = 0; i < 16; i++) {
+      const d = (i + s.beat) / 16;
+      g.globalAlpha = 0.06 + 0.3 * d; g.lineWidth = 1 + 3 * d;
+      g.beginPath(); g.arc(cx, cy, R * d * d, 0, 7); g.stroke();
+    }
+    const a = s.age[0];
+    if (a < 1) { g.globalAlpha = 0.5 * (1 - a); g.strokeStyle = pal.ink; g.lineWidth = 14 * (1 - a); g.beginPath(); g.arc(cx, cy, R * Math.pow(a, 0.6), 0, 7); g.stroke(); }
+  },
+  // acustico: bateria vista desde arriba; el parche de cada voz ondula al golpear
+  acustico(g, s) {
+    back(g, s);
+    const {w, h, pal} = s, m = Math.min(w, h), cx = w / 2;
+    const kit = [[cx, h * 0.62, 0.2, 0], [cx - m * 0.3, h * 0.62, 0.11, 1], [cx + m * 0.5, h * 0.36, 0.15, 2], [cx - m * 0.5, h * 0.45, 0.1, 3],
+                 [cx - m * 0.5, h * 0.45, 0.1, 4], [cx - m * 0.12, h * 0.36, 0.09, 5], [cx + m * 0.16, h * 0.36, 0.1, 6]];
+    for (const [x, y, rr, vi] of kit) {
+      const r = rr * m, cym = vi === 2 || vi >= 3 && vi <= 4, k = dec(s.age[vi], 0.3);
+      g.globalAlpha = 0.45; g.fillStyle = cym ? '#ca8a04' : pal.cell; g.strokeStyle = '#a16207'; g.lineWidth = cym ? 1 : 4;
+      g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); g.stroke();
+      if (k > 0.01) {
+        g.strokeStyle = pal.ink; g.lineWidth = 2;
+        for (let j = 1; j <= 3; j++) {
+          g.globalAlpha = 0.6 * k; g.beginPath();
+          g.arc(x, y, r * (j / 4 + 0.03 * k * Math.sin(s.age[vi] * 50 + j)), 0, 7); g.stroke();
+        }
+      }
+    }
+  },
+  // lo-fi: vinilo que gira a 33 rpm (escalado por el tempo), grano, polvo con los hats y vineta calida
+  lofi(g, s) {
+    back(g, s);
+    const {w, h, pal} = s, cx = w / 2, cy = h * 0.55, R = Math.min(w, h) * 0.38, a = s.t * 2 * Math.PI * (33.333 / 60) * (s.bpm / 90);
+    g.globalAlpha = 0.85; g.fillStyle = '#18181b'; g.beginPath(); g.arc(cx, cy, R, 0, 7); g.fill();
+    g.strokeStyle = '#fff'; g.lineWidth = 1;
+    for (let i = 0; i < 26; i++) { g.globalAlpha = 0.03 + 0.03 * (i % 3 === 0); g.beginPath(); g.arc(cx, cy, R * (0.36 + 0.62 * i / 26), 0, 7); g.stroke(); }
+    g.globalAlpha = 0.07; g.fillStyle = '#fff'; g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, R, a, a + 0.5); g.fill();
+    g.globalAlpha = 0.9; g.fillStyle = pal.ink; g.beginPath(); g.arc(cx, cy, R * 0.32, 0, 7); g.fill();
+    g.strokeStyle = pal.bg; g.lineWidth = 3; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + Math.cos(a) * R * 0.3, cy + Math.sin(a) * R * 0.3); g.stroke();
+    g.strokeStyle = pal.muted; g.lineWidth = 6; g.globalAlpha = 0.7;
+    g.beginPath(); g.moveTo(cx + R * 1.05, cy - R * 0.95); g.lineTo(cx + R * 0.5, cy - R * 0.1); g.stroke();
+    if (Math.min(s.age[3], s.age[4]) < 0.08) {
+      g.fillStyle = '#fff'; g.globalAlpha = 0.7;
+      for (let i = 0; i < 6; i++) { const r = R * Math.sqrt(Math.random()), t = Math.random() * 7; g.fillRect(cx + Math.cos(t) * r, cy + Math.sin(t) * r, 2, 2); }
+    }
+    g.globalAlpha = 1;
+    const v = g.createRadialGradient(cx, cy, R * 0.6, cx, cy, Math.hypot(w, h) / 1.6);
+    v.addColorStop(0, 'rgba(120,80,40,0)'); v.addColorStop(1, 'rgba(120,80,40,.28)'); g.fillStyle = v; g.fillRect(0, 0, w, h);
+    grain(g, s, 400, 0.06);
+  },
+  // hardcore: franjas de aviso que pasan al tempo y suelo aspero; el bombo sacude la camara, sin destellos
+  hardcore(g, s) {
+    back(g, s);
+    const {w, h} = s, a = s.age[0], k = dec(a, 0.1);
+    g.translate(10 * k * Math.sin(a * 80), 6 * k * Math.cos(a * 70));
+    g.fillStyle = 'rgba(127,29,29,.12)'; g.fillRect(-20, -20, w + 40, h + 40);
+    g.strokeStyle = s.pal.muted; g.lineWidth = 1.5; g.globalAlpha = 0.35;
+    for (let j = 0; j < 7; j++) {
+      g.beginPath();
+      for (let x = -20; x <= w + 20; x += 12) {
+        const y = h * (0.3 + 0.07 * j) + Math.sin(x * 0.05 + j * 3 + s.pos * 2) * 6 + Math.sin(x * 0.13 + j) * 3;
+        x < 0 ? g.moveTo(x, y) : g.lineTo(x, y);
+      }
+      g.stroke();
+    }
+    const sw = 40, off = (s.pos * 2 * sw) % (2 * sw);
+    for (const [y0, y1] of [[-20, h * 0.1], [h * 0.9, h + 20]]) {
+      g.save(); g.beginPath(); g.rect(-20, y0, w + 40, y1 - y0); g.clip();
+      g.globalAlpha = 0.6; g.fillStyle = '#0a0a0a'; g.fillRect(-20, y0, w + 40, y1 - y0);
+      g.globalAlpha = 0.55; g.fillStyle = '#eab308';
+      for (let x = -h - 2 * sw + off; x < w + h; x += 2 * sw) {
+        g.beginPath(); g.moveTo(x, y1); g.lineTo(x + sw, y1); g.lineTo(x + sw + (y1 - y0), y0); g.lineTo(x + (y1 - y0), y0); g.fill();
+      }
+      g.restore();
+    }
+  },
+  // 80s: rejilla de neon que avanza al tempo, sol a franjas; la caja da brillo en el horizonte, los hats estrellas
+  '80s'(g, s) {
+    back(g, s);
+    const {w, h, pal} = s, y0 = h * 0.55, R = Math.min(w, h) * 0.2;
+    const sky = g.createLinearGradient(0, 0, 0, y0);
+    sky.addColorStop(0, pal.dark ? '#1e0b3a' : '#f5d0fe'); sky.addColorStop(1, pal.dark ? '#5b1a5e' : '#fbcfe8');
+    g.globalAlpha = 0.6; g.fillStyle = sky; g.fillRect(0, 0, w, y0);
+    g.fillStyle = pal.dark ? '#fff' : '#7e22ce';
+    for (let i = 0; i < 50; i++) {
+      g.globalAlpha = 0.2 + (i % 3 === 0 ? 0.6 * dec(s.age[3], 0.15) : 0) + (i % 5 === 0 ? 0.6 * dec(s.age[4], 0.3) : 0);
+      g.fillRect(hash(i) * w, hash(i + 99) * y0 * 0.85, 2, 2);
+    }
+    g.save(); g.beginPath(); g.rect(0, 0, w, y0); g.clip();
+    const sun = g.createLinearGradient(0, y0 - R, 0, y0); sun.addColorStop(0, '#fde047'); sun.addColorStop(1, '#ec4899');
+    g.globalAlpha = 0.85; g.fillStyle = sun; g.beginPath(); g.arc(w / 2, y0, R, 0, 7); g.fill();
+    g.globalAlpha = 1; g.fillStyle = pal.dark ? '#5b1a5e' : '#fbcfe8';
+    for (let k = 0; k < 6; k++) g.fillRect(w / 2 - R, y0 - R * (0.08 + 0.13 * k), 2 * R, 2 + k * 1.2);
+    g.restore();
+    g.globalAlpha = 0.35; g.fillStyle = pal.dark ? '#2e1065' : '#ede9fe'; g.fillRect(0, y0, w, h - y0);
+    g.strokeStyle = '#e879f9'; g.lineWidth = 1.5; g.globalAlpha = 0.6;
+    for (let i = -24; i <= 24; i++) { g.beginPath(); g.moveTo(w / 2, y0); g.lineTo(w / 2 + i * w * 0.09, h); g.stroke(); }
+    const fr = s.pos % 1;
+    for (let j = 0; j < 16; j++) { const z = j + 1 - fr, y = y0 + (h - y0) / z; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+    const k = dec(s.age[1], 0.2);
+    g.globalAlpha = 0.8; g.shadowColor = '#f0abfc'; g.shadowBlur = 24 * k; g.lineWidth = 2 + 6 * k;
+    g.beginPath(); g.moveTo(0, y0); g.lineTo(w, y0); g.stroke();
+  },
+  // percusion: tejido de colores; cada golpe deja caer una piedra con ondas de un color por voz
+  percusion(g, s) {
+    back(g, s);
+    const {w, h} = s, C = ['#b45309', '#dc2626', '#ca8a04', '#65a30d', '#16a34a', '#0891b2', '#9333ea'], T = 28;
+    g.globalAlpha = 0.12;
+    for (let y = 0, iy = 0; y < h; y += T, iy++) for (let x = 0, ix = 0; x < w; x += T, ix++) {
+      g.fillStyle = C[(ix + 2 * iy) % 4];
+      (ix + iy) % 2 ? g.fillRect(x, y + T * 0.3, T, T * 0.4) : g.fillRect(x + T * 0.3, y, T * 0.4, T);
+    }
+    g.lineWidth = 3;
+    for (const e of s.ev) {
+      const x = hash(e.seed * 91.7) * w, y = hash(e.seed * 47.3) * h, r = 20 + e.age * 260;
+      g.strokeStyle = C[e.vi]; g.globalAlpha = 0.6 * (1 - e.age / 1.5);
+      g.beginPath(); g.arc(x, y, r, 0, 7); g.stroke(); g.beginPath(); g.arc(x, y, r * 0.6, 0, 7); g.stroke();
+    }
+  },
+  // chiptune: CRT de Game Boy con ecualizador de bloques y un sprite que salta con el bombo
+  chiptune(g, s) {
+    back(g, s);
+    const {w, h, pal} = s, GB = ['#0f380f', '#306230', '#8bac0f', '#9bbc0f'], scr = pal.dark ? GB[0] : GB[3], px = pal.dark ? GB[2] : GB[0];
+    const x0 = w * 0.08, y0 = h * 0.1, sw = w * 0.84, sh = h * 0.8, bs = sw / 16 / 1.25;
+    g.globalAlpha = 0.85; g.fillStyle = scr; g.beginPath(); g.roundRect(x0, y0, sw, sh, 24); g.fill();
+    g.strokeStyle = pal.line; g.lineWidth = 6; g.stroke();
+    g.fillStyle = px; g.globalAlpha = 0.8;
+    for (let i = 0; i < 16; i++) {
+      const n = s.calm ? 1 + (i * 7 % 5) : Math.round(s.spec[i] * 12);
+      for (let j = 0; j < n; j++) g.fillRect(x0 + sw * 0.04 + i * sw * 0.92 / 16, y0 + sh * 0.92 - (j + 1) * bs * 0.8, bs, bs * 0.65);
+    }
+    const SPR = ['00100100', '00011000', '00111100', '01011010', '11111111', '10111101', '10100101', '00011000'], ps = bs * 0.4;
+    const sx = x0 + sw * (0.1 + 0.8 * s.pos / 4), sy = y0 + sh * 0.18 - bs * 3 * dec(s.age[0], 0.25);
+    g.fillStyle = GB[1]; g.globalAlpha = 0.95;
+    SPR.forEach((row, r) => [...row].forEach((c, k) => { if (c === '1') g.fillRect(sx + k * ps, sy + r * ps, ps, ps); }));
+    g.fillStyle = '#000'; g.globalAlpha = 0.12;
+    for (let y = y0; y < y0 + sh; y += 3) g.fillRect(x0, y, sw, 1);
+  },
+  // otros: grano suave
+  actual(g, s) { back(g, s); grain(g, s, 300, 0.05); },
+};
+addEventListener('resize', () => { sceneSize(); drawScene(0, true); });
+sceneSize();
 function playButton(label, onClick) {
   const b = document.createElement('button');
   b.type = 'button'; b.className = 'play'; b.textContent = label; b.setAttribute('aria-pressed', 'false');
@@ -684,7 +950,7 @@ function midiFile(st) {
     }
   }
   ev.sort((a, b) => a[0] - b[0] || (a[1] === 0x89 ? -1 : 1));
-  const us = Math.round(60000000 / st.bpm), trk = [0, 0xff, 0x51, 3, us >> 16 & 255, us >> 8 & 255, us & 255];
+  const us = Math.round(60000000 / (bpmFor === st && bpmOverride || st.bpm)), trk = [0, 0xff, 0x51, 3, us >> 16 & 255, us >> 8 & 255, us & 255];
   let last = 0;
   for (const [t, s, n, vel] of ev) { trk.push(...vlq(t - last), s, n, vel); last = t; }
   trk.push(...vlq(Math.max(0, 8 * PPQ - last)), 0xff, 0x2f, 0);
@@ -723,6 +989,9 @@ function zoomTools(st) {
   };
   slider('Density', 'zdens', dens, 0, 260);
   slider('Swing', 'zswing', swing, 50, 75);
+  if (!play && bpmFor !== st) setBpmSlider(st.bpm);
+  slider('BPM', 'zbpm', bpmI, 40, 240);
+  const rb = playButton('↺', resetBpm); rb.title = 'Volver al BPM del estilo'; t.lastChild.append(rb);
   for (const src of FXI) {
     const l = document.createElement('label'), r = document.createElement('input'), d = document.createElement('span'), o = document.createElement('output');
     l.className = 'knob'; d.className = 'disc';
@@ -761,7 +1030,7 @@ function showAuto(st) {  // "Auto (909)": que kit esta usando Auto
 }
 
 function syncZoom() {  // los controles de la vista ampliada siguen a los de la cabecera
-  for (const [id, src] of [['zdens', dens], ['zswing', swing], ...FXI.map(x => ['z' + x.id, x])]) {
+  for (const [id, src] of [['zdens', dens], ['zswing', swing], ['zbpm', bpmI], ...FXI.map(x => ['z' + x.id, x])]) {
     const r = document.getElementById(id);
     if (r) {
       r.value = src.value; document.getElementById(id + 'v').value = src.value;
@@ -775,6 +1044,7 @@ function writeHash() {
   if (fam.value) q.set('fam', fam.value);
   if (+dens.value !== 50) q.set('density', dens.value);
   if (kitChoice !== 'auto') q.set('kit', kitChoice);
+  if (bpmOverride != null && bpmFor) q.set('bpm', bpmOverride);
   FXI.forEach(r => { if (+r.value) q.set(r.id, r.value); });
   if (current) q.set('style', current.name);
   history.replaceState(null, '', q.toString() ? '#' + q.toString() : location.pathname + location.search);
@@ -820,7 +1090,7 @@ function filter() {
   const shown = f ? DATA.groups.find(g => g.family === f).styles.length : total;
   count.value = f ? shown + ' de ' + total + ' estilos' : total + ' estilos';
 }
-fam.addEventListener('change', () => { filter(); writeHash(); }); filter();
+fam.addEventListener('change', () => { filter(); writeHash(); drawScene(0, true); }); filter();
 
 const redraw = () => { canvases.forEach(draw); zoomed.forEach(draw); };
 dens.addEventListener('input', () => { densv.value = dens.value; redraw(); writeHash(); syncZoom(); });
@@ -840,8 +1110,11 @@ dens.addEventListener('input', () => { densv.value = dens.value; redraw(); write
   if (d >= 0 && d <= 260) { dens.value = densv.value = d; redraw(); }
   const st = DATA.groups.flatMap(g => g.styles).find(s => s.name === q.get('style'));
   if (st) openZoom(st);
+  const b = parseInt(q.get('bpm'), 10);
+  if (st && b >= 40 && b <= 240) { bpmOverride = b; bpmFor = st; setBpmSlider(b); writeHash(); }
+  drawScene(0, true);
 }
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { redraw(); S.pal = null; drawScene(0, true); });
 </script>
 </body>
 </html>
