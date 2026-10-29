@@ -42,6 +42,11 @@ dialog h3{margin:0 0 12px;font-size:15px}
 .play:hover,.play:focus-visible{border-color:var(--ink);outline:none}
 .bpm{color:var(--muted);font-size:12px;margin-left:8px}
 .playing{outline:2px solid var(--ink);outline-offset:1px}
+.knob{position:relative}
+.knob input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.disc{--v:0;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);cursor:ns-resize;touch-action:none;background:conic-gradient(from 225deg,var(--ink) calc(var(--v)*2.7deg),var(--cell) 0 270deg,transparent 0)}
+.knob input:focus-visible+.disc{outline:2px solid var(--ink);outline-offset:1px}
+.knob output{min-width:2ch}
 .pat{min-width:96px;min-height:21px}
 .tools{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 12px;font-size:12px;color:var(--muted)}
 .tools a{color:var(--ink)}
@@ -64,6 +69,9 @@ dialog h3{margin:0 0 12px;font-size:15px}
 <label>Density <input id="dens" type="range" min="0" max="260" value="50"><output id="densv">50</output></label>
 <label>Swing <input id="swing" type="range" min="50" max="75" value="50"><output id="swingv">50</output></label>
 <label>Kit <select id="kit"></select></label>
+<label class="knob">Distortion <input id="dist" type="range" min="0" max="100" value="0"><span class="disc"></span><output id="distv">0</output></label>
+<label class="knob">Delay <input id="dly" type="range" min="0" max="100" value="0"><span class="disc"></span><output id="dlyv">0</output></label>
+<label class="knob">Reverb <input id="rev" type="range" min="0" max="100" value="0"><span class="disc"></span><output id="revv">0</output></label>
 <span class="hint" style="margin:0">color = valor 0–255 · atenuado = no suena con esta Density · clic para ampliar · ▶ preview sintetizado (no es el sonido de tu sampler) · Esc para</span>
 </header>
 <main id="main"></main>
@@ -115,20 +123,20 @@ function env(g, t, a, len) { g.gain.setValueAtTime(a, t); g.gain.exponentialRamp
 function tone(t, f0, f1, len, a, out, type = 'sine') {
   const o = ac.createOscillator(), g = ac.createGain();
   o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + len);
-  env(g, t, a, len); o.connect(g).connect(out || ac.destination); o.start(t); o.stop(t + len);
+  env(g, t, a, len); o.connect(g).connect(out || bus()); o.start(t); o.stop(t + len);
 }
 function noise(t, type, freq, len, a, out, gate) {
   const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
   s.buffer = noiseBuf; f.type = type; f.frequency.value = freq;
   if (gate) { g.gain.setValueAtTime(a, t); g.gain.setValueAtTime(0, t + len); } else env(g, t, a, len);
-  s.connect(f).connect(g).connect(out || ac.destination); s.start(t); s.stop(t + len + 0.01);
+  s.connect(f).connect(g).connect(out || bus()); s.start(t); s.stop(t + len + 0.01);
   return s;
 }
 // metal: seis cuadradas en las frecuencias del hat del 808, con paso banda y paso alto
 function metal(t, len, a, out) {
   const bp = ac.createBiquadFilter(), hp = ac.createBiquadFilter(), g = ac.createGain();
   bp.type = 'bandpass'; bp.frequency.value = 10000; hp.type = 'highpass'; hp.frequency.value = 7000;
-  env(g, t, a, len); bp.connect(hp).connect(g).connect(out || ac.destination);
+  env(g, t, a, len); bp.connect(hp).connect(g).connect(out || bus());
   const oscs = [205.3, 304.4, 369.6, 522.7, 540, 800].map(f => {
     const o = ac.createOscillator(); o.type = 'square'; o.frequency.value = f; o.connect(bp); o.start(t); o.stop(t + len); return o;
   });
@@ -136,7 +144,7 @@ function metal(t, len, a, out) {
 }
 function cowbell(t, a, out) {
   const bp = ac.createBiquadFilter(), g = ac.createGain();
-  bp.type = 'bandpass'; bp.frequency.value = 800; env(g, t, a, 0.3); bp.connect(g).connect(out || ac.destination);
+  bp.type = 'bandpass'; bp.frequency.value = 800; env(g, t, a, 0.3); bp.connect(g).connect(out || bus());
   [540, 800].forEach(f => { const o = ac.createOscillator(); o.type = 'square'; o.frequency.value = f; o.connect(bp); o.start(t); o.stop(t + 0.3); });
 }
 const click = (t, a, out) => noise(t, 'highpass', 2000, 0.006, a, out);
@@ -153,14 +161,74 @@ function fx(name) {
     ws.curve = c; out.connect(ws);
     let last = ws;
     if (name === 'lofi') { const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4000; ws.connect(lp); last = lp; }
-    const g = ac.createGain(); g.gain.value = 0.9; last.connect(g).connect(ac.destination);
+    const g = ac.createGain(); g.gain.value = 0.9; last.connect(g).connect(bus());
   } else if (name === 'drive') {
     const ws = ac.createWaveShaper(), c = new Float32Array(1024), g = ac.createGain();
     for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; c[i] = Math.tanh(8 * x); }
-    ws.curve = c; g.gain.value = 0.45; out.connect(ws).connect(g).connect(ac.destination);
-  } else out.connect(ac.destination);
+    ws.curve = c; g.gain.value = 0.45; out.connect(ws).connect(g).connect(bus());
+  } else out.connect(bus());
   return (FX[name] = out);
 }
+// ---- efectos globales: master -> distortion -> seco + envio de delay + envio de reverb
+const FXI = ['dist', 'dly', 'rev'].map(id => document.getElementById(id));
+let FXB = null;
+function bus() {
+  if (FXB) return FXB.in;
+  const inp = ac.createGain(), ws = ac.createWaveShaper(), mk = ac.createGain();
+  const dsend = ac.createGain(), dl = ac.createDelay(2), lp = ac.createBiquadFilter(), fb = ac.createGain();
+  const rsend = ac.createGain(), conv = ac.createConvolver();
+  lp.type = 'lowpass'; lp.frequency.value = 3000; fb.gain.value = 0.35;  // realimentacion fija < 0.5: no crece sin fin
+  const n = ac.sampleRate * 2, ir = ac.createBuffer(2, n, ac.sampleRate);  // respuesta de impulso de 2 s generada
+  for (let ch = 0; ch < 2; ch++) {
+    const d = ir.getChannelData(ch);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-6 * i / n);
+  }
+  conv.buffer = ir;
+  dl.delayTime.value = 0.75 * 60 / (play ? play.bpm : 120);
+  inp.connect(ws).connect(mk).connect(ac.destination);
+  mk.connect(dsend).connect(dl).connect(lp).connect(ac.destination); lp.connect(fb).connect(dl);
+  mk.connect(rsend).connect(conv).connect(ac.destination);
+  dsend.gain.value = rsend.gain.value = 0;  // sin rampa desde 1 al crear
+  FXB = {in: inp, ws, mk, dsend, rsend, dl};
+  applyFx();
+  return inp;
+}
+function applyFx() {  // mueve parametros, no reconstruye nodos
+  if (!FXB) return;
+  const [dist, dly, rev] = FXI.map(r => +r.value / 100), t = ac.currentTime;
+  if (dist) {
+    const k = 1 + 19 * dist, c = new Float32Array(1024);
+    for (let i = 0; i < 1024; i++) c[i] = Math.tanh(k * (i / 511.5 - 1)) / Math.tanh(k);
+    FXB.ws.curve = c; FXB.ws.oversample = '2x';
+  } else { FXB.ws.curve = null; FXB.ws.oversample = 'none'; }  // a 0, la señal pasa intacta
+  FXB.mk.gain.setTargetAtTime(1 - 0.5 * dist, t, 0.02);
+  FXB.dsend.gain.setTargetAtTime(0.6 * dly, t, 0.02);
+  FXB.rsend.gain.setTargetAtTime(0.8 * rev, t, 0.02);
+}
+const delayBpm = bpm => { if (FXB) FXB.dl.delayTime.setTargetAtTime(0.75 * 60 / bpm, ac.currentTime, 0.02); };  // corchea con puntillo
+function knob(r) {  // disco que se gira arrastrando en vertical o con la rueda; el range da el teclado
+  const d = r.nextElementSibling, set = v => {
+    v = Math.max(0, Math.min(100, Math.round(v)));
+    if (v !== +r.value) { r.value = v; r.dispatchEvent(new Event('input')); }
+  };
+  r.addEventListener('input', () => d.style.setProperty('--v', r.value)); d.style.setProperty('--v', r.value);
+  d.addEventListener('pointerdown', e => {
+    e.preventDefault(); d.setPointerCapture(e.pointerId); r.focus();
+    const y0 = e.clientY, v0 = +r.value, move = ev => set(v0 + (y0 - ev.clientY) / 2);
+    d.addEventListener('pointermove', move);
+    d.addEventListener('pointerup', () => d.removeEventListener('pointermove', move), {once: true});
+  });
+  d.addEventListener('wheel', e => { e.preventDefault(); set(+r.value + (e.deltaY < 0 ? 2 : -2)); }, {passive: false});
+}
+FXI.forEach(r => {
+  knob(r);
+  r.addEventListener('input', () => {
+    document.getElementById(r.id + 'v').value = r.value;
+    applyFx(); syncZoom(); writeHash();
+    try { localStorage.setItem('gb-fx', JSON.stringify(FXI.map(x => +x.value))); } catch (e) {}
+  });
+});
+
 const choke = {};  // el hho de cada kit, para que el hhc lo corte
 const hh = (kit, t, open, make) => {
   if (choke[kit]) { try { choke[kit].stop(t); } catch (e) {} choke[kit] = null; }
@@ -176,7 +244,7 @@ const acoustic = o => [
   t => { tone(t, 220, 200, 0.3, 0.55, o()); noise(t, 'bandpass', 1500, 0.03, 0.2, o()); },
   t => { tone(t, 140, 125, 0.35, 0.65, o()); noise(t, 'bandpass', 900, 0.03, 0.2, o()); },
 ];
-const dry = () => ac.destination, fxLofi = () => fx('lofi'), fxChip = () => fx('chip'), fxDrive = () => fx('drive');
+const dry = () => bus(), fxLofi = () => fx('lofi'), fxChip = () => fx('chip'), fxDrive = () => fx('drive');
 const KITS = {
   actual: {label: 'Actual', v: [
     t => tone(t, 150, 45, 0.35, 1),
@@ -233,7 +301,7 @@ const KITS = {
       const n = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
       n.buffer = noiseBuf; f.type = 'bandpass'; f.frequency.value = 6000;
       g.gain.setValueAtTime(0.001, t); g.gain.linearRampToValueAtTime(0.3, t + 0.02); g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
-      n.connect(f).connect(g).connect(ac.destination); n.start(t); n.stop(t + 0.1); return n;
+      n.connect(f).connect(g).connect(bus()); n.start(t); n.stop(t + 0.1); return n;
     }),
     t => hh('percusion', t, true, () => { for (let k = 0; k < 4; k++) noise(t + k * 0.03, 'bandpass', 3000, 0.025, 0.3); return {stop() {}}; }),
     t => cowbell(t, 0.35),
@@ -314,6 +382,7 @@ function tick() {
       if (P.cur.st !== P.lastSt) {  // A/B: cada estilo con su BPM y su swing
         if (P.lastSt) { swing.value = swingv.value = P.cur.st.swing; syncZoom(); }
         P.lastSt = P.cur.st; P.bpm = P.cur.st.bpm; P.amt = P.cur.st.amt || Array(NV).fill(100);
+        delayBpm(P.bpm);
       }
       showAuto(P.cur.st);
       const t0 = Math.max(P.barStart, ac.currentTime), mark = P.cur.mark;
@@ -488,6 +557,13 @@ function zoomTools(st) {
   };
   slider('Density', 'zdens', dens, 0, 260);
   slider('Swing', 'zswing', swing, 50, 75);
+  for (const src of FXI) {
+    const l = document.createElement('label'), r = document.createElement('input'), d = document.createElement('span'), o = document.createElement('output');
+    l.className = 'knob'; d.className = 'disc';
+    r.type = 'range'; r.id = 'z' + src.id; r.min = 0; r.max = 100; r.value = src.value; o.id = r.id + 'v'; o.value = src.value;
+    r.addEventListener('input', () => { if (src.value !== r.value) { src.value = r.value; src.dispatchEvent(new Event('input')); } });
+    l.append(src.parentNode.firstChild.textContent, r, d, o); t.append(l); knob(r);
+  }
   const kl = document.createElement('label'), ks = document.createElement('select');
   ks.id = 'zkit'; fillKits(ks); kl.append('Kit ', ks); t.append(kl); showAuto(st);
   const link = (txt, href) => { const a = document.createElement('a'); a.href = href; a.textContent = txt; a.target = '_blank'; a.rel = 'noopener'; t.append(a); };
@@ -519,9 +595,12 @@ function showAuto(st) {  // "Auto (909)": que kit esta usando Auto
 }
 
 function syncZoom() {  // los controles de la vista ampliada siguen a los de la cabecera
-  for (const [id, src] of [['zdens', dens], ['zswing', swing]]) {
+  for (const [id, src] of [['zdens', dens], ['zswing', swing], ...FXI.map(x => ['z' + x.id, x])]) {
     const r = document.getElementById(id);
-    if (r) { r.value = src.value; document.getElementById(id + 'v').value = src.value; }
+    if (r) {
+      r.value = src.value; document.getElementById(id + 'v').value = src.value;
+      if (r.nextElementSibling.classList.contains('disc')) r.nextElementSibling.style.setProperty('--v', r.value);
+    }
   }
 }
 
@@ -530,6 +609,7 @@ function writeHash() {
   if (fam.value) q.set('fam', fam.value);
   if (+dens.value !== 50) q.set('density', dens.value);
   if (kitChoice !== 'auto') q.set('kit', kitChoice);
+  FXI.forEach(r => { if (+r.value) q.set(r.id, r.value); });
   if (current) q.set('style', current.name);
   history.replaceState(null, '', q.toString() ? '#' + q.toString() : location.pathname + location.search);
 }
@@ -584,6 +664,12 @@ dens.addEventListener('input', () => { densv.value = dens.value; redraw(); write
   let saved = null; try { saved = localStorage.getItem('gb-kit'); } catch (e) {}
   kitChoice = KITS[q.get('kit')] ? q.get('kit') : (KITS[saved] ? saved : 'auto');
   fillKits(document.getElementById('kit'));
+  let fxv = null; try { fxv = JSON.parse(localStorage.getItem('gb-fx')); } catch (e) {}
+  if (FXI.some(r => q.has(r.id))) fxv = FXI.map(r => parseInt(q.get(r.id), 10) || 0);  // el permalink manda entero
+  if (Array.isArray(fxv)) FXI.forEach((r, i) => {
+    const v = Math.max(0, Math.min(100, +fxv[i] || 0));
+    r.value = document.getElementById(r.id + 'v').value = v; r.nextElementSibling.style.setProperty('--v', v);
+  });
   const d = parseInt(q.get('density'), 10);
   if (d >= 0 && d <= 260) { dens.value = densv.value = d; redraw(); }
   const st = DATA.groups.flatMap(g => g.styles).find(s => s.name === q.get('style'));
