@@ -1,5 +1,8 @@
-## ADDED Requirements
+# afro-latin-club-styles Specification
 
+## Purpose
+TBD - created by archiving change add-afro-latin-club-styles. Update Purpose after archive.
+## Requirements
 ### Requirement: Cuatro estilos de club afro y latino con tempo
 `drum_styles_v/` SHALL incluir `AMAPIANO 112.txt`, `AFRO HOUSE 122.txt`, `KUDURO 135.txt`, `GUARACHA 130.txt`, generados con `tools/make_style.py build` desde fuentes en `styles_src/` escritas con la escala de 5 niveles. Cada fuente SHALL llevar una receta de groove (swing, amount por voz y slide) en un comentario.
 
@@ -44,9 +47,9 @@ Con Density por defecto, la base (p4/p5) de cada estilo SHALL tocar el ritmo que
 - **WHEN** suena la base de cualquiera de los cuatro estilos
 - **THEN** hitom o lotom tocan al menos dos golpes por compás en `X`
 
-#### Scenario: Kuduro sin negras
+#### Scenario: Tresillo de kuduro
 - **WHEN** suena la base de KUDURO 135
-- **THEN** el kick no toca las cuatro negras
+- **THEN** el kick toca las cuatro negras y el snare los pasos 0, 3, 8 y 11 de cada compás (en semicorcheas)
 
 #### Scenario: Afro house frente a guaracha
 - **WHEN** se comparan las bases de AFRO HOUSE 122 y GUARACHA 130
@@ -69,3 +72,4 @@ El cambio SHALL NOT modificar ningún `.txt` existente de `drum_styles_v/`.
 #### Scenario: Comprobación con git
 - **WHEN** se aplica el cambio
 - **THEN** `git status` solo muestra como nuevos los 4 `.txt` y sus fuentes, y ningún `.txt` anterior como modificado
+

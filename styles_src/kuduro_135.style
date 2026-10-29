@@ -1,0 +1,49 @@
+name: KUDURO 135
+# Kuduro (Luanda, Angola). Tempo sugerido: 135 BPM. Div por defecto (4).
+# Fuente del ritmo: Wikipedia ("Kuduro"): bombo rapido a negras, y caja o sidestick
+#   en los dos primeros golpes del tresillo.
+# Voces: kick=bombo  snare=caja/sidestick  clap=palmas  hhc=hat cerrado
+#        hitom=tom agudo (tercer golpe del tresillo)  lotom=tom grave
+# Groove: swing 50 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: tresillo sin bombo
+snare  X..X .... X..X ....
+hitom  .... ..X. .... ..X.
+[p1]
+kick   X... .... .... ....
+
+[p2 p3]                         # ENERGIA: hats y toms sincopados
+kick   X... X... X... X...
+snare  X..X .... X..X ..o.
+clap   .... X... .... X...
+hhc    X.X. X.X. X.X. X.X.
+hitom  .x.. ..X. .x.. ..X.
+lotom  ...x .o.x ...x .o.x
+[p3]
+snare  X..X .... X..X .XXX
+
+[p4 p5]                         # BASE
+kick   X... X... X... X...
+snare  X..X .... X..X ....
+hhc    ..-. ..-. ..-. ..-.
+hitom  .x.. ..X. .x.. ..X.
+lotom  ...o .... ...o ...,
+[p5]
+snare  X..X .... X..X ..o.
+
+[p6 p7]                         # VARIACION: tresillo entero en la caja
+kick   X... X... X... X...
+snare  X..X ..X. X..X ..X.
+clap   .... X... .... X...
+hitom  .X.X .... .X.X ....
+lotom  .... .X.X .... .X.X
+
+[p8]                            # FILL
+kick   X... .... X... ....
+snare  X..X ..X. XXXX XXXX
+hitom  .... .... .... X.X.
+lotom  .... .... .... .X.X

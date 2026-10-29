@@ -29,10 +29,10 @@
 
   | Estilo | Kick | Snare / clap | Hats / toms |
   |---|---|---|---|
-  | AMAPIANO 112 | 1 y 3 | rim (clap) en la "e" del 2 y el "&" del 4 | hhc (shaker) en semicorcheas; lotom (log drum) en los pasos 0, 3, 6, 10 y 12 de 16 |
+  | AMAPIANO 112 | las cuatro negras (bombo suave) | rim (clap) en la "e" del 2 y el "&" del 4 | hhc (shaker) en semicorcheas; lotom (log drum) en los pasos 0, 3, 6, 10 y 12 de 16 |
   | AFRO HOUSE 122 | las cuatro negras | clap en 2 y 4 | hhc en cada "&"; hitom en 3-3-2 (pasos 0, 3 y 6 de cada 8); lotom en la "a" del 2 y del 4 |
-  | KUDURO 135 | 1, "a" del 1 y "&" del 3 | clap en 2 y 4 | hitom en las "e" y lotom en las "a" de cada negra |
-  | GUARACHA 130 | las cuatro negras | snare en 2 y 4 | hho en cada "&"; hitom y lotom alternados en semicorcheas en las negras 2 y 4 |
+  | KUDURO 135 | las cuatro negras | snare (sidestick) en los dos primeros golpes del tresillo: pasos 0 y 3 de cada medio compás | hitom en el tercer golpe del tresillo ("&" del 2 y del 4); toms en las "e" y las "a" en `x`/`o` |
+  | GUARACHA 130 | las cuatro negras | snare en 2 y 4 y en la "a" del 4 | hhc en las "e" y las "a" (shaker); hitom y lotom alternados en semicorcheas en las negras 2 y 4 |
 
   En la tabla, "&" es la corchea a contratiempo, y "e" y "a" son la 2.ª y la 4.ª semicorchea de la negra.
 - **Receta de groove** (cabecera de cada fuente): swing 56 en AMAPIANO (hhc y clap), 54 en AFRO HOUSE (hitom y lotom), 50 en KUDURO y GUARACHA. Slide 0.
@@ -44,7 +44,8 @@
 - [Sin dinámica] Las fantasmas suenan a la velocidad de la voz. → Van en niveles bajos (`-`, `,`) para que solo entren con Density alta.
 - [Parecido entre estilos] → Lo detecta la comprobación de distancia antes de escribir, y la escucha en REAPER después. Se retocan las fuentes, sin cambiar el plugin.
 - [Interpretación musical] Se toma la gramática del género, no una grabación concreta. Las fuentes son texto plano y se regeneran en segundos.
-- [AFRO HOUSE ≈ GUARACHA] Los dos tienen bombo a negras y toms. → AFRO HOUSE usa clap y hhc a contratiempo; GUARACHA, snare, hho y toms en semicorcheas.
+- [AFRO HOUSE ≈ GUARACHA] Los dos tienen bombo a negras y toms. → AFRO HOUSE usa clap y hhc a contratiempo; GUARACHA, snare (también en la "a" del 4), shaker en las "e" y "a" y toms en semicorcheas. Con hho en cada "&" y snare en 2 y 4, la primera versión coincidía con DISCO 118 en kick, snare y hats.
+- [Fuentes] Antes de escribir se consultó: Wikipedia ("Kuduro": bombo a negras y caja o sidestick en los dos primeros golpes del tresillo), guías de producción de amapiano (bombo en cada negra, shaker continuo, mucho swing) y reseñas de tribal guarachero (basado en tresillos). Por eso AMAPIANO y KUDURO pasaron a bombo a negras, y GUARACHA es la versión recta colombiana (aleteo/zapateo); el tribal guarachero de Monterrey queda fuera porque pide tresillos.
 - [Conocimiento del género] Kuduro y guaracha se conocen menos que los demás. → Antes de escribir las fuentes, revisar dos o tres temas de referencia de cada uno y anotar en la cabecera de qué se ha sacado el ritmo.
 
 ## Verificación en REAPER

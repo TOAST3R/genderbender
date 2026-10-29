@@ -1,0 +1,54 @@
+name: GUARACHA 130
+# Guaracha colombiana (aleteo/zapateo, Medellin): house a negras con percusion tribal.
+# Tempo sugerido: 130 BPM. Div por defecto (4).
+# El tribal guarachero de Monterrey va en tresillos, que el plugin no tiene: este estilo es la version recta.
+# Voces: kick=bombo  snare=caja  clap=palmas  hhc=shaker  hho=hat abierto
+#        hitom/lotom=toms tribales
+# Groove: swing 50 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: shaker y toms
+hhc    .X.X .X.X .X.X .X.X
+hitom  .... X.X. .... X.X.
+lotom  .... .X.X .... .X.X
+[p1]
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA: semicorcheas y hat abierto
+kick   X... X... X... X...
+snare  .... X... .... X..X
+clap   .... x... .... x...
+hhc    xXxX xXxX xXxX xXxX
+hho    ..x. ..x. ..x. ..x.
+hitom  ..o. X.X. ..o. X.X.
+lotom  ...o .X.X ...o .X.X
+[p3]
+snare  .... X... .... XXXX
+
+[p4 p5]                         # BASE
+kick   X... X... X... X...
+snare  .... X... .... X..X
+hhc    .X.X .X.X .X.X .X.X
+hho    ..o. ..o. ..o. ..o.
+hitom  .... X.X. .... X.X.
+lotom  .... .X.X .... .X.X
+[p5]
+snare  .... X... ..-. X..X
+
+[p6 p7]                         # VARIACION: toms en toda la negra
+kick   X... X... X... X...
+snare  .... X... .... X...
+hhc    .X.X .X.X .X.X .X.X
+hitom  X.X. ..X. X.X. ..X.
+lotom  .X.X ...X .X.X ...X
+[p7]
+snare  .... X... .... X.XX
+
+[p8]                            # FILL
+kick   X... X... X... X...
+snare  .... .... XXXX XXXX
+hitom  X.X. X.X. .... ....
+lotom  .X.X .X.X .... ....

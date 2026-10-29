@@ -53,19 +53,24 @@ hhc    XXxX XXxX XXxX XXxX
 
 | Family | Styles (BPM) |
 |--------|--------------|
-| Cumbia | CUMBIA COLOMBIANA (95), CUMBIA SONIDERA (92), CUMBIA VILLERA (98), CUMBIA DIGITAL (100), CUMBIA REBAJADA (72) |
-| Footwork / juke | 101 JUKE, Juke160 (160) |
-| Reggaeton / dancehall | 101 RAGATON |
+| Cumbia | CUMBIA COLOMBIANA (95), CUMBIA SONIDERA (92), CUMBIA VILLERA (98), CUMBIA DIGITAL (100), CUMBIA REBAJADA (72), CUMBION |
+| Footwork / juke | 101 JUKE, Juke160 (160), 101 FOOTWORK, 102 JUKE |
+| Reggaeton / dancehall | 101 RAGATON, 101 DANCEHALL, 101 FUNK FAVELA |
 | House | Chicago.Jouse 125 (125), JetoHouse 135 (135), MIAMI BEIGE 135 (135) |
-| UK garage / 2-step | Two-stepppo, uk_fungui, uk_garbage |
+| Synth / disco | SYNTHWAVE 100 (100), DISCO 118 (118), ITALO DISCO 120 (120) |
+| UK garage / 2-step | Two-stepppo, uk_fungui, uk_garbage, garage_2step, garage_uk_4x4 |
 | Grime | GRIME140 (140), Grimer140 (140) |
-| Dubstep | DUBSTEP140 (140), DubSteppo |
+| Dubstep | DUBSTEP140 (140), DubSteppo, 101 STEPPA |
 | Drum & bass | JUNGLE 165 (165), RAGGA JUNGLE 165 (165), HARDSTEP 172 (172), JUMP-UP 174 (174), DANCEFLOOR DNB 174 (174), TECHSTEP 172 (172), HALFTIME 174 (174), drumbass, DurumBass160 (160), DURUMBREAK_160 (160) |
 | Techno | techAXX, TekkBooooring, TekkChungo, TekkThump |
 | Hip-hop | BOOM BAP 90 (90), LOFI HIPHOP 82 (82), TRIP HOP 88 (88), NEW JACK SWING 104 (104) |
 | R&B / trap | RB, WCOAST R&B 110 (110), VAPORTRAP, TRAP 140 (140), UK DRILL 142 (142) |
 | Gqom | GQOM |
-| Other | ESTAIL, TEST2, ZZZZ BLACK |
+| Afro / Caribbean | AFRO BEAT, AFRO BEAT & JU JU, SOCA, 101 ZOUK KIZOMBA, ZOUK KIZOMBA 2 |
+| Afro / Latin club | AMAPIANO 112 (112), AFRO HOUSE 122 (122), KUDURO 135 (135), GUARACHA 130 (130) |
+| Electro / Miami bass | ELECTRO CYBOTRON, ELECTRO UR 138 (138), BASS 101 |
+| Funk / New Orleans | MOTOWN BREAKS, NEW ORLEANS, NEW ORLEANS BOUNCE |
+| Other | ESTAIL, 101 SPARSE, BELLY DANCE, JERSEY BASICS, ZZZ BLACK |
 
 This table also sets the families on the fingerprints page, so keep its format.
 

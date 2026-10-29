@@ -1,0 +1,48 @@
+name: AMAPIANO 112
+# Amapiano (Sudafrica, house lento con log drum). Tempo sugerido: 112 BPM. Div por defecto (4).
+# Fuentes del ritmo: guias de produccion (Native Instruments, RouteNote, Beatstorapon):
+#   bombo suave en cada negra, shaker continuo y mucho swing, tambien en el log drum.
+# Voces: kick=bombo suave  clap=rim  hhc=shaker  hho=hat abierto  hitom=percusion
+#        lotom=log drum (solo el ritmo; la nota la decide el sampler)
+# Groove: swing 56 · amount: hhc 100, clap 100, lotom 100, resto 0 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: shaker
+hhc    XXXX XXXX XXXX XXXX
+[p1]
+lotom  X..X ..X. ..X. X...
+
+[p2 p3]                         # ENERGIA: log drum mas denso y percusion
+kick   X... X... X... X...
+clap   ..x. .X.. ..x. ..X.
+hhc    XXXX XXXX XXXX XXXX
+hho    ..x. ..x. ..x. ..x.
+hitom  ...o ...o ...o ...o
+lotom  X..X ..X. ..X. X.X.
+[p3]
+lotom  X..X ..X. X.X. X..X
+
+[p4 p5]                         # BASE
+kick   X... X... X... X...
+clap   .... .X.. .... ..X.
+hhc    XXXX XXXX XXXX XXXX
+hitom  ...- .... ...- ....
+lotom  X..X ..X. ..X. X...
+[p5]
+lotom  X..X ..X. ..X. X..o
+
+[p6 p7]                         # VARIACION: se cae medio bombo
+kick   X... .... X... ....
+clap   .... .X.. .... ..X.
+hhc    X.XX X.XX X.XX X.XX
+hitom  ..X. .... ..X. ....
+lotom  X... ..X. ..X. ..XX
+
+[p8]                            # FILL
+kick   X... .... .... ....
+clap   .... .X.. .X.X .XXX
+hhc    XXXX XXXX .... ....
+lotom  X..X ..X. X.X. XXXX

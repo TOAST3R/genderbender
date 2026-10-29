@@ -1,0 +1,49 @@
+name: DISCO 118
+# Disco (Filadelfia/Nueva York, finales de los 70). Tempo sugerido: 118 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja  clap=palmas  hhc=hat cerrado  hho=hat abierto
+#        hitom/lotom=toms y congas
+# Groove: swing 50 · amount: hho 0 si se sube el swing global · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hat abierto
+hho    ..X. ..X. ..X. ..X.
+hhc    xx.x xx.x xx.x xx.x
+[p1]
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: semicorcheas completas y palmas
+kick   X... X... X... X...
+snare  .... X... .... X...
+clap   .... X... .... X...
+hhc    XX.X XX.X XX.X XX.X
+hho    ..X. ..X. ..X. ..X.
+[p3]
+snare  .... X... .... X..o
+
+[p4 p5]                         # BASE
+kick   X... X... X... X...
+snare  .... X... .... X...
+clap   .... o... .... o...
+hhc    xx.x xx.x xx.x xx.x
+hho    ..X. ..X. ..X. ..X.
+[p5]
+snare  .... X... .... X..-
+hitom  .... .... .... ..o.
+lotom  .... .... .... ...o
+
+[p6 p7]                         # VARIACION: congas
+kick   X... X... X... X...
+snare  .... X... .... X...
+hho    ..X. ..X. ..X. ..X.
+hitom  ...x ..x. ...x ..x.
+lotom  .x.. .... .x.. ....
+
+[p8]                            # FILL
+kick   X... X... X... X...
+snare  .... .... XXXX X.X.
+hho    ..X. ..X. .... ....
+hitom  .... .... .... .X..
+lotom  .... .... .... ...X

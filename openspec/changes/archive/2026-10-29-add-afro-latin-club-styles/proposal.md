@@ -24,4 +24,4 @@ La mayoría de los estilos dejan casi vacíos los toms. Los géneros de club afr
 - Archivos nuevos: `styles_src/<estilo>.style` (4) y `drum_styles_v/<ESTILO>.txt` (4).
 - `README.md` (sección "Included styles") y `docs/fingerprints.html`.
 - **Conflicto con los otros cambios de estilos** (`add-hiphop-styles`, `add-synth-disco-styles`, `add-afro-latin-club-styles`, `add-breaks-styles`, `add-hard-dance-styles`, `add-sambass-schaffel-styles`): todos editan la tabla del README y `docs/fingerprints.html`. Se aplican de uno en uno, regenerando la página en cada uno.
-- Fuera de alcance: afrobeats (falta saber si `AFRO BEAT` ya lo cubre), azonto, coupé-décalé, rabòday, changa tuki, budots, kwaito y tecnocumbia (≈ `CUMBIA DIGITAL 100`).
+- Fuera de alcance: afrobeats (falta saber si `AFRO BEAT` ya lo cubre), azonto, coupé-décalé, rabòday, changa tuki, budots, kwaito, tribal guarachero de Monterrey (pide tresillos) y tecnocumbia (≈ `CUMBIA DIGITAL 100`).

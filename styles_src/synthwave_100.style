@@ -1,0 +1,47 @@
+name: SYNTHWAVE 100
+# Synthwave (backbeat ochentero de LinnDrum, caja gated). Tempo sugerido: 100 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja gated  clap=capa sobre la caja  hhc=hat cerrado  hho=hat abierto
+#        hitom/lotom=toms, protagonistas en los fills
+# Groove: swing 50 (recto) · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats
+hhc    X.X. X.X. X.X. X.X.
+[p1]
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA: semicorcheas y kick extra
+kick   X... ..x. X.X. ....
+snare  .... X... .... X...
+clap   .... X... .... X...
+hhc    XxXx XxXx XxXx XxXx
+hho    .... .... .... ..X.
+[p3]
+hitom  .... .... .... XX..
+lotom  .... .... .... ..XX
+
+[p4 p5]                         # BASE
+kick   X... .... X... ..o.
+snare  .... X... .... X...
+clap   .... x... .... x...
+hhc    X,X, X,X, X,X, X,X,
+hho    .... .... .... ..-.
+[p5]
+kick   X... .... X.x. ....
+hitom  .... .... .... .o..
+lotom  .... .... .... ...o
+
+[p6 p7]                         # VARIACION: hat abierto y tom grave
+kick   X... .... X... ....
+snare  .... X... .... X...
+hho    X.o. X.o. X.o. X.o.
+lotom  X... .... .... ....
+
+[p8]                            # FILL: redoble que baja de la caja al tom grave
+kick   X... .... .... ....
+snare  XX.X .... .... ....
+hitom  .... XXXX .... ....
+lotom  .... .... XXXX X.XX

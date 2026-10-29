@@ -1,0 +1,47 @@
+name: AFRO HOUSE 122
+# Afro house (house a negras con percusion polirritmica). Tempo sugerido: 122 BPM. Div por defecto (4).
+# Voces: kick=bombo  clap=palmas  hhc=hat cerrado  hho=hat abierto
+#        hitom=conga/tom agudo  lotom=tom grave
+# Groove: swing 54 · amount: hitom 100, lotom 100, resto 0 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y conga en 3-3-2
+hhc    ..X. ..X. ..X. ..X.
+hitom  X..X ..X. X..X ..X.
+[p1]
+lotom  .... ...X .... ...X
+
+[p2 p3]                         # ENERGIA: semicorcheas y tom grave
+kick   X... X... X... X...
+clap   .... X... .... X...
+hhc    .xX. .xX. .xX. .xX.
+hho    .... .... .... ..x.
+hitom  X..X ..X. X..X ..X.
+lotom  .x.. ...X .x.. ...X
+[p3]
+hitom  X..X ..X. X..X .XX.
+
+[p4 p5]                         # BASE
+kick   X... X... X... X...
+clap   .... X... .... X...
+hhc    .,X. .,X. .,X. .,X.
+hitom  X..X ..X. X..X ..X.
+lotom  .... ...X .... ...X
+[p5]
+lotom  ..o. ...X ..o. ...X
+
+[p6 p7]                         # VARIACION: hat abierto y otra polirritmia
+kick   X... X... X... X...
+clap   .... X... .... X...
+hho    ..X. ..X. ..X. ..X.
+hitom  X.X. .X.X .X.. X.X.
+lotom  ...X .... ..X. ....
+
+[p8]                            # FILL
+kick   X... X... .... ....
+clap   .... X... .... ....
+hitom  X.X. X.X. XXXX .X.X
+lotom  .X.X .X.X .... X.X.

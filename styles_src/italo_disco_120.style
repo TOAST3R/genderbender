@@ -1,0 +1,50 @@
+name: ITALO DISCO 120
+# Italo disco (Italia, principios de los 80, cajas de ritmos y Simmons). Tempo sugerido: 120 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja (solo en adornos)  clap=palmas  hhc=hat cerrado  hho=hat abierto
+#        hitom/lotom=toms electronicos (Simmons)
+# Groove: swing 50 (recto) · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats
+hhc    X.X. X.X. X.X. X.X.
+[p1]
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: semicorcheas y toms al final del compas
+kick   X... X... X... X...
+clap   .... X... .... X...
+snare  .... x... .... x...
+hhc    XxXx XxXx XxXx XxXx
+hitom  .... .... .... ..X.
+lotom  .... .... .... ...X
+[p3]
+hitom  .... .... X.X. XX..
+lotom  .... .... .X.X ..XX
+
+[p4 p5]                         # BASE
+kick   X... X... X... X...
+clap   .... X... .... X...
+snare  .... x... .... x...
+hhc    X,X, X,X, X,X, X,X,
+hho    .... .... .... ..o.
+hitom  .... .... .... ..o.
+[p5]
+hitom  .... .... .... ..X.
+lotom  .... .... .... ...X
+
+[p6 p7]                         # VARIACION: kick en corcheas
+kick   X.X. X.X. X.X. X.X.
+clap   .... X... .... X...
+hhc    ..X. ..X. ..X. ..X.
+[p7]
+hitom  .... .... .... X.X.
+lotom  .... .... .... .X.X
+
+[p8]                            # FILL: Simmons de agudo a grave
+kick   X... .... .... ....
+clap   .... X... .... ....
+hitom  .... XXXX X... ....
+lotom  .... .... .XXX XXXX
