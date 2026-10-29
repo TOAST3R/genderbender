@@ -1,0 +1,45 @@
+name: SINGELI 200
+# Singeli (Dar es Salaam, Tanzania): muy rapido, bucles que mutan. Tempo sugerido: 200 BPM. Div por defecto (4).
+# Fuente del ritmo: MusicRadar, Pan African Music: entre 180 y 300 BPM, bucles que mutan con energia punk.
+# Voces: kick=bombo  snare=caja  hitom/lotom=percusion troceada
+# Groove: swing 50 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    ..X. ..X. ..X. ..X.
+hitom  X.XX .X.X X.XX .XX.
+lotom  .X.. X.X. .X.. X..X
+[p1]
+kick   X... .... .... ....
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   X... X... X... X..o
+snare  ..X. ..Xo ..X. ..X.
+hhc    ..x. ..x. ..x. ..x.
+hitom  X.XX .X.X X.XX .XX.
+lotom  .X.. X.X. .X.. X..X
+[p3]
+snare  ....X... ....X.o. ....X... xox-Xox-
+
+[p4 p5]                         # BASE
+kick   X... X... X... X...
+snare  ..X. ..X. ..X. ..X.
+hitom  X.XX .X.X X.XX .XX.
+lotom  .X.. X.X. .X.. X..X
+
+[p6 p7]                         # VARIACION: menos hats, toms
+kick   X... X... X... X...
+snare  ..X. ..X. ..X. ..X.
+hhc    X... X... X... X...
+hitom  X.XX .X.X X.XX .XX.
+lotom  .X.. X.X. .X.. X..X
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  ........ X....... X...X... XoXoXoXo
+hitom  .... .... .X.X ....
+lotom  .... .... .... X.X.

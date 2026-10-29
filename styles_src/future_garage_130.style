@@ -1,0 +1,42 @@
+name: FUTURE GARAGE 130
+# Future garage (Burial): 2-step roto y con mucho swing. Tempo sugerido: 130 BPM. Div por defecto (4).
+# Voces: kick=bombo  snare=caja o rim  clap=palmas  hhc=hat cerrado  hho=hat abierto  hitom/lotom=toms
+# Groove: swing 58 · amount: hhc 100, snare 100, resto 0 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    ..X. .X.. ..X. .X..
+[p1]
+kick   X... .... .... ....
+snare  .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   X... .... ...X ...o
+snare  .... X..o .... .X..
+hhc    xxXx xXxx xxXx xXxx
+hitom  .... .... ...- ....
+[p3]
+snare  ........ X.....o. ........ xoX-xox-
+
+[p4 p5]                         # BASE
+kick   X... .... ...X ....
+snare  .... X... .... .X..
+hhc    ..X. .X.. ..X. .X..
+
+[p6 p7]                         # VARIACION: menos hats, toms
+kick   X... .... ...X ....
+snare  .... X... .... .X..
+hhc    ..X. .... ..X. ....
+hitom  ...X .... ...X ....
+lotom  .... ..X. .... ..x.
+[p7]
+snare  .... X... .... .XX.
+
+[p8]                            # FILL
+kick   X... .... .... ....
+snare  ........ X....... X...X... XoXoXoXo
+hitom  .... .... .X.X ....
+lotom  .... .... .... X.X.

@@ -1,0 +1,44 @@
+name: BRAZILIAN PHONK 130
+# Phonk brasileño: tamborzao de funk carioca con cencerro de phonk. Tempo sugerido: 130 BPM. Div por defecto (4).
+# Voces: kick=808  clap=palmas  hhc=hat cerrado  hitom=cencerro (la nota la decide el sampler)
+# Groove: swing 50 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    X.X. X.X. X.X. X.X.
+hitom  ..X. ...X ..X. X...
+[p1]
+kick   X... .... .... ....
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   X..X ..X. ..X. ...o
+clap   .... X..o .... X...
+hhc    XxXx XxXx XxXx XxXx
+hitom  ..X. ...X ..X- X...
+[p3]
+clap   ........ X.....o. ........ Xox-xox-
+
+[p4 p5]                         # BASE
+kick   X..X ..X. ..X. ....
+clap   .... X... .... X...
+hhc    X.X. X.X. X.X. X.X.
+hitom  ..X. ...X ..X. X...
+
+[p6 p7]                         # VARIACION: menos hats, toms
+kick   X..X ..X. ..X. ....
+clap   .... X... .... X...
+hhc    X.X. X.X. X.X. X.X.
+hitom  ..X. ...X ..X. X...
+lotom  .... ..X. .... ..x.
+[p7]
+clap   .... X... .... X.X.
+
+[p8]                            # FILL
+kick   X... .... .... ....
+clap   ........ X....... X...X... XoXoXoXo
+hitom  .... .... .X.X ....
+lotom  .... .... .... X.X.
