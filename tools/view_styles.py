@@ -33,6 +33,33 @@ def families():
     return table
 
 
+def grooves():
+    # receta de groove de la cabecera de cada fuente: nombre -> (swing, amount por voz)
+    alias = {'kick': 0, 'snare': 1, 'clap': 2, 'hhc': 3, 'hho': 4, 'hitom': 5, 'lotom': 6}
+    out = {}
+    for path in glob.glob(os.path.join(ROOT, 'styles_src', '*.style')):
+        text = open(path, encoding='utf-8').read()
+        name = re.search(r'^name:\s*(.+?)\s*$', text, re.M)
+        groove = re.search(r'^#\s*Groove:(.*)$', text, re.M)
+        if not name or not groove:
+            continue
+        sw = re.search(r'swing(?: global)? (\d{2})', groove.group(1))
+        amt = re.search(r'amount:([^·]*)', groove.group(1))
+        pairs = dict(re.findall(r'(kick|snare|clap|hhc|hho|hitom|lotom|resto) (\d+)', amt.group(1))) if amt else {}
+        rest = int(pairs.get('resto', 100))
+        out[name.group(1)] = (int(sw.group(1)) if sw else 50,
+                              [int(pairs[v]) if v in pairs else rest for v in alias])
+    return out
+
+
+def bpm_of(name, readme_bpm):
+    # BPM del preview: numero final del nombre (60-220) -> (bpm) de su entrada del README -> 120
+    m = re.search(r'(\d{2,3})$', name)
+    if m and 60 <= int(m.group(1)) <= 220:
+        return int(m.group(1))
+    return readme_bpm or 120
+
+
 def render():
     styles = {}
     for path in sorted(glob.glob(os.path.join(ROOT, 'drum_styles_v', '*.txt'))):
@@ -44,11 +71,13 @@ def render():
         # un patron = 7 voces x 32 pasos en hex (2 caracteres por paso)
         styles[name] = [''.join(f'{v:02x}' for vi in range(len(VOICES)) for v in data[vi][p])
                         for p in range(PATTERNS)]
-    groups, used = [], set()
+    groups, used, tempo = [], set(), {}
     for family, entries in families():
-        names = [n for base, bpm in entries for n in styles
-                 if n not in used and (n == base or (bpm and n == f'{base} {bpm}'))]
-        used.update(names)
+        names = []
+        for base, bpm in entries:
+            for n in styles:
+                if n not in used and (n == base or (bpm and n == f'{base} {bpm}')):
+                    names.append(n); used.add(n); tempo[n] = int(bpm) if bpm else None
         groups.append([family, names])
     rest = [n for n in styles if n not in used]
     other = next((g for g in groups if g[0] == 'Other'), None)
@@ -57,7 +86,10 @@ def render():
         groups.append(other)
     if rest:
         other[1] += rest
-    page = [{'family': f, 'styles': [{'name': n, 'p': styles[n]} for n in names]}
+    groove = grooves()
+    page = [{'family': f, 'styles': [{'name': n, 'bpm': bpm_of(n, tempo.get(n)),
+                                      'swing': groove.get(n, (50, None))[0], 'amt': groove.get(n, (50, None))[1],
+                                      'p': styles[n]} for n in names]}
             for f, names in groups if names]
     payload = json.dumps({'voices': VOICES, 'groups': page}, ensure_ascii=False,
                          separators=(',', ':')).replace('</', '<\\/')
@@ -102,14 +134,22 @@ dialog h3{margin:0 0 12px;font-size:15px}
 .big .voices{display:flex;flex-direction:column;justify-content:space-around;font-size:10px;color:var(--muted);text-align:right}
 .big canvas{max-width:calc(100vw - 120px);height:auto}
 .hint{color:var(--muted);font-size:12px;margin:12px 0 0}
+.src{color:var(--ink);font-size:12px;text-decoration:none}
+.src:hover,.src:focus-visible{text-decoration:underline}
+.play{font:inherit;font-size:12px;color:var(--fg);background:var(--cell);border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-left:8px;cursor:pointer}
+.play:hover,.play:focus-visible{border-color:var(--ink);outline:none}
+.bpm{color:var(--muted);font-size:12px;margin-left:8px}
+.playing{outline:2px solid var(--ink);outline-offset:1px}
 </style>
 </head>
 <body>
 <header>
 <h1>GENDERBENDER · FINGERPRINTS</h1>
+<a class="src" href="https://github.com/TOAST3R/genderbender">Código fuente ↗</a>
 <label>Género <select id="fam"></select></label><output id="count"></output>
 <label>Density <input id="dens" type="range" min="0" max="260" value="50"><output id="densv">50</output></label>
-<span class="hint" style="margin:0">color = valor 0–255 · atenuado = no suena con esta Density · clic para ampliar</span>
+<label>Swing <input id="swing" type="range" min="50" max="75" value="50"><output id="swingv">50</output></label>
+<span class="hint" style="margin:0">color = valor 0–255 · atenuado = no suena con esta Density · clic para ampliar · ▶ preview sintetizado (no es el sonido de tu sampler) · Esc para</span>
 </header>
 <main id="main"></main>
 <dialog id="zoom"><h3 id="zname"></h3><div class="big" id="zbody"></div><p class="hint">Esc o clic fuera para cerrar</p></dialog>
@@ -144,11 +184,96 @@ function pattern(hex, s) {
   return c;
 }
 
+// ---- preview de audio: voces sintetizadas con Web Audio, sin recursos externos
+const swing = document.getElementById('swing'), swingv = document.getElementById('swingv');
+let ac = null, noiseBuf = null, openHat = null, play = null;
+function audio() {
+  if (!ac) {
+    ac = new AudioContext();
+    noiseBuf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  ac.resume();
+}
+function env(g, t, a, len) { g.gain.setValueAtTime(a, t); g.gain.exponentialRampToValueAtTime(0.001, t + len); }
+function tone(t, f0, f1, len, a) {
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + len);
+  env(g, t, a, len); o.connect(g).connect(ac.destination); o.start(t); o.stop(t + len);
+}
+function noise(t, type, freq, len, a) {
+  const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+  s.buffer = noiseBuf; f.type = type; f.frequency.value = freq;
+  env(g, t, a, len); s.connect(f).connect(g).connect(ac.destination); s.start(t); s.stop(t + len);
+  return s;
+}
+const VOICE = [  // mismo orden que DATA.voices
+  t => tone(t, 150, 45, 0.35, 1),
+  t => { noise(t, 'highpass', 1000, 0.15, 0.5); tone(t, 180, 160, 0.1, 0.3); },
+  t => { for (let k = 0; k < 3; k++) noise(t + k * 0.01, 'bandpass', 1200, k < 2 ? 0.02 : 0.12, 0.6); },
+  t => { if (openHat) { openHat.stop(t); openHat = null; } noise(t, 'highpass', 7000, 0.05, 0.3); },
+  t => { openHat = noise(t, 'highpass', 7000, 0.3, 0.25); },
+  t => tone(t, 220, 160, 0.25, 0.6),
+  t => tone(t, 140, 100, 0.3, 0.7),
+];
+function stepTime(i, bpm, amt = 100) {
+  // deformacion de groove-swing: dentro de cada corchea, [0, 0.25) -> [0, p) y [0.25, 0.5) -> [p, 0.5)
+  // con el swing de la voz: S_voz = 50 + (S - 50) * amount / 100
+  const sv = 50 + (swing.value - 50) * amt / 100;
+  const x = (i % 4) * 0.125, p = sv / 100 * 0.5;
+  const w = x < 0.25 ? x * p / 0.25 : p + (x - 0.25) * (0.5 - p) / 0.25;
+  return (Math.floor(i / 4) * 0.5 + w) * 60 / bpm;
+}
+function tick() {
+  const P = play;
+  while (P.barStart + stepTime(P.step, P.bpm) < ac.currentTime + 0.1) {
+    const t = Math.max(P.barStart + stepTime(P.step, P.bpm), ac.currentTime);
+    const k = P.bar % P.pats.length, hex = P.pats[k], d = +dens.value;
+    for (let vi = 0; vi < NV; vi++) {
+      const v = parseInt(hex.substr((vi * STEPS + P.step) * 2, 2), 16);
+      // misma regla que el plugin; cada voz con su amount de swing
+      if (v && 256 - v < d) VOICE[vi](Math.max(P.barStart + stepTime(P.step, P.bpm, P.amt[vi]), ac.currentTime));
+    }
+    if (P.step === 0) setTimeout(() => { if (play === P) P.marks.forEach((m, j) => m.classList.toggle('playing', j === k)); },
+                                 (t - ac.currentTime) * 1000);
+    if (++P.step === STEPS) { P.step = 0; P.bar++; P.barStart += 240 / P.bpm; }
+  }
+}
+function stop() {
+  if (!play) return;
+  clearInterval(play.timer);
+  play.btn.textContent = play.label; play.btn.setAttribute('aria-pressed', 'false');
+  play.marks.forEach(m => m.classList.remove('playing'));
+  play = null;
+}
+function start(btn, label, pats, marks, st, inZoom) {
+  const same = play && play.btn === btn;
+  stop();
+  if (same) return;
+  audio();
+  swing.value = swingv.value = st.swing;  // la receta del estilo; se puede mover a mano mientras suena
+  play = {btn, label, pats, marks, bpm: st.bpm, amt: st.amt || Array(NV).fill(100), inZoom,
+          bar: 0, step: 0, barStart: ac.currentTime + 0.05};
+  btn.textContent = '■ Stop'; btn.setAttribute('aria-pressed', 'true');
+  play.timer = setInterval(tick, 25); tick();
+}
+function playButton(label, onClick) {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'play'; b.textContent = label; b.setAttribute('aria-pressed', 'false');
+  b.addEventListener('click', e => { e.stopPropagation(); onClick(b); });
+  b.addEventListener('keydown', e => e.stopPropagation());
+  return b;
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !zoom.open) stop(); });
+swing.addEventListener('input', () => { swingv.value = swing.value; });
+
 const main = document.getElementById('main'), zoom = document.getElementById('zoom');
 const zbody = document.getElementById('zbody');
 let zoomed = [];
 
 function openZoom(st) {
+  if (play && play.inZoom) stop();
   canvases.splice(canvases.length - zoomed.length, zoomed.length);
   zbody.textContent = '';
   document.getElementById('zname').textContent = st.name;
@@ -156,6 +281,7 @@ function openZoom(st) {
   st.p.forEach((hex, i) => {
     const f = document.createElement('figure'), cap = document.createElement('figcaption');
     cap.textContent = 'p' + i + (i === 8 ? ' FILL' : '');
+    cap.append(playButton('▶', b => start(b, '▶', [hex], [f], st, true)));
     const row = document.createElement('div'); row.className = 'row';
     const names = document.createElement('div'); names.className = 'voices';
     DATA.voices.forEach(v => { const e = document.createElement('span'); e.textContent = v; names.append(e); });
@@ -178,12 +304,16 @@ for (const grp of DATA.groups) {
     el.className = 'style'; el.tabIndex = 0; el.setAttribute('role', 'button');
     el.setAttribute('aria-label', 'Ampliar ' + st.name);
     const n = document.createElement('div'); n.className = 'name'; n.textContent = st.name;
+    const bpm = document.createElement('span'); bpm.className = 'bpm'; bpm.textContent = st.bpm + ' BPM';
     const strip = document.createElement('div'); strip.className = 'strip';
+    const pats = [];
     st.p.forEach((hex, i) => {
       const w = document.createElement('div'); w.className = 'pat'; w.title = 'p' + i;
       if (i === 8 && !/[^0]/.test(hex)) w.classList.add('empty');
-      w.append(pattern(hex, 3)); strip.append(w);
+      w.append(pattern(hex, 3)); strip.append(w); pats.push(w);
     });
+    // la BASE: p4 en el compas 1 y p5 en el 2, como el plugin
+    n.append(bpm, playButton('▶ Play', b => start(b, '▶ Play', [st.p[4], st.p[5]], [pats[4], pats[5]], st, false)));
     el.append(n, strip); sec.append(el);
     el.addEventListener('click', () => openZoom(st));
     el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); openZoom(st); } });

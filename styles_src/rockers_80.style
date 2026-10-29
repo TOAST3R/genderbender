@@ -1,0 +1,47 @@
+name: ROCKERS 80
+# Rockers (Sly Dunbar, Channel One, 1976): one drop con el bombo tambien en la 1. Tempo sugerido: 80 BPM. Div por defecto (4).
+# Fuente del ritmo: Wikipedia ("Sly and Robbie") y foros de roots: el rockers acentua la 1 y la 3; hay fuentes que lo confunden con el steppers.
+# Voces: kick=bombo  clap=cross-stick  hhc=hat cerrado  hho=hat abierto
+# Groove: swing 56 · amount: hhc 100, hho 100, resto 0 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    XXXX XXXX XXXX XXXX
+hho    ...X ...X ...X ...X
+[p1]
+kick   X... .... .... ....
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   X... .... X... ...o
+clap   .... ...o X... ....
+hhc    XXXX XXXX XXXX XXXX
+hho    ...X ...X ...X ...X
+hitom  .... .... ...- ....
+[p3]
+clap   ........ ......o. X....... xox-xox-
+
+[p4 p5]                         # BASE
+kick   X... .... X... ....
+clap   .... .... X... ....
+hhc    XXXX XXXX XXXX XXXX
+hho    ...X ...X ...X ...X
+
+[p6 p7]                         # VARIACION: los toms toman el ritmo de los hats
+kick   X... .... X... ....
+clap   .... .... X... ....
+hhc    x... x... x... x...
+hitom  XXXX XXXX .... ....
+lotom  .... .... XXXX XXXX
+[p7]
+kick   X... .... X... ...x
+clap   .... .... X... ..X.
+
+[p8]                            # FILL: redoble que acentua los golpes de la base
+kick   X... .... .... ....
+clap   ........ ........ X.x.x.x. Xoxoxoxo
+hitom  .... .... XXXX ....
+lotom  .... .... .... XXXX

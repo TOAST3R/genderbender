@@ -1,0 +1,46 @@
+name: ROOTS REGGAE 75
+# Roots reggae (70s): one drop, bombo y cross-stick solo en el 3. Tempo sugerido: 75 BPM. Div por defecto (4).
+# Fuente del ritmo: guias de bateria reggae (Bax Shop, Bonedo): en el one drop el bombo y la caja caen en el 3 y la 1 queda vacia.
+# Voces: kick=bombo  clap=cross-stick  hhc=hat cerrado  hho=hat abierto
+# Groove: swing 58 · amount: hhc 100, hho 100, resto 0 · slide: 0
+# Pad: centro=BASE p4/5 · derecha=ENERGIA p2/3 · arriba-dcha=VARIACION p6/7
+#      izquierda/abajo=INTRO p0/1 · abajo-dcha/arriba-centro=FILL p8
+# Escala: X=255 x=204 o=153 -=102 ,=51 .=0
+# Density (por defecto 50) solo deja sonar X; x entra con >52, o con >103, - con >154, , con >205.
+
+[p0 p1]                         # INTRO: hats y percusion
+hhc    XXXX XXXX XXXX XXXX
+hho    .... ..X. .... ..X.
+[p1]
+kick   X... .... .... ....
+clap   .... .... .... X...
+
+[p2 p3]                         # ENERGIA: hats completos y adornos
+kick   .... .... X... ...o
+clap   .... ...o X... ....
+hhc    XXXX XXXX XXXX XXXX
+hho    .... ..X. .... ..X.
+hitom  .... .... ...- ....
+[p3]
+clap   ........ ......o. X....... xox-xox-
+
+[p4 p5]                         # BASE
+kick   .... .... X... ....
+clap   .... .... X... ....
+hhc    XXXX XXXX XXXX XXXX
+hho    .... ..X. .... ..X.
+
+[p6 p7]                         # VARIACION: los toms toman el ritmo de los hats
+kick   .... .... X... ....
+clap   .... .... X... ....
+hhc    x... x... x... x...
+hitom  XXXX XXXX .... ....
+lotom  .... .... XXXX XXXX
+[p7]
+kick   .... .... X... ...x
+clap   .... .... X... ..X.
+
+[p8]                            # FILL: redoble que acentua los golpes de la base
+clap   ........ ........ X.x.x.x. Xoxoxoxo
+hitom  .... .... XXXX ....
+lotom  .... .... .... XXXX
