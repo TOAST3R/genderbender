@@ -163,6 +163,7 @@ dialog h3{margin:0 0 12px;font-size:15px}
 <label>Género <select id="fam"></select></label><output id="count"></output>
 <label>Density <input id="dens" type="range" min="0" max="260" value="50"><output id="densv">50</output></label>
 <label>Swing <input id="swing" type="range" min="50" max="75" value="50"><output id="swingv">50</output></label>
+<label>Kit <select id="kit"></select></label>
 <span class="hint" style="margin:0">color = valor 0–255 · atenuado = no suena con esta Density · clic para ampliar · ▶ preview sintetizado (no es el sonido de tu sampler) · Esc para</span>
 </header>
 <main id="main"></main>
@@ -200,7 +201,7 @@ function pattern(hex, s, list = canvases) {
 
 // ---- preview de audio: voces sintetizadas con Web Audio, sin recursos externos
 const swing = document.getElementById('swing'), swingv = document.getElementById('swingv');
-let ac = null, noiseBuf = null, openHat = null, play = null;
+let ac = null, noiseBuf = null, play = null;
 function audio() {
   if (!ac) {
     ac = new AudioContext();
@@ -211,26 +212,158 @@ function audio() {
   ac.resume();
 }
 function env(g, t, a, len) { g.gain.setValueAtTime(a, t); g.gain.exponentialRampToValueAtTime(0.001, t + len); }
-function tone(t, f0, f1, len, a) {
+function tone(t, f0, f1, len, a, out, type = 'sine') {
   const o = ac.createOscillator(), g = ac.createGain();
-  o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + len);
-  env(g, t, a, len); o.connect(g).connect(ac.destination); o.start(t); o.stop(t + len);
+  o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + len);
+  env(g, t, a, len); o.connect(g).connect(out || ac.destination); o.start(t); o.stop(t + len);
 }
-function noise(t, type, freq, len, a) {
+function noise(t, type, freq, len, a, out, gate) {
   const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
   s.buffer = noiseBuf; f.type = type; f.frequency.value = freq;
-  env(g, t, a, len); s.connect(f).connect(g).connect(ac.destination); s.start(t); s.stop(t + len);
+  if (gate) { g.gain.setValueAtTime(a, t); g.gain.setValueAtTime(0, t + len); } else env(g, t, a, len);
+  s.connect(f).connect(g).connect(out || ac.destination); s.start(t); s.stop(t + len + 0.01);
   return s;
 }
-const VOICE = [  // mismo orden que DATA.voices
-  t => tone(t, 150, 45, 0.35, 1),
-  t => { noise(t, 'highpass', 1000, 0.15, 0.5); tone(t, 180, 160, 0.1, 0.3); },
-  t => { for (let k = 0; k < 3; k++) noise(t + k * 0.01, 'bandpass', 1200, k < 2 ? 0.02 : 0.12, 0.6); },
-  t => { if (openHat) { openHat.stop(t); openHat = null; } noise(t, 'highpass', 7000, 0.05, 0.3); },
-  t => { openHat = noise(t, 'highpass', 7000, 0.3, 0.25); },
-  t => tone(t, 220, 160, 0.25, 0.6),
-  t => tone(t, 140, 100, 0.3, 0.7),
+// metal: seis cuadradas en las frecuencias del hat del 808, con paso banda y paso alto
+function metal(t, len, a, out) {
+  const bp = ac.createBiquadFilter(), hp = ac.createBiquadFilter(), g = ac.createGain();
+  bp.type = 'bandpass'; bp.frequency.value = 10000; hp.type = 'highpass'; hp.frequency.value = 7000;
+  env(g, t, a, len); bp.connect(hp).connect(g).connect(out || ac.destination);
+  const oscs = [205.3, 304.4, 369.6, 522.7, 540, 800].map(f => {
+    const o = ac.createOscillator(); o.type = 'square'; o.frequency.value = f; o.connect(bp); o.start(t); o.stop(t + len); return o;
+  });
+  return {stop: when => oscs.forEach(o => o.stop(when))};
+}
+function cowbell(t, a, out) {
+  const bp = ac.createBiquadFilter(), g = ac.createGain();
+  bp.type = 'bandpass'; bp.frequency.value = 800; env(g, t, a, 0.3); bp.connect(g).connect(out || ac.destination);
+  [540, 800].forEach(f => { const o = ac.createOscillator(); o.type = 'square'; o.frequency.value = f; o.connect(bp); o.start(t); o.stop(t + 0.3); });
+}
+const click = (t, a, out) => noise(t, 'highpass', 2000, 0.006, a, out);
+const clapBursts = (t, n, freq, a, out) => { for (let k = 0; k < n; k++) noise(t + k * 0.01, 'bandpass', freq, k < n - 1 ? 0.015 : 0.18, a, out); };
+
+// salidas con efecto por kit: crush (bits + paso bajo), drive (distorsion); creadas una vez por contexto
+const FX = {};
+function fx(name) {
+  if (FX[name]) return FX[name];
+  const out = ac.createGain();
+  if (name === 'lofi' || name === 'chip') {
+    const levels = name === 'lofi' ? 32 : 3, ws = ac.createWaveShaper(), c = new Float32Array(1024);
+    for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; c[i] = Math.round(x * levels) / levels; }
+    ws.curve = c; out.connect(ws);
+    let last = ws;
+    if (name === 'lofi') { const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4000; ws.connect(lp); last = lp; }
+    const g = ac.createGain(); g.gain.value = 0.9; last.connect(g).connect(ac.destination);
+  } else if (name === 'drive') {
+    const ws = ac.createWaveShaper(), c = new Float32Array(1024), g = ac.createGain();
+    for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; c[i] = Math.tanh(8 * x); }
+    ws.curve = c; g.gain.value = 0.45; out.connect(ws).connect(g).connect(ac.destination);
+  } else out.connect(ac.destination);
+  return (FX[name] = out);
+}
+const choke = {};  // el hho de cada kit, para que el hhc lo corte
+const hh = (kit, t, open, make) => {
+  if (choke[kit]) { try { choke[kit].stop(t); } catch (e) {} choke[kit] = null; }
+  const n = make(); if (open) choke[kit] = n;
+};
+// acustico: tambien lo usa el Lo-fi a traves de su salida con crush
+const acoustic = o => [
+  t => { tone(t, 90, 55, 0.25, 1, o()); noise(t, 'lowpass', 600, 0.05, 0.4, o()); },
+  t => { noise(t, 'bandpass', 3000, 0.25, 0.55, o()); tone(t, 190, 170, 0.12, 0.35, o()); },
+  t => clapBursts(t, 3, 1300, 0.45, o()),
+  t => hh(o === fxLofi ? 'lofi' : 'acustico', t, false, () => noise(t, 'highpass', 6000, 0.06, 0.25, o())),
+  t => hh(o === fxLofi ? 'lofi' : 'acustico', t, true, () => noise(t, 'highpass', 5000, 0.6, 0.14, o())),
+  t => { tone(t, 220, 200, 0.3, 0.55, o()); noise(t, 'bandpass', 1500, 0.03, 0.2, o()); },
+  t => { tone(t, 140, 125, 0.35, 0.65, o()); noise(t, 'bandpass', 900, 0.03, 0.2, o()); },
 ];
+const dry = () => ac.destination, fxLofi = () => fx('lofi'), fxChip = () => fx('chip'), fxDrive = () => fx('drive');
+const KITS = {
+  actual: {label: 'Actual', v: [
+    t => tone(t, 150, 45, 0.35, 1),
+    t => { noise(t, 'highpass', 1000, 0.15, 0.5); tone(t, 180, 160, 0.1, 0.3); },
+    t => { for (let k = 0; k < 3; k++) noise(t + k * 0.01, 'bandpass', 1200, k < 2 ? 0.02 : 0.12, 0.6); },
+    t => hh('actual', t, false, () => noise(t, 'highpass', 7000, 0.05, 0.3)),
+    t => hh('actual', t, true, () => noise(t, 'highpass', 7000, 0.3, 0.25)),
+    t => tone(t, 220, 160, 0.25, 0.6),
+    t => tone(t, 140, 100, 0.3, 0.7),
+  ]},
+  '808': {label: '808', v: [
+    t => tone(t, 60, 45, 0.8, 1),
+    t => { tone(t, 180, 170, 0.15, 0.3); tone(t, 330, 320, 0.12, 0.2); noise(t, 'highpass', 1500, 0.18, 0.4); },
+    t => clapBursts(t, 4, 1100, 0.5),
+    t => hh('808', t, false, () => metal(t, 0.05, 0.35)),
+    t => hh('808', t, true, () => metal(t, 0.35, 0.3)),
+    t => cowbell(t, 0.4),
+    t => tone(t, 130, 90, 0.5, 0.7),
+  ]},
+  '909': {label: '909', v: [
+    t => { tone(t, 160, 50, 0.3, 1); click(t, 0.5); },
+    t => { noise(t, 'highpass', 2000, 0.2, 0.6); tone(t, 200, 180, 0.1, 0.35); },
+    t => clapBursts(t, 3, 1500, 0.55),
+    t => hh('909', t, false, () => noise(t, 'highpass', 8000, 0.04, 0.35)),
+    t => hh('909', t, true, () => noise(t, 'highpass', 7000, 0.25, 0.28)),
+    t => tone(t, 250, 180, 0.2, 0.6),
+    t => tone(t, 160, 110, 0.25, 0.7),
+  ]},
+  acustico: {label: 'Acústico', v: acoustic(dry)},
+  lofi: {label: 'Lo-fi', v: acoustic(fxLofi)},
+  hardcore: {label: 'Hardcore', v: [
+    t => tone(t, 200, 45, 0.5, 1, fxDrive()),
+    t => { noise(t, 'highpass', 2000, 0.12, 0.6); tone(t, 220, 190, 0.08, 0.4); },
+    t => clapBursts(t, 2, 1600, 0.6),
+    t => hh('hardcore', t, false, () => noise(t, 'highpass', 9000, 0.03, 0.4)),
+    t => hh('hardcore', t, true, () => noise(t, 'highpass', 7000, 0.15, 0.35)),
+    t => tone(t, 250, 180, 0.2, 0.6),
+    t => tone(t, 160, 110, 0.25, 0.7),
+  ]},
+  '80s': {label: '80s / Linn', v: [
+    t => tone(t, 120, 55, 0.18, 1),
+    t => { noise(t, 'bandpass', 1800, 0.18, 0.6, null, true); tone(t, 220, 180, 0.08, 0.35); },
+    t => clapBursts(t, 3, 1200, 0.5),
+    t => hh('80s', t, false, () => noise(t, 'highpass', 9000, 0.03, 0.3)),
+    t => hh('80s', t, true, () => noise(t, 'highpass', 8000, 0.2, 0.25)),
+    t => { tone(t, 300, 120, 0.25, 0.6); noise(t, 'bandpass', 2000, 0.02, 0.2); },
+    t => { tone(t, 200, 80, 0.3, 0.7); noise(t, 'bandpass', 1500, 0.02, 0.2); },
+  ]},
+  percusion: {label: 'Percusión', v: [
+    t => tone(t, 80, 70, 0.6, 0.9),
+    t => tone(t, 2500, 2400, 0.04, 0.5),
+    t => clapBursts(t, 3, 1200, 0.4),
+    t => hh('percusion', t, false, () => {  // shaker: ataque suave
+      const n = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+      n.buffer = noiseBuf; f.type = 'bandpass'; f.frequency.value = 6000;
+      g.gain.setValueAtTime(0.001, t); g.gain.linearRampToValueAtTime(0.3, t + 0.02); g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+      n.connect(f).connect(g).connect(ac.destination); n.start(t); n.stop(t + 0.1); return n;
+    }),
+    t => hh('percusion', t, true, () => { for (let k = 0; k < 4; k++) noise(t + k * 0.03, 'bandpass', 3000, 0.025, 0.3); return {stop() {}}; }),
+    t => cowbell(t, 0.35),
+    t => { tone(t, 200, 190, 0.25, 0.7); noise(t, 'bandpass', 2500, 0.01, 0.3); },
+  ]},
+  chiptune: {label: 'Chiptune', v: [
+    t => tone(t, 120, 40, 0.15, 0.8, null, 'square'),
+    t => noise(t, 'highpass', 1000, 0.12, 0.5, fxChip()),
+    t => noise(t, 'bandpass', 1500, 0.1, 0.5, fxChip()),
+    t => hh('chiptune', t, false, () => noise(t, 'highpass', 8000, 0.03, 0.35, fxChip())),
+    t => hh('chiptune', t, true, () => noise(t, 'highpass', 6000, 0.18, 0.3, fxChip())),
+    t => tone(t, 440, 300, 0.12, 0.4, null, 'square'),
+    t => tone(t, 220, 150, 0.15, 0.45, null, 'square'),
+  ]},
+};
+// Auto: el kit de la familia del estilo que suena
+const FAM_KIT = {
+  'Techno': '909', 'House': '909', 'Hard house': '909', 'Psytrance': '909', 'Rave / oldskool': '909', 'UK garage': '909', 'Gqom': '909',
+  'R&B / trap': '808', 'Electro': '808', 'Bass music': '808', 'Phonk': '808', 'Footwork / juke': '808', 'Reggaeton / funk carioca': '808',
+  'Breaks': 'acustico', 'Drum & bass': 'acustico', 'Funk / New Orleans': 'acustico', 'Country / Americana': 'acustico', 'Reggae / dancehall': 'acustico',
+  'Hip-hop': 'lofi', 'Downtempo / chill': 'lofi', 'Hardcore / hard dance': 'hardcore', 'Synth / disco': '80s', 'EBM / industrial': '80s',
+  'Latin / Caribbean': 'percusion', 'Brazil': 'percusion', 'South America': 'percusion', 'Afro / Caribbean': 'percusion',
+  'Afro / Latin club': 'percusion', 'Cumbia': 'percusion', 'Flamenco': 'percusion', 'Folk ibérico': 'percusion', 'Celtic': 'percusion',
+  'World folk': 'percusion', 'IDM / experimental': 'chiptune', 'Other': 'actual',
+};
+const FAMILY = {};
+DATA.groups.forEach(g => g.styles.forEach(st => { FAMILY[st.name] = g.family; }));
+let kitChoice = 'auto';
+const kitOf = st => kitChoice !== 'auto' ? kitChoice : (FAM_KIT[FAMILY[st.name]] || 'actual');
+const playVoice = (st, vi, t) => KITS[kitOf(st)].v[vi](t);
 function stepTime(i, bpm, amt = 100) {
   // deformacion de groove-swing: dentro de cada corchea, [0, 0.25) -> [0, p) y [0.25, 0.5) -> [p, 0.5)
   // con el swing de la voz: S_voz = 50 + (S - 50) * amount / 100
@@ -282,6 +415,7 @@ function tick() {
         if (P.lastSt) { swing.value = swingv.value = P.cur.st.swing; syncZoom(); }
         P.lastSt = P.cur.st; P.bpm = P.cur.st.bpm; P.amt = P.cur.st.amt || Array(NV).fill(100);
       }
+      showAuto(P.cur.st);
       const t0 = Math.max(P.barStart, ac.currentTime), mark = P.cur.mark;
       setTimeout(() => { if (play === P) P.marks.forEach(m => m.classList.toggle('playing', m === mark)); }, (t0 - ac.currentTime) * 1000);
     }
@@ -290,7 +424,7 @@ function tick() {
       if (!audible(vi)) continue;
       const v = P.cur.val(vi, P.step);
       // misma regla que el plugin; cada voz con su amount de swing
-      if (v && 256 - v < d) VOICE[vi](Math.max(P.barStart + stepTime(P.step, P.bpm, P.amt[vi]), ac.currentTime));
+      if (v && 256 - v < d) playVoice(P.cur.st, vi, Math.max(P.barStart + stepTime(P.step, P.bpm, P.amt[vi]), ac.currentTime));
     }
     if (++P.step === STEPS) { P.step = 0; P.bar++; P.barStart += 240 / P.bpm; }
   }
@@ -454,12 +588,36 @@ function zoomTools(st) {
   };
   slider('Density', 'zdens', dens, 0, 260);
   slider('Swing', 'zswing', swing, 50, 75);
+  const kl = document.createElement('label'), ks = document.createElement('select');
+  ks.id = 'zkit'; fillKits(ks); kl.append('Kit ', ks); t.append(kl); showAuto(st);
   const link = (txt, href) => { const a = document.createElement('a'); a.href = href; a.textContent = txt; a.target = '_blank'; a.rel = 'noopener'; t.append(a); };
   link('.txt ↗', GH + 'drum_styles_v/' + encodeURIComponent(st.name) + '.txt');
   if (st.src) link('.style ↗', GH + 'styles_src/' + encodeURIComponent(st.src) + '.style');
 }
 
 // ---- permalink: #style=…&density=…&fam=…
+function fillKits(sel) {
+  sel.textContent = '';
+  sel.append(new Option('Auto', 'auto'));
+  for (const [id, k] of Object.entries(KITS)) sel.append(new Option(k.label, id));
+  sel.value = kitChoice;
+  sel.addEventListener('change', () => setKit(sel.value));
+}
+function setKit(v) {
+  kitChoice = KITS[v] ? v : 'auto';
+  try { localStorage.setItem('gb-kit', kitChoice); } catch (e) {}
+  for (const id of ['kit', 'zkit']) { const s = document.getElementById(id); if (s) s.value = kitChoice; }
+  showAuto(play ? play.cur && play.cur.st : current);
+  writeHash();
+}
+function showAuto(st) {  // "Auto (909)": que kit esta usando Auto
+  const k = st ? KITS[FAM_KIT[FAMILY[st.name]] || 'actual'].label : '';
+  for (const id of ['kit', 'zkit']) {
+    const s = document.getElementById(id);
+    if (s && s.options.length) s.options[0].textContent = k ? 'Auto (' + k + ')' : 'Auto';
+  }
+}
+
 function syncZoom() {  // los controles de la vista ampliada siguen a los de la cabecera
   for (const [id, src] of [['zdens', dens], ['zswing', swing]]) {
     const r = document.getElementById(id);
@@ -471,6 +629,7 @@ function writeHash() {
   const q = new URLSearchParams();
   if (fam.value) q.set('fam', fam.value);
   if (+dens.value !== 50) q.set('density', dens.value);
+  if (kitChoice !== 'auto') q.set('kit', kitChoice);
   if (current) q.set('style', current.name);
   history.replaceState(null, '', q.toString() ? '#' + q.toString() : location.pathname + location.search);
 }
@@ -522,6 +681,9 @@ dens.addEventListener('input', () => { densv.value = dens.value; redraw(); write
 {  // aplicar el permalink al cargar: genero, Density y estilo
   const q = new URLSearchParams(location.hash.slice(1));
   if (q.has('fam') && DATA.groups.some(g => g.family === q.get('fam'))) { fam.value = q.get('fam'); filter(); }
+  let saved = null; try { saved = localStorage.getItem('gb-kit'); } catch (e) {}
+  kitChoice = KITS[q.get('kit')] ? q.get('kit') : (KITS[saved] ? saved : 'auto');
+  fillKits(document.getElementById('kit'));
   const d = parseInt(q.get('density'), 10);
   if (d >= 0 && d <= 260) { dens.value = densv.value = d; redraw(); }
   const st = DATA.groups.flatMap(g => g.styles).find(s => s.name === q.get('style'));
