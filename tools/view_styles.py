@@ -143,6 +143,17 @@ dialog h3{margin:0 0 12px;font-size:15px}
 .bpm{color:var(--muted);font-size:12px;margin-left:8px}
 .playing{outline:2px solid var(--ink);outline-offset:1px}
 .knob{position:relative}
+.big .row{position:relative}
+.cursor{position:absolute;background:var(--ink);opacity:.25;pointer-events:none}
+.voices span{transition:color .15s}
+.voices span.hit{color:var(--ink);transition:none}
+.vis{display:none;width:100%;cursor:pointer}
+.vis.on{display:block}
+#zvis{height:64px;margin:0 0 12px}
+#visbar{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:4px 16px;display:none}
+#visbar.on{display:block}
+body:has(#visbar.on){padding-bottom:60px}
+#fvis{height:48px}
 .knob input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
 .disc{--v:0;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);cursor:ns-resize;touch-action:none;background:conic-gradient(from 225deg,var(--ink) calc(var(--v)*2.7deg),var(--cell) 0 270deg,transparent 0)}
 .knob input:focus-visible+.disc{outline:2px solid var(--ink);outline-offset:1px}
@@ -175,7 +186,8 @@ dialog h3{margin:0 0 12px;font-size:15px}
 <span class="hint" style="margin:0">color = valor 0–255 · atenuado = no suena con esta Density · clic para ampliar · ▶ preview sintetizado (no es el sonido de tu sampler) · Esc para</span>
 </header>
 <main id="main"></main>
-<dialog id="zoom"><h3 id="zname"></h3><div class="tools" id="ztools"></div><div class="zplay" id="zplay"></div><div class="big" id="zbody"></div><p class="hint">Esc o clic fuera para cerrar</p></dialog>
+<div id="visbar"><canvas id="fvis" class="vis on" title="Clic: onda / espectro"></canvas></div>
+<dialog id="zoom"><h3 id="zname"></h3><div class="tools" id="ztools"></div><canvas id="zvis" class="vis" title="Clic: onda / espectro"></canvas><div class="zplay" id="zplay"></div><div class="big" id="zbody"></div><p class="hint">Esc o clic fuera para cerrar</p></dialog>
 <script>
 const DATA = /*DATA*/;
 const STEPS = 32, NV = DATA.voices.length;
@@ -289,7 +301,9 @@ function bus() {
   mk.connect(dsend).connect(dl).connect(lp).connect(ac.destination); lp.connect(fb).connect(dl);
   mk.connect(rsend).connect(conv).connect(ac.destination);
   dsend.gain.value = rsend.gain.value = 0;  // sin rampa desde 1 al crear
-  FXB = {in: inp, ws, mk, dsend, rsend, dl};
+  const an = ac.createAnalyser(); an.fftSize = 2048;
+  mk.connect(an); lp.connect(an); conv.connect(an);
+  FXB = {in: inp, ws, mk, dsend, rsend, dl, an};
   applyFx();
   return inp;
 }
@@ -488,13 +502,14 @@ function tick() {
       const t0 = Math.max(P.barStart, ac.currentTime), mark = P.cur.mark;
       setTimeout(() => { if (play === P) P.marks.forEach(m => m.classList.toggle('playing', m === mark)); }, (t0 - ac.currentTime) * 1000);
     }
-    const d = +dens.value;
+    const d = +dens.value, hits = [];
     for (let vi = 0; vi < NV; vi++) {
       if (!audible(vi)) continue;
       const v = P.cur.val(vi, P.step);
       // misma regla que el plugin; cada voz con su amount de swing
-      if (v && 256 - v < d) playVoice(P.cur.st, vi, Math.max(P.barStart + stepTime(P.step, P.bpm, P.amt[vi]), ac.currentTime));
+      if (v && 256 - v < d) { playVoice(P.cur.st, vi, Math.max(P.barStart + stepTime(P.step, P.bpm, P.amt[vi]), ac.currentTime)); hits.push(vi); }
     }
+    P.q.push({t: P.barStart + stepTime(P.step, P.bpm), mark: P.cur.mark, step: P.step, hits});
     if (++P.step === STEPS) { P.step = 0; P.bar++; P.barStart += 240 / P.bpm; }
   }
 }
@@ -504,6 +519,8 @@ function stop() {
   play.btn.textContent = play.label; play.btn.setAttribute('aria-pressed', 'false');
   play.marks.forEach(m => m.classList.remove('playing'));
   play = null;
+  cursor.remove();
+  document.querySelectorAll('.vis, #visbar').forEach(e => e.classList.toggle('on', e.id === 'fvis'));
 }
 function start(btn, label, pats, marks, st, inZoom, getBar) {
   const same = play && play.btn === btn;
@@ -514,9 +531,58 @@ function start(btn, label, pats, marks, st, inZoom, getBar) {
   syncZoom();
   getBar = getBar || (b => barOf(st, pats[b % pats.length], marks[b % marks.length]));
   play = {btn, label, getBar, marks, st, bpm: st.bpm, amt: st.amt || Array(NV).fill(100), inZoom,
-          bar: 0, step: 0, barStart: ac.currentTime + 0.05};
+          bar: 0, step: 0, barStart: ac.currentTime + 0.05, q: []};
   btn.textContent = '■ Stop'; btn.setAttribute('aria-pressed', 'true');
   play.timer = setInterval(tick, 25); tick();
+  if (!raf) raf = requestAnimationFrame(frame);
+}
+
+// ---- visuales: cursor de paso, golpes por voz y onda / espectro, solo mientras suena
+const cursor = document.createElement('div'); cursor.className = 'cursor';
+const still = matchMedia('(prefers-reduced-motion: reduce)');
+let raf = 0, visMode = 'onda';
+try { if (localStorage.getItem('gb-vis') === 'espectro') visMode = 'espectro'; } catch (e) {}
+document.querySelectorAll('.vis').forEach(c => c.addEventListener('click', () => {
+  visMode = visMode === 'onda' ? 'espectro' : 'onda';
+  try { localStorage.setItem('gb-vis', visMode); } catch (e) {}
+}));
+function showStep(e) {
+  const row = e.mark.querySelector && e.mark.querySelector('.row');
+  if (!row) return;  // en la lista no hay cursor: solo se marca el patron
+  const c = row.querySelector('canvas'), w = c.offsetWidth / STEPS;
+  if (cursor.parentNode !== row) row.append(cursor);
+  Object.assign(cursor.style, {left: c.offsetLeft + e.step * w + 'px', top: c.offsetTop + 'px', width: w + 'px', height: c.offsetHeight + 'px'});
+  if (still.matches) return;
+  const names = row.querySelectorAll('.voices span');
+  e.hits.forEach(vi => { const n = names[vi]; n.classList.add('hit'); setTimeout(() => n.classList.remove('hit'), 80); });
+}
+function drawVis(c) {
+  if (c.width !== c.offsetWidth) { c.width = c.offsetWidth; c.height = c.offsetHeight; }
+  const g = c.getContext('2d'), W = c.width, H = c.height, an = FXB.an;
+  g.clearRect(0, 0, W, H); g.fillStyle = g.strokeStyle = getComputedStyle(c).getPropertyValue('--ink') || '#c40';
+  if (visMode === 'onda') {
+    const d = new Float32Array(an.fftSize); an.getFloatTimeDomainData(d);
+    g.beginPath();
+    for (let x = 0; x < W; x++) { const y = H / 2 - d[Math.floor(x / W * d.length)] * H / 2; x ? g.lineTo(x, y) : g.moveTo(x, y); }
+    g.stroke();
+  } else {
+    const d = new Uint8Array(an.frequencyBinCount), N = 48, bw = W / N; an.getByteFrequencyData(d);
+    for (let i = 0; i < N; i++) {  // barras en escala logaritmica de 30 Hz a 16 kHz
+      const f = 30 * Math.pow(16000 / 30, i / (N - 1)), v = d[Math.min(d.length - 1, Math.round(f / (ac.sampleRate / 2) * d.length))] / 255;
+      g.fillRect(i * bw + 1, H - v * H, bw - 2, v * H);
+    }
+  }
+}
+function frame() {
+  if (!play) { raf = 0; return; }
+  const now = ac.currentTime - (ac.outputLatency || 0);
+  let e; while (play.q.length && play.q[0].t <= now) e = play.q.shift();
+  if (e) showStep(e);
+  const vis = [document.getElementById('zvis')], bar = document.getElementById('visbar');
+  vis[0].classList.toggle('on', !still.matches && zoom.open);
+  bar.classList.toggle('on', !still.matches && !play.inZoom);
+  if (!still.matches && FXB) { if (zoom.open) drawVis(vis[0]); if (!play.inZoom) drawVis(document.getElementById('fvis')); }
+  raf = requestAnimationFrame(frame);
 }
 function playButton(label, onClick) {
   const b = document.createElement('button');
