@@ -224,6 +224,15 @@ slider198:30<1,127,1>-vel follow min velocity;
 slider199:100<25,400,1>-vel follow curve (exponent %);
 slider200:0<0,1,1>-vel follow mode (0 absolute, 1 relative to threshold);
 
+// ---- candado de estilo por voz: con el candado puesto, ALL RND / EACH RND no cambian el estilo de esa voz ----
+slider201:0<0,1,1>-kick style lock;
+slider202:0<0,1,1>-snare style lock;
+slider203:0<0,1,1>-clap style lock;
+slider204:0<0,1,1>-hhclosed style lock;
+slider205:0<0,1,1>-hhopen style lock;
+slider206:0<0,1,1>-hitom style lock;
+slider207:0<0,1,1>-lotom style lock;
+
 
 
 
@@ -931,21 +940,41 @@ function changeBar()(
 
 // ---------- RANDOM STYLES ----------
 // cuenta cuantos archivos hay en la lista de estilos (los sliders 1..7 son de tipo archivo)
-function countStyles() local(i, n, ok, h)(
-	i=0; n=0; ok=1;
+// lista de estilos validos: indices de la carpeta drum_styles_v que son .txt legibles.
+// No se para en el primer archivo raro (.DS_Store, carpetas, archivos sin permiso): lo salta y sigue,
+// hasta que el nombre sale vacio o se repite (fuera de rango).
+stList = 3950000; stCount = 0;
+stSkip = 3950600; stSkipN = 0;   // .txt que existen pero no se pudieron abrir
+function scanStyles() local(i, ok, h, keep)(
+	keep = slider8; i = 0; ok = 1; stCount = 0; stSkipN = 0;
+	strcpy(#probePrev, "");
 	while (ok && i < 512) (
-		strcpy_fromslider(#probe, i);
-		strlen(#probe) > 0 && (h = file_open(#probe)) >= 0 ? (
-			file_close(h);
-			n += 1;
+		slider8 = i;                          // strcpy_fromslider necesita un slider real
+		strcpy_fromslider(#probe, slider8);
+		strlen(#probe) == 0 || (i > 0 && strcmp(#probe, #probePrev) == 0) ? ok = 0 : (
+			strcpy(#probePrev, #probe);
+			strcpy_substr(#probeExt, #probe, max(0, strlen(#probe) - 4), 4);
+			stricmp(#probeExt, ".txt") == 0 ? (
+				(h = file_open(#probe)) >= 0 ? (
+					file_close(h);
+					stList[stCount] = i; stCount += 1;
+				) : (
+					stSkip[stSkipN] = i; stSkipN += 1;
+				);
+			);
 			i += 1;
-		) : ok = 0;
+		);
 	);
-	n;
+	slider8 = keep;
+	stCount;
 );
+// estilo al azar entre los validos
+function randStyle()( stCount > 0 ? stList[floor(rand(stCount))] : floor(rand(24)); );
+// posicion del indice idx en la lista (-1 si no esta)
+function stPos(idx) local(k, p)( p = -1; k = 0; loop(stCount, stList[k] == idx ? p = k; k += 1;); p; );
 
-STYLE_FIRST = 0;          // primer indice valido (sube a 1 si el 0 no es un estilo real)
-numStyles = countStyles();
+STYLE_FIRST = 0;
+numStyles = scanStyles();
 numStyles < 1 ? numStyles = 24;
 
 // ---------- CONTROL REMOTO POR MIDI CC (plantilla TouchOSC) ----------
@@ -974,6 +1003,7 @@ loop(7,
 	rcSet(16, rcB + 11, 191 + rcV, 0, 100, 1);    // vel follow
 	rcSet(16, rcB + 12, rcV + 1, 0, 0, 3);        // estilo siguiente
 	rcSet(16, rcB + 13, rcV + 1, 0, 0, 4);        // estilo anterior
+	rcSet(16, rcB + 14, 201 + rcV, 0, 1, 2);      // candado de estilo
 	rcV += 1;
 );
 rcSet(15, 0, 44, -100, 100, 1);  rcSet(15, 1, 45, -100, 100, 1);    // pad X / Y
@@ -1007,19 +1037,23 @@ function rcOld(v)(
 );
 // estilo siguiente / anterior de la voz v (1..7)
 function rcStyleStep(v, d) local(n)(
-	n = max(1, numStyles - STYLE_FIRST);
-	slider(v) = STYLE_FIRST + ((slider(v) - STYLE_FIRST + d + n) % n);
+	stCount > 0 ? (
+		n = stPos(slider(v));
+		slider(v) = stList[n < 0 ? 0 : (n + d + stCount) % stCount];
+	) : slider(v) = max(0, slider(v) + d);
 	userSelM[v] = 0;
 	loadStyle(v); rcOld(v);
 	sliderchange(2 ^ (v - 1));
 );
 function rcRandom(each) local(v, r)(
-	r = STYLE_FIRST + floor(rand(numStyles - STYLE_FIRST));
+	r = randStyle();
 	v = 1;
 	loop(7,
-		slider(v) = each ? STYLE_FIRST + floor(rand(numStyles - STYLE_FIRST)) : r;
-		userSelM[v] = 0;
-		loadStyle(v); rcOld(v);
+		slider(200 + v) < 1 ? (
+			slider(v) = each ? randStyle() : r;
+			userSelM[v] = 0;
+			loadStyle(v); rcOld(v);
+		);
 		v += 1;
 	);
 	sliderchange(127);
@@ -1519,7 +1553,8 @@ mouse_cap ? init_mouse() : uninit_mouse();
 SEL_W = 100; SEL_H = 14; NOTE_W = 24;
 selGeom = 3200000;
 selGeom[0]=114;  selGeom[1]=334;  selGeom[2]=555;  selGeom[3]=134;  selGeom[4]=342;  selGeom[5]=555;  selGeom[6]=114;   // x estilo (como 2.9; hihat closed/open algo mas a la derecha para dejar sitio a la nota)
-selGeom[30]=100; selGeom[31]=100; selGeom[32]=100; selGeom[33]=80;  selGeom[34]=92;  selGeom[35]=100; selGeom[36]=100;   // ancho estilo
+selGeom[30]=89;  selGeom[31]=89;  selGeom[32]=89;  selGeom[33]=69;  selGeom[34]=81;  selGeom[35]=89;  selGeom[36]=89;    // ancho estilo (el candado ocupa los 11 px de la derecha)
+LOCK_W = 10;
 selGeom[20]=88;  selGeom[21]=308; selGeom[22]=529; selGeom[23]=108; selGeom[24]=316; selGeom[25]=529; selGeom[26]=88;    // x nota (entre el titulo y el desplegable)
 selGeom[10]=17;  selGeom[11]=17;  selGeom[12]=17;  selGeom[13]=117; selGeom[14]=117; selGeom[15]=117; selGeom[16]=217;  // y
 // si el clic empezo sobre un selector, los faders de debajo lo ignoran
@@ -1529,6 +1564,7 @@ mouse_cap ? (
 	loop(7,
 		X >= selGeom[sbV] && X < selGeom[sbV]+selGeom[30+sbV] && Y >= selGeom[10+sbV] && Y < selGeom[10+sbV]+SEL_H ? uiBlock = 1;
 		X >= selGeom[20+sbV] && X < selGeom[20+sbV]+NOTE_W && Y >= selGeom[10+sbV] && Y < selGeom[10+sbV]+SEL_H ? uiBlock = 1;
+		X >= selGeom[sbV]+selGeom[30+sbV] && X < selGeom[sbV]+selGeom[30+sbV]+LOCK_W+1 && Y >= selGeom[10+sbV] && Y < selGeom[10+sbV]+SEL_H ? uiBlock = 1;
 		sbV += 1;
 	);
 );
@@ -2191,12 +2227,13 @@ function reloadAllStyles()(
 	loadStyle(7); old_slider7 = slider7;
 );
 
-btnAll || btnEach || pendingAll ? memset(userSelM + 1, 0, 7);
+btnAll || btnEach ? ( bI = 1; loop(7, slider(200 + bI) < 1 ? userSelM[bI] = 0; bI += 1;); );
+pendingAll ? memset(userSelM + 1, 0, 7);
 
 btnAll ? (
-	bR = STYLE_FIRST + floor(rand(numStyles - STYLE_FIRST));
+	bR = randStyle();
 	bI = 1;
-	loop(7, slider(bI) = bR; bI += 1;);
+	loop(7, slider(200 + bI) < 1 ? slider(bI) = bR; bI += 1;);
 	slider8 = bR; old_slider8 = bR;     // el menu general muestra el estilo elegido
 	reloadAllStyles();
 	sliderchange(255);      // bits 0..7 = sliders 1..8 (actualiza la interfaz)
@@ -2215,7 +2252,7 @@ pendingAll ? (
 
 btnEach ? (
 	bI = 1;
-	loop(7, slider(bI) = STYLE_FIRST + floor(rand(numStyles - STYLE_FIRST)); bI += 1;);
+	loop(7, slider(200 + bI) < 1 ? slider(bI) = randStyle(); bI += 1;);
 	reloadAllStyles();
 	sliderchange(127);
 	slider_automate(127);
@@ -2281,6 +2318,32 @@ function drawStyleBox(v) local(x, y, hover, sw, sh, sw0)(
 	hover && (mouse_cap & 1) && !(lastCap & 1);
 );
 
+
+// candado de la voz v (1..7) a la derecha del selector de estilo: clic = poner / quitar
+function drawLock(v) local(x, y, on, hover, cx)(
+	x = selGeom[v-1] + selGeom[30+v-1] + 1; y = selGeom[10+v-1];
+	on = slider(200 + v) > 0;
+	hover = mx >= x && mx < x + LOCK_W && my >= y && my < y + SEL_H;
+	hover && (mouse_cap & 1) && !(lastCap & 1) ? (
+		slider(200 + v) = on ? 0 : 1; sliderchange(slider(200 + v)); slider_automate(slider(200 + v));
+		on = !on;
+	);
+	hover ? gfx_set(0.30, 0.30, 0.32, 1) : gfx_set(0.10, 0.10, 0.10, 0.95);
+	gfx_rect(x, y, LOCK_W, SEL_H);
+	gfx_set(0.45, 0.45, 0.45, 1);
+	gfx_rect(x, y, LOCK_W, 1); gfx_rect(x, y + SEL_H - 1, LOCK_W, 1); gfx_rect(x, y, 1, SEL_H); gfx_rect(x + LOCK_W - 1, y, 1, SEL_H);
+	cx = x + 2;
+	on ? gfx_set(0.96, 0.52, 0.22, 1) : gfx_set(0.55, 0.55, 0.57, 1);
+	gfx_rect(cx, y + 7, 6, 5);                         // cuerpo
+	on ? (                                             // arco cerrado
+		gfx_rect(cx + 1, y + 3, 1, 4); gfx_rect(cx + 4, y + 3, 1, 4); gfx_rect(cx + 1, y + 2, 4, 1);
+	) : (                                              // arco abierto (lado derecho levantado)
+		gfx_rect(cx + 1, y + 2, 1, 5); gfx_rect(cx + 4, y + 1, 1, 3); gfx_rect(cx + 1, y + 1, 4, 1);
+	);
+	on ? gfx_set(0.05, 0.05, 0.05, 1) : gfx_set(0.10, 0.10, 0.10, 1);
+	gfx_rect(cx + 2, y + 9, 2, 2);                     // cerradura
+);
+
 // nombre de nota (convencion Ableton: 60 = C3)
 function noteName(dst, n) local(ci, l)(
 	ci = (n % 12) * 2;
@@ -2328,28 +2391,32 @@ function drawNoteBox(v) local(x, y, hover, sw, sh, n, kv, idx)(
 );
 
 // lista de estilos para el menu emergente ("!" marca el actual); devuelve cuantos hay
-function buildStyleMenu(dst, cur, strict) local(i, ok, n, h)(
-	strcpy(dst, "");
-	strcpy(#mn_prev, "");
-	i = 0; n = 0; ok = 1;
-	while (ok && i < 128) (
-		rawStyleName(#mn_tmp, i);
-		strlen(#mn_tmp) > 0 && strcmp(#mn_tmp, #mn_prev) != 0 ? (
-			strict ? (
-				(h = file_open(#mn_tmp)) >= 0 ? file_close(h) : ok = 0;
-			);
-			ok ? (
-				n > 0 ? strcat(dst, "|");
-				i == cur ? strcat(dst, "!");
-				styleLabel(#mn_name, i);
-				strcat(dst, #mn_name);
-				strcpy(#mn_prev, #mn_tmp);
-				n += 1;
-				i += 1;
-			);
-		) : ok = 0;
+// gfx_showmenu interpreta | > < # ! : se cambian para que un nombre raro no rompa el menu
+function menuSafe(str) local(k, c)(
+	k = 0;
+	loop(strlen(str),
+		c = str_getchar(str, k);
+		c == '|' ? str_setchar(str, k, '/');
+		k == 0 && (c == '>' || c == '<' || c == '#' || c == '!') ? str_setchar(str, k, '_');
+		k += 1;
 	);
-	n;
+);
+// menu de estilos: vuelve a leer la carpeta (por si has anadido archivos) y lista todos los validos.
+// el item k del menu corresponde al indice stList[k-1]
+function buildStyleMenu(dst, cur, strict) local(k)(
+	scanStyles();
+	numStyles = max(1, stCount);
+	strcpy(dst, "");
+	k = 0;
+	loop(stCount,
+		k > 0 ? strcat(dst, "|");
+		stList[k] == cur ? strcat(dst, "!");
+		styleLabel(#mn_name, stList[k]);
+		menuSafe(#mn_name);
+		strcat(dst, #mn_name);
+		k += 1;
+	);
+	stCount;
 );
 
 // recarga los patrones de una sola voz
@@ -2374,6 +2441,7 @@ sbV = 1;
 loop(7,
 	drawStyleBox(sbV) ? menuVoice = sbV;
 	drawNoteBox(sbV);
+	drawLock(sbV);
 	sbV += 1;
 );
 gfx_setfont(1);
@@ -2862,6 +2930,7 @@ hF = 0;
 	loop(7,
 		hX = 220*(hV % 3); hY = 100*floor(hV/3);
 		hs(selGeom[20 + hV], selGeom[10 + hV], NOTE_W, SEL_H, "NOTA DE SALIDA|Nota MIDI que dispara esta voz.|Gris = automática (nota base + voz), naranja = fija.|Arrastra arriba/abajo o haz clic para el menú.");
+		hs(selGeom[hV] + selGeom[30 + hV] + 1, selGeom[10 + hV], LOCK_W, SEL_H, "CANDADO DE ESTILO|Con el candado cerrado (naranja), ALL RND y EACH RND|no cambian el estilo de esta voz. Elegirlo a mano sí.");
 		hs(selGeom[hV], selGeom[10 + hV], selGeom[30 + hV], SEL_H, "ESTILO|Archivo de patrones de esta voz.|Clic: lista de estilos. USER = patrón horneado con BAKE.");
 		hs(28 + hX, hY + 28, 20, 62, "AMOUNT|Densidad: suena cada paso cuyo valor en el patrón|supera 256 - amount. Más amount = más golpes.");
 		hs(68 + hX, hY + 28, 20, 62, "DIVISION|Rejilla de la voz: pasos por negra (1 a 32).|El patrón de 32 pasos se lee a ese ritmo.");
@@ -2889,8 +2958,8 @@ hF = 0;
 	hs(498, 318, 64, 18, "VEL ABS / REL|ABS: cada paso tiene siempre la misma velocity.|REL: el paso que apenas supera el umbral sale al mínimo;|al subir el amount los demás ganan fuerza.");
 	hs(40, 405, 20, 62, "SWING|Retrasa la segunda semicorchea de cada corchea.|50 = recto, 66 = tresillo, 75 = máximo.");
 	// ---- botones ----
-	hs(16, 326, 56, 22, "ALL RND|Elige un estilo al azar y lo pone en las 7 voces.");
-	hs(76, 326, 64, 22, "EACH RND|Un estilo al azar distinto para cada voz.");
+	hs(16, 326, 56, 22, "ALL RND|Elige un estilo al azar y lo pone en todas las voces|sin candado.");
+	hs(76, 326, 64, 22, "EACH RND|Un estilo al azar distinto para cada voz sin candado.");
 	hs(144, 326, 40, 22, "BAKE|Congela lo que suena ahora (pad + LFO) de las 7 voces.|Luego elige USER en el menú de estilo de cada voz.");
 	// ---- pad, memorias, escenas ----
 	hs(PD_X, PD_Y, PD_W, PD_W, "PAD XY|Mezcla los 9 arrays del estilo (P0-P8 en las esquinas).|Arrastra para morfear. Clic derecho: volver al centro.");
@@ -3049,11 +3118,17 @@ lfoMenuI > 0 ? (
 menuVoice > 0 ? (
 	gfx_x = mouse_x; gfx_y = mouse_y;
 	nMenu = buildStyleMenu(#styleMenu, userSelM[menuVoice] ? -1 : slider(menuVoice), 1);
-	nMenu < 1 ? nMenu = buildStyleMenu(#styleMenu, userSelM[menuVoice] ? -1 : slider(menuVoice), 0);   // por si file_open no responde
 	// posicion del item USER = numero de items que ya tiene el menu + 1
 	mnItems = strlen(#styleMenu) > 0 ? 1 : 0; mnC = 0;
 	loop(strlen(#styleMenu), str_getchar(#styleMenu, mnC) == '|' ? mnItems += 1; mnC += 1;);
 	bakeOk ? strcat(#styleMenu, userSelM[menuVoice] ? "|!USER (baked)" : "|USER (baked)");
+	// al final (desactivados): .txt que no se han podido abrir, para saber cual falla
+	mnK = 0;
+	loop(stSkipN,
+		styleLabel(#mn_name, stSkip[mnK]); menuSafe(#mn_name);
+		strcat(#styleMenu, "|#no se puede leer: "); strcat(#styleMenu, #mn_name);
+		mnK += 1;
+	);
 	nMenu > 0 ? (
 		gfx_x = mouse_x; gfx_y = mouse_y;
 		choice = gfx_showmenu(#styleMenu);
@@ -3063,7 +3138,7 @@ menuVoice > 0 ? (
 		);
 		choice > 0 ? (
 			userSelM[menuVoice] = 0;
-			slider(menuVoice) = choice - 1;
+			slider(menuVoice) = stList[choice - 1];
 			reloadVoice(menuVoice);
 			sliderchange(2 ^ (menuVoice - 1));
 			slider_automate(2 ^ (menuVoice - 1));
