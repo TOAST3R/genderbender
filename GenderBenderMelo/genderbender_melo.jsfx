@@ -812,6 +812,20 @@ file_mem(0, lockDens, 3);
 file_mem(0, lockCnt, 3);
 file_var(0, progSalt);
 file_var(0, diceN);
+// estilos por indice: REAPER guarda los sliders de archivo por nombre y no se entera de un valor puesto
+// desde el codigo (dados, menu de la GUI); sin esto el proyecto reabre con los estilos de antes del dado.
+// Los proyectos anteriores no traen este campo y lo saltan. Al leer, file_avail devuelve > 0 si quedan datos
+// (no cuantos), 0 al final y < 0 al escribir.
+file_avail(0) < 0 ? (
+	serS1 = slider1; serS2 = slider2; serS3 = slider3;
+	file_var(0, serS1); file_var(0, serS2); file_var(0, serS3);
+) : file_avail(0) > 0 ? (
+	file_var(0, serS1); file_var(0, serS2); file_var(0, serS3);
+	serS1 >= 0 && serS1 < numStyles && serS1 != slider1 ? ( slider1 = serS1; loadStyle(0); );
+	serS2 >= 0 && serS2 < numStyles && serS2 != slider2 ? ( slider2 = serS2; loadStyle(1); );
+	serS3 >= 0 && serS3 < numStyles && serS3 != slider3 ? ( slider3 = serS3; loadStyle(2); );
+	oldS1 = slider1; oldS2 = slider2; oldS3 = slider3;
+);
 
 @block
 b0 = beat_position;
@@ -1009,9 +1023,10 @@ loop(3,
 	hsl(id + 1, 90, y, 110, "pad", base, 0, 100, 100);
 	hsl(id + 2, 206, y, 110, "dens", base + 1, 0, 260, 50);
 	hsl(id + 3, 322, y, 80, "oct", base + 2, -2, 2, 0);
-	hsl(id + 4, 408, y, 100, "dur", base + 3, 1, 64, 3);
-	hsl(id + 5, 514, y, 100, "vel", base + 4, 1, 127, 100);
-	hsl(id + 6, 620, y, 100, "evol", base + 7, 0, 100, 20);
+	// el clic derecho vuelve al valor por defecto declarado en el slider de cada voz
+	hsl(id + 4, 408, y, 100, "dur", base + 3, 1, 64, v == 0 ? 4 : 3);
+	hsl(id + 5, 514, y, 100, "vel", base + 4, 1, 127, v == 1 ? 90 : 100);
+	hsl(id + 6, 620, y, 100, "evol", base + 7, 0, 100, v == 0 ? 10 : v == 1 ? 0 : 40);
 	hsl(id + 7, 90, y + 20, 110, "swing", base + 5, 0, 100, 100);
 	hsl(id + 8, 206, y + 20, 110, "slide", base + 6, -30, 30, 0);
 	hsl(id + 9, 322, y + 20, 80, slider53 ? "bus" : "canal", base + 9, 1, 16, v + 1);

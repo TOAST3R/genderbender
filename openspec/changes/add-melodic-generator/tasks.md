@@ -21,15 +21,15 @@
 ## 3. Esqueleto del plugin y carga de estilos
 
 - [x] 3.1 Crear `GenderBenderMelo/genderbender_melo.jsfx` con el mapa de sliders de design D9, `ext_midi_bus = 1` y un `@serialize` vacío preparado. Verificar en REAPER que compila sin errores y que los 53 sliders aparecen y se pueden automatizar.
-- [ ] 3.2 Cargar el estilo de cada voz con `file_var` y comprobar `MAGIC` y `VERSION`. Si no son válidos, marcar la voz como inválida y mostrarlo en la GUI. Verificar en REAPER con un compilado truncado a propósito (en el scratchpad, no en `melo_styles/`).
+- [x] 3.2 Cargar el estilo de cada voz con `file_var` y comprobar `MAGIC` y `VERSION`. Si no son válidos, marcar la voz como inválida y mostrarlo en la GUI. Verificar en REAPER con un compilado truncado a propósito (en el scratchpad, no en `melo_styles/`).
 - [x] 3.3 Ampliar `tools/install.sh` para copiar `GenderBenderMelo/` y `melo_styles/`. Verificar con `sh tools/install.sh` que el plugin aparece en REAPER como MIDI GenderBender Melo.
 
 ## 4. Director armónico
 
-- [ ] 4.1 Implementar el PRNG por claves de design D5. Verificar con una función de depuración en la GUI que las mismas claves dan el mismo valor tras recargar el plugin.
+- [x] 4.1 Implementar el PRNG por claves de design D5. Verificar que las mismas claves dan el mismo resultado tras recargar el plugin: misma semilla y ajustes, mismo MIDI antes y después de quitar y volver a poner el plugin (comprobado con un registro MIDI en REAPER en lugar de una función de depuración en la GUI).
 - [x] 4.2 Implementar la voz maestra, la tónica, el ritmo armónico, la longitud de ciclo y el modo fija/ciclo/aleatoria. Verificar en REAPER grabando la salida de la voz de acordes con BULERIA en modo fija (iv–bIII–bII–I sobre la tónica elegida).
 - [x] 4.3 Implementar las sustituciones con tensión y el modo Markov con resolución a la tónica al cerrar el ciclo. Verificar que con tensión 0 la grabación es igual a la de modo fija y que en Markov el último acorde del ciclo es i.
-- [ ] 4.4 Aplicar los cambios en el límite del ciclo, la modulación cada N ciclos y el indicador de progresión con acorde actual y cambio pendiente. Verificar en REAPER pulsando cambios a mitad de ciclo.
+- [x] 4.4 Aplicar los cambios en el límite del ciclo, la modulación cada N ciclos y el indicador de progresión con acorde actual y cambio pendiente. Verificar en REAPER pulsando cambios a mitad de ciclo.
 
 ## 5. Voces y pad
 
@@ -56,16 +56,16 @@
 
 ## 8. Azar
 
-- [ ] 8.1 Implementar ALL RND, EACH RND, el dado de progresión, el dado de motivo por voz y el dado de tónica según la spec `melo-randomization`, respetando los locks y guardando el resultado como estado. Verificar en REAPER cada escenario y que el resultado se conserva al reabrir el proyecto.
+- [x] 8.1 Implementar ALL RND, EACH RND, el dado de progresión, el dado de motivo por voz y el dado de tónica según la spec `melo-randomization`, respetando los locks y guardando el resultado como estado. Verificar en REAPER cada escenario y que el resultado se conserva al reabrir el proyecto.
 
 ## 9. Interfaz
 
-- [ ] 9.1 Dibujar la GUI con `gfx_*`: selectores de estilo por voz, pad XY, panel de progresión, controles globales y una fila de controles por voz con lock y dado. Verificar en REAPER que todos los controles responden y que la ventana se reescala.
+- [x] 9.1 Dibujar la GUI con `gfx_*`: selectores de estilo por voz, pad XY, panel de progresión, controles globales y una fila de controles por voz con lock y dado. Verificar en REAPER que todos los controles responden y que la ventana se reescala.
 - [x] 9.2 Documentar el uso en `README.md` (instalación, enrutado por canal o bus, acordes partidos, lock y semilla). Verificar que los pasos del README funcionan en una instalación limpia.
 
 ## 10. Integración
 
-- [ ] 10.1 Prueba completa en REAPER: los 6 estilos como maestro, cruces con EACH RND, modo bus con acordes partidos, transporte con loops y seeks. Grabar el MIDI de las tres salidas y comprobar tonalidad común, ausencia de notas colgadas y reproducibilidad con la misma semilla. Verificar también que `python3 tools/check_styles.py` y `python3 tools/check_melo_styles.py` imprimen `ok` y que gb_18 sigue funcionando igual.
+- [x] 10.1 Prueba completa en REAPER: los 6 estilos como maestro, cruces con EACH RND, modo bus con acordes partidos, transporte con loops y seeks. Grabar el MIDI de las tres salidas y comprobar tonalidad común, ausencia de notas colgadas y reproducibilidad con la misma semilla. Verificar también que `python3 tools/check_styles.py` y `python3 tools/check_melo_styles.py` imprimen `ok` y que gb_18 sigue funcionando igual.
 
 ## Workflow follow-up
 
