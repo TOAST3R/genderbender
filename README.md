@@ -47,6 +47,8 @@ hhc    XXxX XXxX XXxX XXxX
 | `tools/` | Style build/check scripts and the installer |
 | `docs/` | Style fingerprints page (GitHub Pages) |
 | `editor/`, `presets/` | The original SuperCollider style editor and its presets |
+| `GenderBenderMelo/` | The melodic plugin (bass, chords, melody) |
+| `melo_styles/`, `styles_melo_src/` | Melodic styles and their sources |
 | `openspec/` | Specs and change proposals |
 
 ## Included styles
@@ -92,6 +94,62 @@ hhc    XXxX XXxX XXxX XXxX
 Ternary styles (MUINEIRA, JOTA ARAGONESA, SARDANA, TAJARASTE, BULERIA, SOLEA, SEGUIRIYA, SEVILLANA, FANDANGO DE HUELVA, BLUES SHUFFLE 100, WESTERN SWING 170, COUNTRY SHUFFLE 120, JIG 115, CHACARERA 70, HUAPANGO 110, SON JAROCHO 120, BHANGRA 95) are written as triplets and **need the global swing at 67**; with swing 50 they sound distorted. Their BPM is the plugin's: one quarter note = one dotted quarter (6/8), one 3/4 bar, three flamenco compás beats, or one shuffled quarter note.
 
 This table also sets the families on the fingerprints page, so keep its format.
+
+## GenderBender Melo
+
+A sister plugin that plays **bass, chords and melody** instead of drums. It uses the same genre names, one XY pad and the same density, swing and slide ideas. It is a separate plugin, and its styles live in `melo_styles/`.
+
+### Using it
+
+`sh tools/install.sh` installs it with GenderBender. In REAPER, add **MIDI GenderBender Melo** to a track and press play. It makes MIDI only, so route it to instruments:
+
+- **Channels** (default): bass on channel 1, chords on 2, melody on 3. Add one instrument track per voice and send the Melo track to each one with a MIDI send filtered to that channel.
+- **Buses**: switch *salida* to *buses* and each voice goes to its own MIDI bus (always channel 1). Point each send's source bus at the voice.
+- The **canal / bus** slider in each voice row changes its destination. Notes still sounding are released when you change it.
+- **Split chords** (*partido*): note *n* of each chord goes to the chord destination + *n* (up to 16), so you can give each note its own instrument. With the default destinations the second chord note lands on the melody's destination, so move the melody to 5 or higher first.
+
+Harmony: **armonía de** picks the voice whose style sets the scale, the progressions and the Markov table. The other two voices keep their own rhythm and follow it. The key, progression mode, chord length and cycle length are in the progression panel. Changes to the harmony start at the next cycle, never in the middle of one. The plugin's bar 1 is REAPER's bar 1, even when the project starts earlier.
+
+Lock and seed:
+
+- **lock** freezes a voice's pattern (phrase, pad position, density and motif) while its notes keep following the chords. It is saved with the project.
+- Every random choice comes from the **semilla** (seed). The same seed and settings give the same MIDI, also after a seek or a loop. *semilla +1* gives a new take.
+- The dice (**ALL RND**, **EACH RND**, *dado prog*, *dado motivo*, *dado tónica*) also use the seed. They skip locked voices, and the project keeps what they chose.
+
+### Writing a melodic style
+
+Write a `.mstyle` file in `styles_melo_src/`, build it and check it:
+
+```sh
+python3 tools/make_melo_style.py build styles_melo_src/son.mstyle       # -> melo_styles/SON.txt
+python3 tools/make_melo_style.py decode "melo_styles/SON.txt"           # print a style as source
+python3 tools/check_melo_styles.py                                      # must print "ok"
+python3 tools/test_melo.py                                              # compiler tests
+```
+
+```
+name: SON                     # a drum style's name without its BPM
+bpm: 95                       # the drum style's BPM
+meter: 4/4                    # 12/8 for ternary styles (no swing needed)
+key: G
+scale: major                  # major minor harmonic_minor dorian phrygian phrygian_dominant mixolydian ...
+chord_bars: 1                 # bars per chord: 0.5, 1 or 2
+cycle: 4                      # bars per progression cycle: 2, 4 or 8
+form.mel: A A' A B            # phrase form per voice (bass, chord, mel)
+prog: ii7 V7 I I              # progression bank, 3 or more
+sub: V7 > bII7                # substitution used by the Tension control
+markov: V7 > I 3, IV 1        # successors and weights for Markov mode
+[p4 p5]                       # these patterns get the lines below
+bass.rhy   .... ..X. .... X...   # rhythm, same levels as drum styles
+bass.deg   .... ..5. .... R...   # bass: R 3 5 7 8 a (chromatic approach)
+chord.voi  t... ..7. .... ....   # chords: t(riad) 7 9 s(us) p(ower) h (shell)
+mel.cnt    ^... ..-. .... +...   # melody: = repeat, + step up, - step down, ^ chord tone
+mel.art    .... ..~. .... ./..   # . short, ~ tied, / slide
+```
+
+- Roman numerals: with no accidental, the numeral is a degree of the style's scale. With `b` or `#`, it is the major-scale degree moved by a semitone (`bII` is always one semitone above the key). Upper case is major and lower case is minor. Suffixes: `7 maj7 9 m9 maj9 6 add9 sus2 sus4 ° ø +`.
+- Every voice needs a `.rhy` lane in all 9 patterns. The pad layout is the drum one: p4/p5 BASE in the centre, p2/p3 ENERGY, p6/p7 VARIATION, p0/p1 INTRO, p8 FILL.
+- Never edit `melo_styles/*.txt` by hand. They are numbers only, and the plugin rejects a damaged file.
 
 ## Contributing
 

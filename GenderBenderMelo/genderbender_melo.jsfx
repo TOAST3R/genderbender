@@ -1,0 +1,1034 @@
+desc: MIDI GenderBender Melo
+//tags: MIDI generator
+//author: GenderBender
+// Generador de bajo, acordes y melodia por estilos (melo_styles/*.txt), hermano de GenderBender.
+// Ver openspec/changes/add-melodic-generator (proposal, design y specs melo-*).
+// NUNCA renumerar sliders: los presets y proyectos los guardan por indice. Anadir al final.
+
+slider1:/melo_styles:none:-bass style
+slider2:/melo_styles:none:-chord style
+slider3:/melo_styles:none:-melody style
+slider4:/melo_styles:none:-(reserva)
+slider5:0<-100,100,1>-pad X
+slider6:0<-100,100,1>-pad Y
+slider7:1<0,2,1{Bass,Chords,Melody}>-harmony master
+slider8:-1<-1,11,1{style,C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>-key
+slider9:0<0,4,1{Fixed,Cycle bank,Random bank,Bank+subs,Markov}>-progression mode
+slider10:0<0,7,1>-fixed progression
+slider11:30<0,100,1>-tension
+slider12:0<0,3,1{style,1/2 bar,1 bar,2 bars}>-chord length
+slider13:0<0,3,1{style,2 bars,4 bars,8 bars}>-cycle length
+slider14:0<0,4,1{off,1,2,4,8}>-modulate every N cycles
+slider15:50<50,75,1>-swing
+slider16:1<0,9999,1>-seed
+
+slider17:100<0,100,1>-bass pad weight
+slider18:50<0,260,1>-bass density
+slider19:0<-2,2,1>-bass octave
+slider20:4<1,64,1>-bass duration (32nds)
+slider21:100<1,127,1>-bass velocity
+slider22:100<0,100,1>-bass swing amt
+slider23:0<-30,30,1>-bass slide ms
+slider24:10<0,100,1>-bass evolution
+slider25:0<0,1,1{off,on}>-bass lock
+slider26:1<1,16,1>-bass destination
+slider27:0<0,1,1>-bass (reserva)
+slider28:0<0,1,1>-bass (reserva)
+
+slider29:100<0,100,1>-chord pad weight
+slider30:50<0,260,1>-chord density
+slider31:0<-2,2,1>-chord octave
+slider32:3<1,64,1>-chord duration (32nds)
+slider33:90<1,127,1>-chord velocity
+slider34:100<0,100,1>-chord swing amt
+slider35:0<-30,30,1>-chord slide ms
+slider36:0<0,100,1>-chord evolution
+slider37:0<0,1,1{off,on}>-chord lock
+slider38:2<1,16,1>-chord destination
+slider39:0<0,50,1>-chord strum ms
+slider40:0<0,1,1{poly,split}>-chord split
+
+slider41:100<0,100,1>-melody pad weight
+slider42:50<0,260,1>-melody density
+slider43:0<-2,2,1>-melody octave
+slider44:3<1,64,1>-melody duration (32nds)
+slider45:100<1,127,1>-melody velocity
+slider46:100<0,100,1>-melody swing amt
+slider47:0<-30,30,1>-melody slide ms
+slider48:40<0,100,1>-melody evolution
+slider49:0<0,1,1{off,on}>-melody lock
+slider50:3<1,16,1>-melody destination
+slider51:12<2,24,1>-melody max leap
+slider52:0<0,1,1>-melody (reserva)
+
+slider53:0<0,1,1{channels,buses}>-output mode
+
+in_pin:none
+out_pin:none
+
+@init
+ext_noinit = 1;
+ext_midi_bus = 1;
+
+// ---------- MAPA DE MEMORIA ----------
+SDSIZE = 4000;               // un estilo por voz: SD + v*SDSIZE
+SD = 0;
+H_VALID=0; H_BPM=1; H_STEPS=2; H_KEY=3; H_SMASK=4; H_CB2=5; H_CYC=6; H_TONIC=7;
+H_FORMS=10; H_NCH=30; H_ROOT=40; H_MASK=60; H_NPROG=80; H_PLEN=90; H_PROG=100;
+H_MARKOV=300; H_NSUB=600; H_SUBS=610; H_PAT=1000;
+MAGIC = 7714; VERSION = 1;
+
+CY = 20000; CYSIZE = 100;    // cache de 2 ciclos armonicos
+C_VALID=0; C_IDX=1; C_START=2; C_LEN=3; C_SLOTQ=4; C_NS=5; C_KEY=6; C_SMASK=7; C_PROG=8;
+C_MASTER=9; C_ROOT=20; C_MASK=50;
+cycA = CY; cycB = CY + CYSIZE;
+
+QSIZE = 256;                 // cola de eventos
+evType = 30000; evTime = 30300; evNote = 30600; evVel = 30900; evDur = 31200;
+evChan = 31500; evBus = 31800; evVoice = 32100;
+
+UB = 40000; UBSIZE = 1000;   // frase/motivo renderizado por voz
+U_PH=0; U_UNIT=1; U_PX=2; U_PY=3; U_DENS=4; U_CNT=5; U_EVO=6; U_CYC=7; U_OK=8; U_SEED=9;
+U_STEPS=10; U_KEYST=11; U_STYLE=12; U_LEAP=13; U_OCT=14;
+U_ON=100; U_VAL=200; U_SYM=300; U_ART=400; U_NOTE=500;
+
+LEG = 45000;                 // notas ligadas pendientes por voz: LEG + v*32
+PV = 46000;                  // ultimo voicing de acordes (n en [0], notas en 1..)
+PW = 47000;                  // pesos del pad: PW[0..3] peso, PW[4..7] patron base
+TMP = 48000;
+motifCounter = 49000; latched = 49010; lastPhrase = 49020; lockSet = 49030;
+lockPhrase = 49040; lockPx = 49050; lockPy = 49060; lockDens = 49070; lockCnt = 49080;
+slideOn = 49090; numSteps = 49100;
+memset(motifCounter, 0, 110);
+
+M31 = 2147483647;
+EPS = 0.002;                 // separacion legato (negras): NoteOff justo despues del NoteOn siguiente
+SLIDE_MAX_MS = 30;
+progSalt = 0; diceN = 0; serVer = 1;
+
+// ---------- PRNG POR CLAVES (design D5) ----------
+// sin estado: cada decision sale de sus claves; un seek reproduce lo mismo
+function modm(x)( x - floor(x / M31) * M31 );
+function lcg(h)( modm(h * 16807) );
+function hash5(a, b, c, d, e) local(h)(
+	h = modm(abs(floor(a)) * 7919 + 104729);
+	h = lcg(h + 1);
+	h = lcg(modm(h + abs(floor(b)) * 15485863 + 7));
+	h = lcg(modm(h + abs(floor(c)) * 31337 + 11));
+	h = lcg(modm(h + abs(floor(d)) * 65537 + 13));
+	h = lcg(modm(h + abs(floor(e)) * 92821 + 17));
+	h == 0 ? h = 1;
+	h = lcg(lcg(h));
+	h / M31;
+);
+
+function bit(m, i)( (floor(m) >> i) & 1 );
+// modulo 12 seguro: el % de EEL2 trabaja con el valor absoluto (-45 % 12 = 9)
+function mod12(x)( x - floor(x / 12) * 12 );
+
+// ---------- CARGA DE ESTILOS (design D2) ----------
+fh = -1;
+function rd() local(x)( x = 0; file_var(fh, x); x );
+function clampi(x, lo, hi)( x < lo || x > hi || x != floor(x) ? (loadOk = 0; lo) : x );
+
+function baseName(dst, src) local(i, n, s)(
+	n = strlen(src); s = 0; i = 0;
+	loop(n, str_getchar(src, i) == '/' || str_getchar(src, i) == '\\' ? s = i + 1; i += 1;);
+	strcpy_substr(dst, src, s, max(0, n - s - (n - s > 4 ? 4 : 0)));
+);
+
+// indice de estilos (melo_index/estilos.txt, generado por make_melo_style.py): el nombre i esta en el
+// string NAME0 + i. Va en el mismo orden que la lista del slider de archivo, asi el valor del slider
+// basta para abrir el estilo (strcpy_fromslider no sigue al valor si se cambia desde el codigo).
+NAME0 = 200;
+function readIndex() local(h, n, l, c)(
+	n = 0;
+	h = file_open("melo_index/estilos.txt");
+	h >= 0 ? (
+		file_text(h);
+		while (n < 256 && file_avail(h) != 0 && file_string(h, #line) > 0) (
+			l = strlen(#line);
+			while (l > 0 && ((c = str_getchar(#line, l - 1)) == 10 || c == 13 || c == 32)) ( l -= 1; );
+			l > 0 ? ( strcpy_substr(NAME0 + n, #line, 0, l); n += 1; );
+		);
+		file_close(h);
+	);
+	n;
+);
+nIndex = readIndex();
+
+// nombre del estilo de la voz v (sin .txt) en dst
+function styleName(dst, v) local(i)(
+	i = floor(slider(v + 1));
+	nIndex > 0 && i >= 0 && i < nIndex ? strcpy(dst, NAME0 + i) : (
+		v == 0 ? strcpy_fromslider(#sfs, slider1) : v == 1 ? strcpy_fromslider(#sfs, slider2) : strcpy_fromslider(#sfs, slider3);
+		baseName(dst, #sfs);
+	);
+	dst;
+);
+
+function loadStyle(v) local(b, n, i, j, k, p, ln, np, ns, vv, x, steps)(
+	b = SD + v * SDSIZE;
+	memset(b, 0, SDSIZE);
+	strcpy(#fpath, "melo_styles/"); strcat(#fpath, styleName(#sname, v)); strcat(#fpath, ".txt");
+	fh = file_open(#fpath);
+	fh >= 0 ? (
+		loadOk = file_text(fh) ? 1 : 0;
+		loadOk && rd() != MAGIC ? loadOk = 0;
+		loadOk && rd() != VERSION ? loadOk = 0;
+		loadOk ? (
+			b[H_BPM] = rd();
+			steps = rd(); steps != 32 && steps != 24 ? loadOk = 0;
+			b[H_STEPS] = steps;
+			b[H_KEY] = clampi(rd(), 0, 11);
+			b[H_SMASK] = clampi(rd(), 1, 4095);
+			x = rd(); x != 1 && x != 2 && x != 4 ? loadOk = 0; b[H_CB2] = x;
+			x = rd(); x != 2 && x != 4 && x != 8 ? loadOk = 0; b[H_CYC] = x;
+			b[H_TONIC] = rd();
+			i = 0; loop(12, b[H_FORMS + i] = clampi(rd(), 0, 2); i += 1;);
+			n = clampi(rd(), 1, 16); b[H_NCH] = n;
+			b[H_TONIC] = clampi(b[H_TONIC], 0, n - 1);
+			i = 0; loop(n, b[H_ROOT + i] = clampi(rd(), 0, 11); b[H_MASK + i] = clampi(rd(), 1, 4095); i += 1;);
+			np = clampi(rd(), 1, 8); b[H_NPROG] = np;
+			p = 0; loop(np,
+				ln = clampi(rd(), 1, 16); b[H_PLEN + p] = ln;
+				k = 0; loop(ln, b[H_PROG + p*16 + k] = clampi(rd(), 0, n - 1); k += 1;);
+				p += 1;
+			);
+			i = 0; loop(n, j = 0; loop(n, b[H_MARKOV + i*16 + j] = clampi(rd(), 0, 255); j += 1;); i += 1;);
+			ns = clampi(rd(), 0, 16); b[H_NSUB] = ns;
+			i = 0; loop(ns, b[H_SUBS + i*2] = clampi(rd(), 0, n - 1); b[H_SUBS + i*2 + 1] = clampi(rd(), 0, n - 1); i += 1;);
+			// patrones: el archivo trae las 3 voces; esta voz guarda solo la suya
+			vv = 0; loop(3,
+				p = 0; loop(9,
+					i = 0; loop(32,
+						vv == v ? (
+							b[H_PAT + p*96 + i*3] = clampi(rd(), 0, 255);
+							b[H_PAT + p*96 + i*3 + 1] = clampi(rd(), 0, 5);
+							b[H_PAT + p*96 + i*3 + 2] = clampi(rd(), 0, 2);
+						) : ( rd(); rd(); rd(); );
+						i += 1;
+					);
+					p += 1;
+				);
+				vv += 1;
+			);
+			loadOk && rd() != MAGIC ? loadOk = 0;    // archivo truncado o con datos de mas
+		);
+		file_close(fh);
+		b[H_VALID] = loadOk;
+	);
+	numSteps[v] = b[H_VALID] ? b[H_STEPS] : 32;
+	UB[v * UBSIZE + U_OK] = 0;
+	cycA[C_VALID] = 0; cycB[C_VALID] = 0;   // la armonia se recalcula (se ve en el siguiente ciclo)
+);
+
+numStyles = max(1, nIndex);
+
+// ---------- TEORIA ----------
+function thirdOf(m)( bit(m,4) ? 4 : bit(m,3) ? 3 : bit(m,5) ? 5 : bit(m,2) ? 2 : 4 );
+function fifthOf(m)( bit(m,7) ? 7 : bit(m,6) ? 6 : bit(m,8) ? 8 : 7 );
+function seventhOf(m, rootAbs, keyAbs, sm)(
+	bit(m,10) ? 10 : bit(m,11) ? 11 : (bit(m,9) && bit(m,6)) ? 9 :
+	bit(sm, mod12(rootAbs + 11 - keyAbs)) ? 11 : 10
+);
+
+// ---------- PAD (misma geometria de cuadrantes que gb_18) ----------
+// deja en PW los 4 pesos y el patron base (0,2,4,6 -> par de compases; 8 = FILL)
+function padWeights(px, py) local(X, Y)(
+	X = abs(px / 100); Y = abs(py / 100);
+	px < 0 && py <= 0 ? (       // sector 1
+		PW[4]=0; PW[0]=X*Y;  PW[5]=2; PW[1]=(1-X)*Y;  PW[6]=4; PW[2]=X*(1-Y);  PW[7]=6; PW[3]=(1-X)*(1-Y);
+	) : px < 0 ? (              // sector 2
+		PW[4]=0; PW[0]=X*Y;  PW[5]=4; PW[1]=(1-X)*Y;  PW[6]=6; PW[2]=X*(1-Y);  PW[7]=8; PW[3]=(1-X)*(1-Y);
+	) : py > 0 ? (              // sector 3
+		PW[4]=0; PW[0]=(1-X)*(1-Y);  PW[5]=2; PW[1]=X*(1-Y);  PW[6]=8; PW[2]=(1-X)*Y;  PW[7]=6; PW[3]=X*Y;
+	) : (                       // sector 4 (incluye el centro: BASE p4/p5)
+		PW[4]=0; PW[0]=(1-X)*Y;  PW[5]=8; PW[1]=X*Y;  PW[6]=4; PW[2]=(1-X)*(1-Y);  PW[7]=2; PW[3]=X*(1-Y);
+	);
+);
+function patIdx(c, pairBit)( PW[4 + c] == 8 ? 8 : PW[4 + c] + pairBit );
+
+// ---------- DIRECTOR ARMONICO ----------
+function masterStyle() local(m)(
+	m = slider7;
+	!SD[m * SDSIZE + H_VALID] ? ( m = 0; while (m < 3 && !SD[m * SDSIZE + H_VALID]) ( m += 1; ); );
+	m < 3 ? m : -1;
+);
+function curCb2(sty)( slider12 == 0 ? sty[H_CB2] : slider12 == 1 ? 1 : slider12 == 2 ? 2 : 4 );
+function curCycle(sty)( slider13 == 0 ? sty[H_CYC] : slider13 == 1 ? 2 : slider13 == 2 ? 4 : 8 );
+
+// desplazamiento de tonica por modulacion en el ciclo idx
+function modOffset(idx, smask) local(n, j, off, r)(
+	n = slider14 == 0 ? 0 : slider14 == 1 ? 1 : slider14 == 2 ? 2 : slider14 == 3 ? 4 : 8;
+	off = 0;
+	n > 0 ? ( j = 1; loop(min(floor(idx / n), 512),
+		r = hash5(slider16, 71, j, progSalt, 0);
+		off += r < 0.4 ? 5 : r < 0.8 ? 7 : (bit(smask, 3) ? 3 : 9);
+		j += 1;
+	););
+	off % 12;
+);
+
+function pickWeighted(sty, row, r, onlyCad) local(j, tot, acc, n, t, res, w)(
+	n = sty[H_NCH]; t = sty[H_TONIC]; tot = 0;
+	j = 0; loop(n,
+		w = sty[H_MARKOV + row*16 + j];
+		onlyCad && !sty[H_MARKOV + j*16 + t] ? w = 0;
+		tot += w; j += 1;
+	);
+	tot <= 0 ? -1 : (
+		acc = 0; res = -1; j = 0;
+		while (res < 0 && j < n) (
+			w = sty[H_MARKOV + row*16 + j];
+			onlyCad && !sty[H_MARKOV + j*16 + t] ? w = 0;
+			acc += w;
+			w > 0 && r * tot < acc ? res = j;
+			j += 1;
+		);
+		res < 0 ? n - 1 : res;
+	);
+);
+
+function computeCycle(c, idx, start) local(m, sty, cb2, cyc, ns, key, p, np, s, ci, k, cand, nc, r, mode)(
+	m = masterStyle();
+	c[C_VALID] = 0;
+	m >= 0 ? (
+		sty = SD + m * SDSIZE;
+		cb2 = curCb2(sty); cyc = curCycle(sty);
+		c[C_SLOTQ] = cb2 * 2;                    // negras por acorde
+		c[C_LEN] = cyc * 4;                      // negras por ciclo
+		ns = max(1, min(16, floor(c[C_LEN] / c[C_SLOTQ])));
+		c[C_NS] = ns; c[C_IDX] = idx; c[C_START] = start; c[C_MASTER] = m;
+		key = ((slider8 < 0 ? sty[H_KEY] : slider8) + modOffset(idx, sty[H_SMASK])) % 12;
+		c[C_KEY] = key; c[C_SMASK] = sty[H_SMASK];
+		np = sty[H_NPROG]; mode = slider9;
+		p = min(slider10, np - 1);
+		mode == 1 ? p = (p + idx) % np;
+		mode == 2 ? p = floor(hash5(slider16, 11, idx, progSalt, 0) * np) % np;
+		c[C_PROG] = mode == 4 ? -1 : p;
+		s = 0; ci = sty[H_TONIC];
+		loop(ns,
+			mode == 4 ? (
+				s > 0 && s == ns - 1 ? (
+					ci = sty[H_TONIC];                                          // el ciclo cierra en la tonica
+				) : s > 0 ? (
+					r = hash5(slider16, 17, idx, s, progSalt);
+					k = -1;
+					s == ns - 2 ? k = pickWeighted(sty, ci, r, 1);              // penultimo: un acorde que lleve a la tonica
+					k < 0 ? k = pickWeighted(sty, ci, r, 0);
+					k >= 0 ? ci = k;
+				);
+			) : (
+				ci = sty[H_PROG + p*16 + (s % sty[H_PLEN + p])];
+				mode == 3 && hash5(slider16, 13, idx, s, progSalt) * 100 < slider11 ? (
+					nc = 0; k = 0;
+					loop(sty[H_NSUB], sty[H_SUBS + k*2] == ci ? ( TMP[500 + nc] = sty[H_SUBS + k*2 + 1]; nc += 1; ); k += 1;);
+					nc > 0 ? ci = TMP[500 + floor(hash5(slider16, 19, idx, s, progSalt) * nc) % nc];
+				);
+			);
+			c[C_ROOT + s] = (key + sty[H_ROOT + ci]) % 12;
+			c[C_MASK + s] = sty[H_MASK + ci];
+			s += 1;
+		);
+		c[C_VALID] = 1;
+	);
+);
+
+// longitud de ciclo actual (para realinear tras un seek)
+function curCycleQ() local(m)( m = masterStyle(); m < 0 ? 16 : curCycle(SD + m*SDSIZE) * 4 );
+
+// ciclo que contiene t (negras); deja el puntero en cyc
+function cycleFor(t) local(len, idx)(
+	cycA[C_VALID] && t >= cycA[C_START] && t < cycA[C_START] + cycA[C_LEN] ? cycA :
+	cycB[C_VALID] && t >= cycB[C_START] && t < cycB[C_START] + cycB[C_LEN] ? cycB : (
+		cycA[C_VALID] && t >= cycA[C_START] + cycA[C_LEN] && t < cycA[C_START] + 2 * cycA[C_LEN] + 64 ? (
+			computeCycle(cycB, cycA[C_IDX] + 1, cycA[C_START] + cycA[C_LEN]);
+			cycB[C_VALID] && t >= cycB[C_START] && t < cycB[C_START] + cycB[C_LEN] ? cycB : (
+				len = curCycleQ(); idx = floor(t / len);
+				computeCycle(cycB, idx, idx * len); cycB;
+			);
+		) : (
+			len = curCycleQ(); idx = floor(max(0, t) / len);
+			computeCycle(cycA, idx, idx * len); cycB[C_VALID] = 0; cycA;
+		);
+	);
+);
+
+// acorde en t: chRoot (pc absoluta), chMask, chKey, chSmask, chValid
+function chordAt(t) local(c, s)(
+	c = cycleFor(t);
+	chValid = c[C_VALID];
+	chValid ? (
+		s = min(c[C_NS] - 1, max(0, floor((t - c[C_START]) / c[C_SLOTQ])));
+		chRoot = c[C_ROOT + s]; chMask = c[C_MASK + s]; chKey = c[C_KEY]; chSmask = c[C_SMASK];
+		chSlotEnd = c[C_START] + (s + 1) * c[C_SLOTQ];
+	);
+	chValid;
+);
+
+// escala adaptada al acorde (pcs absolutas en mascara de 12 bits): cada nota del acorde fuera de
+// la escala entra y desplaza a sus vecinas a un semitono
+function effScale(root, m, key, sm) local(e, i, pc)(
+	e = 0; i = 0;
+	loop(12, bit(sm, i) && !bit(e, (key + i) % 12) ? e += 2 ^ ((key + i) % 12); i += 1;);
+	i = 0;
+	loop(12,
+		bit(m, i) ? (
+			pc = (root + i) % 12;
+			!bit(e, pc) ? (
+				bit(e, (pc + 1) % 12) ? e -= 2 ^ ((pc + 1) % 12);
+				bit(e, (pc + 11) % 12) ? e -= 2 ^ ((pc + 11) % 12);
+				e += 2 ^ pc;
+			);
+		);
+		i += 1;
+	);
+	e;
+);
+function isChordTone(n, root, m)( bit(m, mod12(n - root)) );
+function stepScale(n, dir, e) local(k)(
+	k = 0; n += dir;
+	while (!bit(e, mod12(n)) && k < 12) ( n += dir; k += 1; );
+	n;
+);
+function nearestChordTone(n, root, m) local(d, r)(
+	r = n; d = 0;
+	while (d < 12 && r == n && !isChordTone(n, root, m)) (
+		d += 1;
+		isChordTone(n - d, root, m) ? r = n - d : isChordTone(n + d, root, m) ? r = n + d;
+	);
+	r;
+);
+
+// ---------- RENDER DEL MOTIVO / FRASE (design D6) ----------
+function vs(v, i)( slider(17 + v*12 + i) );     // controles por voz
+function voiceSteps(v)( numSteps[v] );
+
+// generacion (frase) en la que el paso i se sorteo por ultima vez, segun la evolucion
+function genOf(v, ph, i, evo, cnt) local(j, g, n)(
+	g = 0; j = ph; n = 0;
+	evo > 0 ? while (g == 0 && j > 0 && n < 256) (
+		hash5(slider16, 23 + v, j, i, cnt) * 100 < evo ? g = j;
+		j -= 1; n += 1;
+	);
+	g;
+);
+
+// rellena el buffer de la voz v para la unidad (motivo de 2 compases) u de la frase ph
+function renderUnit(v, ph, u, tStart, px, py, dens, cnt, evo) local(b, sty, nst, n, i, pos, pb, c, val, w, f, g, r, acc, pick,
+		nsym, chosen, k, nOn, maxCh, cur, center, prev, nn, e, leap, lo, hi, kind, sym)(
+	b = UB + v * UBSIZE;
+	sty = SD + v * SDSIZE;
+	nst = sty[H_STEPS];
+	n = 2 * nst;
+	f = sty[H_FORMS + v*4 + u];                  // 0 = A, 1 = A', 2 = B
+	kind = f == 2 ? 5000 : 0;                  // B se sortea en otro espacio de claves
+	padWeights(px, py);
+	nsym = v == 0 ? 5 : v == 1 ? 6 : 4;        // simbolos sorteables (el bajo sin 'a')
+	i = 0;
+	loop(n,
+		pos = i % nst; pb = floor(i / nst);
+		val = 0; c = 0;
+		loop(4, val += PW[c] * sty[H_PAT + patIdx(c, pb)*96 + pos*3]; c += 1;);
+		b[U_ON + i] = (256 - val) < dens;
+		b[U_VAL + i] = val;
+		g = genOf(v, ph, i, evo, cnt) + kind;
+		// altura y articulacion: sorteo ponderado entre esquinas (peso x aporte al ritmo)
+		acc = 0; c = 0; loop(4, acc += PW[c] * (sty[H_PAT + patIdx(c, pb)*96 + pos*3] + 1); c += 1;);
+		r = hash5(slider16, 31 + v, g, i, cnt) * acc;
+		pick = 3; c = 0; w = 0;
+		while (c < 4 && pick == 3 && c < 3) (
+			w += PW[c] * (sty[H_PAT + patIdx(c, pb)*96 + pos*3] + 1);
+			r < w ? pick = c;
+			c += 1;
+		);
+		r >= w ? pick = 3;
+		b[U_SYM + i] = sty[H_PAT + patIdx(pick, pb)*96 + pos*3 + 1];
+		b[U_ART + i] = sty[H_PAT + patIdx(pick, pb)*96 + pos*3 + 2];
+		// parte libre: con la evolucion (y mas en B) el simbolo se sortea entero (bajo y melodia)
+		v != 1 && hash5(slider16, 37 + v, g, i, cnt) * 100 < (f == 2 ? max(35, evo/2) : evo/2) ? (
+			b[U_SYM + i] = floor(hash5(slider16, 39 + v, g, i, cnt) * nsym) % nsym;
+		);
+		i += 1;
+	);
+	// A': cambia como mucho 1/3 de las notas, nunca en los tiempos
+	f == 1 ? (
+		nOn = 0; i = 0; loop(n, nOn += b[U_ON + i]; i += 1;);
+		maxCh = floor(nOn / 3); chosen = 0; i = 0;
+		while (i < n && chosen < maxCh) (
+			b[U_ON + i] && (i % (nst / 4)) != 0 && hash5(slider16, 43 + v, ph, i, cnt) < 0.5 ? (
+				r = hash5(slider16, 47 + v, ph, i, cnt);
+				sym = b[U_SYM + i];
+				v == 1 ? (
+					b[U_SYM + i] = (sym == 0 ? 1 : 0);                    // triada <-> 7a
+				) : r < 0.3 ? (
+					b[U_ON + i] = 0;                                     // quita una nota de paso
+				) : v == 2 ? (
+					b[U_SYM + i] = (sym == 1 ? 2 : sym == 2 ? 1 : sym == 3 ? 0 : 1);
+				) : (
+					b[U_SYM + i] = (sym == 2 ? 4 : 2);                   // quinta <-> octava
+				);
+				chosen += 1;
+			);
+			i += 1;
+		);
+	);
+	// B: la ultima nota cae en nota del acorde
+	f == 2 ? (
+		i = n - 1; while (i > 0 && !b[U_ON + i]) ( i -= 1; );
+		b[U_ON + i] ? b[U_SYM + i] = (v == 2 ? 3 : 0);
+	);
+	// melodia: notas por contorno sobre la escala del acorde de cada paso (design D7)
+	v == 2 ? (
+		center = 72 + 12 * vs(2, 2); lo = center - 12; hi = center + 12;
+		leap = max(2, vs(2, 10));
+		chordAt(tStart);
+		// ancla: nota del acorde cerca del centro, sorteada con las claves del motivo
+		k = 0; i = center - 6;
+		loop(13, chValid && isChordTone(i, chRoot, chMask) ? ( TMP[k] = i; k += 1; ); i += 1;);
+		cur = k > 0 ? TMP[floor(hash5(slider16, 53, genOf(v, ph, 0, evo, cnt) + kind, cnt, 0) * k) % k] : center;
+		prev = cur;
+		i = 0;
+		loop(n,
+			b[U_ON + i] ? (
+				chordAt(tStart + i * 4 / nst);
+				chValid ? (
+					e = effScale(chRoot, chMask, chKey, chSmask);
+					nn = cur; sym = b[U_SYM + i];
+					sym == 0 ? (
+						!bit(e, mod12(nn)) ? nn = stepScale(nn, 1, e);
+					) : sym == 1 ? (
+						nn = stepScale(cur, 1, e);
+					) : sym == 2 ? (
+						nn = stepScale(cur, -1, e);
+					) : (
+						// salto a nota del acorde hacia el centro del registro (al menos 3 semitonos)
+						k = cur >= center ? -1 : 1; nn = cur + 3 * k;
+						while (!isChordTone(nn, chRoot, chMask) && abs(nn - cur) < 15) ( nn += k; );
+					);
+					(i % (nst / 2)) == 0 ? nn = nearestChordTone(nn, chRoot, chMask);   // tiempo fuerte
+					k = 0; while (abs(nn - prev) > leap && k < 4) ( nn += nn > prev ? -12 : 12; k += 1; );
+					nn > hi ? nn -= 12; nn < lo ? nn += 12;
+					b[U_NOTE + i] = nn; prev = nn; cur = nn;
+				) : (
+					b[U_ON + i] = 0;
+				);
+			);
+			i += 1;
+		);
+	);
+	b[U_OK] = 1;
+);
+
+// asegura que el buffer de la voz v corresponde a la unidad (ph, u) que suena y al estado de los controles.
+// Con lock, las claves (frase, pad, densidad, contador) son las guardadas; los acordes, los de ahora.
+function ensureUnit(v, ph, u) local(b, px, py, dens, cnt, evo, w, phKey, lk)(
+	b = UB + v * UBSIZE;
+	w = vs(v, 0) / 100;
+	lk = vs(v, 8) && lockSet[v];
+	lk ? (
+		phKey = lockPhrase[v]; px = lockPx[v] * w; py = lockPy[v] * w; dens = lockDens[v]; cnt = lockCnt[v];
+	) : (
+		phKey = ph; px = slider5 * w; py = slider6 * w; dens = vs(v, 1); cnt = latched[v];
+	);
+	evo = vs(v, 7);
+	!b[U_OK] || b[U_PH] != ph || b[U_UNIT] != u || b[U_PX] != px || b[U_PY] != py || b[U_DENS] != dens ||
+	b[U_CNT] != cnt || b[U_EVO] != evo || b[U_SEED] != slider16 || b[U_CYC] != phKey + (lk ? 100000 : 0) ||
+	b[U_LEAP] != vs(v, 10) || b[U_OCT] != vs(v, 2) ? (
+		renderUnit(v, phKey, u, (ph * 8 + u * 2) * 4, px, py, dens, cnt, evo);
+		b[U_PH] = ph; b[U_UNIT] = u; b[U_PX] = px; b[U_PY] = py; b[U_DENS] = dens; b[U_CNT] = cnt;
+		b[U_EVO] = evo; b[U_SEED] = slider16; b[U_CYC] = phKey + (lk ? 100000 : 0);
+		b[U_LEAP] = vs(v, 10); b[U_OCT] = vs(v, 2);
+	);
+	b;
+);
+
+// ---------- COLA DE EVENTOS MIDI (como note-scheduling de gb_18, con canal y bus) ----------
+function qPush(type, t, note, vel, dur, ch, bus, v) local(i, done)(
+	i = 0; done = -1;
+	while (i < QSIZE && done < 0) (
+		evType[i] == 0 ? (
+			evType[i] = type; evTime[i] = t; evNote[i] = note; evVel[i] = vel; evDur[i] = dur;
+			evChan[i] = ch; evBus[i] = bus; evVoice[i] = v;
+			done = i;
+		);
+		i += 1;
+	);
+	done;
+);
+function sampleOffset(t)( min(max(floor((t - b0) / bpb), 0), samplesblock - 1) );
+function send(off, st, ch, bus, a, c)( midi_bus = bus; midisend(off, st | ch, a, c); );
+function flushNoteOffs(off, note, ch, bus) local(i)(
+	i = 0;
+	loop(QSIZE,
+		evType[i] == 2 && evNote[i] == note && evChan[i] == ch && evBus[i] == bus ? (
+			send(off, $x80, ch, bus, note, 0); evType[i] = 0;
+		);
+		i += 1;
+	);
+);
+// salto de transporte / stop: suelta todo (NoteOff y portamento) y descarta lo pendiente
+function resetQueue() local(i)(
+	i = 0;
+	loop(QSIZE,
+		evType[i] == 2 ? send(0, $x80, evChan[i], evBus[i], evNote[i], 0);
+		evType[i] == 3 && evVel[i] == 0 ? send(0, $xB0, evChan[i], evBus[i], evNote[i], 0);
+		i += 1;
+	);
+	memset(evType, 0, QSIZE);
+	memset(LEG, 0, 96);
+);
+function rank(i)( evType[i] == 2 ? 0 : evType[i] == 3 ? 1 : 2 );
+function emitDue() local(i, best, bt, off)(
+	while (
+		best = -1; bt = b1 - 0.5 * bpb;
+		i = 0;
+		loop(QSIZE,
+			evType[i] && (evTime[i] < bt || (best >= 0 && evTime[i] == bt && rank(i) < rank(best))) ? (
+				best = i; bt = evTime[i];
+			);
+			i += 1;
+		);
+		best >= 0 ? (
+			off = sampleOffset(evTime[best]);
+			evType[best] == 1 ? (
+				flushNoteOffs(off, evNote[best], evChan[best], evBus[best]);   // re-disparo
+				send(off, $x90, evChan[best], evBus[best], evNote[best], evVel[best]);
+				evType[best] = 2; evTime[best] += evDur[best];
+			) : evType[best] == 2 ? (
+				send(off, $x80, evChan[best], evBus[best], evNote[best], 0);
+				evType[best] = 0;
+			) : (
+				send(off, $xB0, evChan[best], evBus[best], evNote[best], evVel[best]);
+				evType[best] = 0;
+			);
+		);
+		best >= 0;
+	);
+);
+
+// ligaduras: la nota ligada (o con slide) se corta justo despues del siguiente NoteOn de su voz
+function legClose(v, tNext) local(L, k, i, t)(
+	L = LEG + v * 32;
+	k = 0;
+	loop(L[0],
+		i = L[1 + k];
+		t = tNext + EPS;
+		evVoice[i] == v && evNote[i] == L[20 + k] ? (
+			evType[i] == 1 ? evDur[i] = max(EPS, t - evTime[i]);
+			evType[i] == 2 ? evTime[i] = t;
+		);
+		k += 1;
+	);
+	L[16] >= 0 && L[17] ? (
+		i = L[16];
+		evType[i] == 3 && evVoice[i] == v ? evTime[i] = tNext + 2 * EPS;
+	);
+	L[0] = 0; L[17] = 0;
+);
+function legAdd(v, i) local(L)(
+	L = LEG + v * 32;
+	L[0] < 8 ? ( L[1 + L[0]] = i; L[20 + L[0]] = evNote[i]; L[0] += 1; );
+);
+
+function swingWarp(t, s) local(cell, u, p)(
+	cell = floor(t * 2) / 2; u = t - cell; p = s / 100 * 0.5;
+	cell + (u < 0.25 ? u * (p / 0.25) : p + (u - 0.25) * ((0.5 - p) / 0.25));
+);
+
+function destOf(v, n)( min(16, vs(v, 9) + n) - 1 );
+function outCh(d)( slider53 ? 0 : d );
+function outBus(d)( slider53 ? d : 0 );
+
+// emite una nota (o la nota n de un acorde) de la voz v
+function playNote(v, tt, note, vel, art, durQ, n) local(d, i, cc)(
+	d = destOf(v, v == 1 && vs(1, 11) ? n : 0);
+	note = max(0, min(127, note));
+	i = qPush(1, tt, note, vel, art ? 8 : durQ, outCh(d), outBus(d), v);
+	art && i >= 0 ? legAdd(v, i);
+	art == 2 && v != 1 && n == 0 ? (
+		qPush(3, tt - EPS, 65, 127, 0, outCh(d), outBus(d), v);
+		cc = qPush(3, tt + 8, 65, 0, 0, outCh(d), outBus(d), v);
+		LEG[v*32 + 16] = cc; LEG[v*32 + 17] = 1;
+	);
+);
+
+// acordes: pcs del voicing en TMP+100.., devuelve n
+function voicingPcs(sym, root, m, key, sm) local(n, t3, t5, t7)(
+	t3 = thirdOf(m); t5 = fifthOf(m); t7 = seventhOf(m, root, key, sm);
+	n = 0;
+	sym == 4 ? ( TMP[100]=0; TMP[101]=t5; TMP[102]=12; n=3; ) :          // power
+	sym == 3 ? ( TMP[100]=0; TMP[101]=5; TMP[102]=t5; n=3; ) :           // sus4
+	sym == 5 ? ( TMP[100]=0; TMP[101]=t3; TMP[102]=t7; n=3; ) :          // shell
+	sym == 2 ? ( TMP[100]=0; TMP[101]=t3; TMP[102]=t5; TMP[103]=t7; TMP[104]=14; n=5; ) :
+	sym == 1 ? ( TMP[100]=0; TMP[101]=t3; TMP[102]=t5; TMP[103]=t7; n=4; ) :
+	( TMP[100]=0; TMP[101]=t3; TMP[102]=t5; n=3; );
+	n;
+);
+// voice leading: inversion con menos movimiento respecto al acorde anterior (en TMP+200.., n notas)
+function voiceChord(sym, root, m, key, sm, center) local(n, r, k, base, best, bestS, s, j, x, low)(
+	n = voicingPcs(sym, root, m, key, sm);
+	low = center - 6;
+	bestS = 1000000; best = 0;
+	r = 0;
+	loop(sym == 4 ? 1 : n,
+		// inversion r: empieza en la nota r, el resto apiladas encima
+		base = low + mod12(root + TMP[100 + r] - low);
+		TMP[300] = base; k = 1;
+		loop(n - 1,
+			x = root + TMP[100 + (r + k) % n];
+			x = TMP[300 + k - 1] + mod12(x - TMP[300 + k - 1]);
+			x == TMP[300 + k - 1] ? x += 12;
+			TMP[300 + k] = x; k += 1;
+		);
+		sym == 4 ? ( TMP[300] = base; TMP[301] = base + TMP[101]; TMP[302] = base + 12; );
+		s = 0;
+		PV[0] > 0 ? (
+			j = 0; loop(n, s += abs(TMP[300 + j] - PV[1 + min(j, PV[0] - 1)]); j += 1;);
+		) : (
+			j = 0; loop(n, s += TMP[300 + j]; j += 1;); s = abs(s / n - center);
+		);
+		s < bestS ? ( bestS = s; best = r; j = 0; loop(n, TMP[200 + j] = TMP[300 + j]; j += 1;); );
+		r += 1;
+	);
+	PV[0] = n; j = 0; loop(n, PV[1 + j] = TMP[200 + j]; j += 1;);
+	n;
+);
+
+// ---------- PLANIFICADOR ----------
+// programa los pasos de la voz v cuyo tiempo recto cae en (h0, h1]
+function scheduleVoice(v, h0, h1) local(sty, nst, stepQ, k, kEnd, t, bar, pos, ph, u, siu, b, sv, tt, vel,
+		art, durQ, sym, note, base, n, j, strum, center, d)(
+	sty = SD + v * SDSIZE;
+	sty[H_VALID] ? (
+		nst = sty[H_STEPS]; stepQ = 4 / nst;
+		k = floor(h0 / stepQ + 0.000001) + 1; kEnd = floor(h1 / stepQ + 0.000001);
+		while (k <= kEnd) (
+			t = k * stepQ;
+			t >= 0 ? (
+				bar = floor(k / nst); pos = k - bar * nst;
+				ph = floor(bar / 8); u = floor(bar / 2) % 4; siu = (bar % 2) * nst + pos;
+				ph != lastPhrase[v] ? ( latched[v] = motifCounter[v]; lastPhrase[v] = ph; );
+				b = ensureUnit(v, ph, u);
+				b[U_ON + siu] && chordAt(t) ? (
+					sv = 50 + (slider15 - 50) * vs(v, 5) / 100;
+					tt = swingWarp(t, sv) + vs(v, 6) / 1000 * tempo / 60;
+					vel = max(1, min(127, floor(vs(v, 4) * (0.55 + 0.45 * b[U_VAL + siu] / 255) + 0.5)));
+					art = b[U_ART + siu]; sym = b[U_SYM + siu];
+					durQ = vs(v, 3) / 8;
+					legClose(v, tt);
+					v == 0 ? (
+						base = 36 + 12 * vs(0, 2);
+						note = base + chRoot; note > base + 7 ? note -= 12;
+						sym == 1 ? ( note += thirdOf(chMask); ) :
+						sym == 2 ? ( note += fifthOf(chMask); ) :
+						sym == 3 ? ( note += seventhOf(chMask, chRoot, chKey, chSmask); ) :
+						sym == 4 ? ( note += 12; ) :
+						sym == 5 ? (            // aproximacion cromatica a la fundamental del acorde siguiente
+							d = chSlotEnd;
+							chordAt(d);
+							note = base + chRoot; note > base + 7 ? note -= 12; note -= 1;
+						);
+						playNote(0, tt, note, vel, art, durQ, 0);
+					) : v == 1 ? (
+						center = 60 + 12 * vs(1, 2);
+						n = voiceChord(sym, chRoot, chMask, chKey, chSmask, center);
+						strum = vs(1, 10) / 1000 * tempo / 60;
+						j = 0;
+						loop(n,
+							playNote(1, tt + (n > 1 ? j * strum / (n - 1) : 0), TMP[200 + j], vel, art, durQ, j);
+							j += 1;
+						);
+					) : (
+						playNote(2, tt, b[U_NOTE + siu], vel, art, durQ, 0);
+					);
+				);
+			);
+			k += 1;
+		);
+	);
+);
+
+// ---------- LOCK ----------
+function lockUpdate() local(v, bar)(
+	v = 0;
+	loop(3,
+		vs(v, 8) ? (
+			!lockSet[v] ? (
+				bar = floor(max(0, b0) / 4);
+				lockPhrase[v] = floor(bar / 8); lockPx[v] = slider5; lockPy[v] = slider6;
+				lockDens[v] = vs(v, 1); lockCnt[v] = latched[v]; lockSet[v] = 1;
+			);
+		) : lockSet[v] = 0;
+		v += 1;
+	);
+);
+
+// ---------- AZAR (spec melo-randomization) ----------
+// todo sale del PRNG con semilla y queda guardado en sliders o en @serialize
+function dice(tag)( diceN += 1; hash5(slider16, 91, tag, diceN, progSalt) );
+function slSet(idx, val)( slider(idx) = val; sliderchange(slider(idx)); slider_automate(slider(idx)); );
+function setStyle(v, i)( slSet(v + 1, i); loadStyle(v); );
+function progCount() local(m)( m = masterStyle(); m < 0 ? 1 : SD[m * SDSIZE + H_NPROG] );
+function rndProg() local(np, p)(
+	np = progCount();
+	p = floor(dice(5) * np) % np;
+	np > 1 && p == slider10 ? p = (p + 1) % np;
+	slSet(10, p); progSalt += 1;
+);
+function allRnd(each) local(r, v)(
+	r = floor(dice(1) * numStyles) % numStyles;
+	v = 0;
+	loop(3,
+		!vs(v, 8) ? setStyle(v, each ? floor(dice(2 + v) * numStyles) % numStyles : r);
+		v += 1;
+	);
+	!each ? rndProg();
+);
+function rndMotif(v)( !vs(v, 8) ? motifCounter[v] += 1; );
+function rndKey()( slSet(8, floor(dice(9) * 12) % 12); );
+
+// ---------- ESTADO INICIAL ----------
+b0 = 0; bpb = 0; b1 = 0;
+lastPhrase[0] = lastPhrase[1] = lastPhrase[2] = -1;
+loadStyle(0); loadStyle(1); loadStyle(2);
+oldS1 = slider1; oldS2 = slider2; oldS3 = slider3;
+
+@slider
+slider1 != oldS1 ? ( loadStyle(0); oldS1 = slider1; );
+slider2 != oldS2 ? ( loadStyle(1); oldS2 = slider2; );
+slider3 != oldS3 ? ( loadStyle(2); oldS3 = slider3; );
+
+@serialize
+// orden fijo; anadir campos nuevos solo al final
+file_var(0, serVer);
+file_mem(0, motifCounter, 3);
+file_mem(0, lockSet, 3);
+file_mem(0, lockPhrase, 3);
+file_mem(0, lockPx, 3);
+file_mem(0, lockPy, 3);
+file_mem(0, lockDens, 3);
+file_mem(0, lockCnt, 3);
+file_var(0, progSalt);
+file_var(0, diceN);
+
+@block
+b0 = beat_position;
+bpb = tempo / (60 * srate);          // negras por sample
+b1 = b0 + samplesblock * bpb;
+lockUpdate();
+
+// la armonia avanza de ciclo cuando el transporte entra en el siguiente
+cycA[C_VALID] && cycB[C_VALID] && b0 >= cycA[C_START] + cycA[C_LEN] && cycB[C_START] == cycA[C_START] + cycA[C_LEN] ? (
+	memcpy(cycA, cycB, CYSIZE); cycB[C_VALID] = 0;
+);
+
+play_state & 1 ? (
+	// arranque, loop o seek: soltar notas y re-evaluar desde la nueva posicion
+	(!wasPlaying || abs(b0 - expectedB0) > 0.02) ? (
+		resetQueue();
+		cycA[C_VALID] = 0; cycB[C_VALID] = 0;
+		UB[U_OK] = 0; UB[UBSIZE + U_OK] = 0; UB[2*UBSIZE + U_OK] = 0;
+		PV[0] = 0;
+		lastPhrase[0] = lastPhrase[1] = lastPhrase[2] = -1;
+		evalHorizon = b0 - 0.000001;
+	);
+	h1 = b1 + SLIDE_MAX_MS / 1000 * tempo / 60;
+	scheduleVoice(0, evalHorizon, h1);
+	scheduleVoice(1, evalHorizon, h1);
+	scheduleVoice(2, evalHorizon, h1);
+	evalHorizon = h1;
+	emitDue();
+	wasPlaying = 1;
+	expectedB0 = b1;
+	curBeat = b0;
+) : (
+	wasPlaying ? resetQueue();     // stop / pausa: ninguna nota colgada
+	wasPlaying = 0;
+);
+
+@gfx 900 540
+UI_W = 900; UI_H = 540; UI_BUF = 10;
+!uiInit ? ( gfx_setimgdim(UI_BUF, UI_W, UI_H); uiInit = 1; );
+sc = max(0.2, min(gfx_w / UI_W, gfx_h / UI_H));
+ox = floor((gfx_w - UI_W * sc) / 2); oy = floor((gfx_h - UI_H * sc) / 2);
+mx = (mouse_x - ox) / sc; my = (mouse_y - oy) / sc;
+down = (mouse_cap & 1) && !(lastCap & 1);
+up = !(mouse_cap & 1);
+up ? dragId = 0;
+
+function col(r, g, b)( gfx_set(r / 255, g / 255, b / 255, 1); );
+function inside(x, y, w, h)( mx >= x && mx < x + w && my >= y && my < y + h );
+function txt(x, y, s)( gfx_x = x; gfx_y = y; gfx_drawstr(s); );
+function btn(x, y, w, h, label, on) local(hv)(
+	hv = inside(x, y, w, h);
+	on ? col(240, 120, 60) : hv ? col(70, 70, 80) : col(45, 45, 52);
+	gfx_rect(x, y, w, h, 1);
+	col(230, 230, 235);
+	gfx_measurestr(label, tw, th);
+	txt(x + (w - tw) / 2, y + (h - th) / 2, label);
+	hv && down;
+);
+// deslizador horizontal sobre el slider idx; arrastrar fija el valor, clic derecho lo resetea
+function hsl(id, x, y, w, label, idx, lo, hi, def) local(v, f)(
+	inside(x, y, w, 16) && down ? dragId = id;
+	inside(x, y, w, 16) && (mouse_cap & 2) && !(lastCap & 2) ? slSet(idx, def);
+	dragId == id ? (
+		v = floor(lo + (hi - lo) * max(0, min(1, (mx - x) / w)) + 0.5);
+		v != slider(idx) ? slSet(idx, v);
+	);
+	f = (slider(idx) - lo) / (hi - lo);
+	col(40, 40, 46); gfx_rect(x, y, w, 16, 1);
+	col(90, 140, 200); gfx_rect(x, y, w * f, 16, 1);
+	col(235, 235, 240);
+	sprintf(#hs, "%s %d", label, slider(idx));
+	txt(x + 4, y + 2, #hs);
+);
+function noteName(dst, pc)(
+	pc = mod12(pc);
+	strcpy(dst, pc == 0 ? "C" : pc == 1 ? "C#" : pc == 2 ? "D" : pc == 3 ? "Eb" : pc == 4 ? "E" : pc == 5 ? "F" :
+		pc == 6 ? "F#" : pc == 7 ? "G" : pc == 8 ? "Ab" : pc == 9 ? "A" : pc == 10 ? "Bb" : "B");
+);
+function chordLabel(dst, root, m)(
+	noteName(dst, root);
+	bit(m,3) && bit(m,6) && !bit(m,7) ? strcat(dst, bit(m,10) ? "m7b5" : bit(m,9) ? "dim7" : "dim") :
+	bit(m,4) && bit(m,8) && !bit(m,7) ? strcat(dst, "+") :
+	!bit(m,3) && !bit(m,4) ? strcat(dst, bit(m,5) ? "sus4" : "sus2") : (
+		bit(m,3) ? strcat(dst, "m");
+		bit(m,11) ? strcat(dst, bit(m,2) ? "maj9" : "maj7") :
+		bit(m,10) ? strcat(dst, bit(m,2) ? "9" : "7") :
+		bit(m,9) ? strcat(dst, "6") :
+		bit(m,2) ? strcat(dst, "add9");
+	);
+);
+// menu de estilos: devuelve el indice elegido o -1
+function styleMenu(cur) local(i, r)(
+	strcpy(#menu, "");
+	i = 0;
+	loop(nIndex,
+		i == cur ? strcat(#menu, "!");
+		strcat(#menu, NAME0 + i); i < nIndex - 1 ? strcat(#menu, "|");
+		i += 1;
+	);
+	gfx_x = mouse_x; gfx_y = mouse_y;
+	r = gfx_showmenu(#menu);
+	r > 0 ? r - 1 : -1;
+);
+
+gfx_dest = UI_BUF;
+gfx_setfont(1, "Arial", 13);
+col(28, 28, 33); gfx_rect(0, 0, UI_W, UI_H, 1);
+
+// --- fila superior: estilos por voz, azar, voz maestra ---
+col(240, 120, 60); gfx_setfont(2, "Arial", 20, 'b'); txt(16, 10, "GenderBender Melo"); gfx_setfont(1);
+vname0 = "BASS"; vname1 = "CHORDS"; vname2 = "MELODY";
+v = 0;
+loop(3,
+	x = 16 + v * 210;
+	styleName(#snb, v);
+	col(150, 150, 160); txt(x, 40, v == 0 ? vname0 : v == 1 ? vname1 : vname2);
+	SD[v * SDSIZE + H_VALID] ? 0 : strcpy(#snb, "estilo invalido");
+	btn(x, 56, 200, 22, #snb, 0) ? ( r = styleMenu(slider(v + 1)); r >= 0 ? setStyle(v, r); );
+	v += 1;
+);
+btn(650, 56, 76, 22, "ALL RND", 0) ? allRnd(0);
+btn(732, 56, 76, 22, "EACH RND", 0) ? allRnd(1);
+col(150, 150, 160); txt(650, 40, "armonia de:");
+btn(814, 56, 70, 22, slider7 == 0 ? "bajo" : slider7 == 1 ? "acordes" : "melodia", 1) ? slSet(7, (slider7 + 1) % 3);
+
+// --- pad XY ---
+PADX = 16; PADY = 92; PADS = 260;
+col(38, 38, 44); gfx_rect(PADX, PADY, PADS, PADS, 1);
+col(60, 60, 70); gfx_line(PADX + PADS/2, PADY, PADX + PADS/2, PADY + PADS); gfx_line(PADX, PADY + PADS/2, PADX + PADS, PADY + PADS/2);
+inside(PADX, PADY, PADS, PADS) && down ? dragId = 1;
+dragId == 1 ? (
+	nx = floor(max(-100, min(100, (mx - PADX) / PADS * 200 - 100)));
+	ny = floor(max(-100, min(100, 100 - (my - PADY) / PADS * 200)));
+	nx != slider5 ? slSet(5, nx); ny != slider6 ? slSet(6, ny);
+);
+(mouse_cap & 2) && !(lastCap & 2) && inside(PADX, PADY, PADS, PADS) ? ( slSet(5, 0); slSet(6, 0); );
+col(240, 120, 60);
+gfx_circle(PADX + (slider5 + 100) / 200 * PADS, PADY + (100 - slider6) / 200 * PADS, 7, 1);
+col(110, 110, 120); txt(PADX + 4, PADY + PADS - 16, "BASE en el centro · clic dcho = centro");
+
+// --- progresion ---
+PX = 296; PY = 92;
+col(38, 38, 44); gfx_rect(PX, PY, 588, 120, 1);
+c = cycA[C_VALID] && curBeat >= cycA[C_START] && curBeat < cycA[C_START] + cycA[C_LEN] ? cycA :
+	cycB[C_VALID] && curBeat >= cycB[C_START] && curBeat < cycB[C_START] + cycB[C_LEN] ? cycB : cycA;
+c[C_VALID] ? (
+	s = 0; ns = c[C_NS];
+	cw = min(70, 570 / ns);
+	cur = floor((curBeat - c[C_START]) / c[C_SLOTQ]);
+	loop(ns,
+		chordLabel(#cl, c[C_ROOT + s], c[C_MASK + s]);
+		s == cur && (play_state & 1) ? col(240, 120, 60) : col(60, 60, 70);
+		gfx_rect(PX + 8 + s * cw, PY + 8, cw - 4, 36, 1);
+		col(240, 240, 245); txt(PX + 12 + s * cw, PY + 18, #cl);
+		s += 1;
+	);
+	noteName(#kn, c[C_KEY]);
+	c[C_PROG] >= 0 ? sprintf(#pn, "progresion %d", c[C_PROG] + 1) : strcpy(#pn, "markov");
+	sprintf(#info, "tonica %s · ciclo %d · %s", #kn, c[C_IDX] + 1, #pn);
+	col(170, 170, 180); txt(PX + 8, PY + 50, #info);
+	m = masterStyle();
+	pend = (m != c[C_MASTER]) || (slider9 == 0 && c[C_PROG] >= 0 && min(slider10, progCount() - 1) != c[C_PROG]);
+	pend ? ( col(240, 200, 90); txt(PX + 420, PY + 50, "cambio pendiente"); );
+) : ( col(170, 170, 180); txt(PX + 8, PY + 18, "sin estilo valido"); );
+btn(PX + 8, PY + 72, 120, 20, slider9 == 0 ? "fija" : slider9 == 1 ? "ciclo del banco" : slider9 == 2 ? "aleatoria" :
+	slider9 == 3 ? "banco + sust." : "markov", 1) ? slSet(9, (slider9 + 1) % 5);
+btn(PX + 134, PY + 72, 24, 20, "<", 0) ? slSet(10, (slider10 + progCount() - 1) % progCount());
+sprintf(#pg, "%d/%d", min(slider10, progCount() - 1) + 1, progCount());
+col(220, 220, 225); txt(PX + 164, PY + 76, #pg);
+btn(PX + 200, PY + 72, 24, 20, ">", 0) ? slSet(10, (slider10 + 1) % progCount());
+btn(PX + 230, PY + 72, 70, 20, "dado prog", 0) ? rndProg();
+slider8 < 0 ? strcpy(#kk, "tonica: est.") : noteName(#kk, slider8);
+btn(PX + 306, PY + 72, 70, 20, #kk, 0) ? (
+	gfx_x = mouse_x; gfx_y = mouse_y;
+	r = gfx_showmenu("del estilo|C|C#|D|Eb|E|F|F#|G|Ab|A|Bb|B");
+	r > 0 ? slSet(8, r - 2);
+);
+btn(PX + 382, PY + 72, 70, 20, "dado tonica", 0) ? rndKey();
+hsl(10, PX + 8, PY + 98, 140, "tension", 11, 0, 100, 30);
+btn(PX + 156, PY + 96, 96, 20, slider12 == 0 ? "acorde: est." : slider12 == 1 ? "acorde 1/2" : slider12 == 2 ? "acorde 1" : "acorde 2", 0) ? slSet(12, (slider12 + 1) % 4);
+btn(PX + 258, PY + 96, 96, 20, slider13 == 0 ? "ciclo: est." : slider13 == 1 ? "ciclo 2" : slider13 == 2 ? "ciclo 4" : "ciclo 8", 0) ? slSet(13, (slider13 + 1) % 4);
+btn(PX + 360, PY + 96, 96, 20, slider14 == 0 ? "modular: no" : slider14 == 1 ? "modular 1" : slider14 == 2 ? "modular 2" : slider14 == 3 ? "modular 4" : "modular 8", 0) ? slSet(14, (slider14 + 1) % 5);
+btn(PX + 462, PY + 96, 118, 20, slider53 ? "salida: buses" : "salida: canales", 1) ? slSet(53, 1 - slider53);
+
+// --- globales ---
+hsl(11, PX, 222, 200, "swing", 15, 50, 75, 50);
+hsl(12, PX + 210, 222, 200, "semilla", 16, 0, 9999, 1);
+btn(PX + 420, 220, 80, 20, "semilla +1", 0) ? slSet(16, (slider16 + 1) % 10000);
+
+// --- filas por voz ---
+v = 0;
+loop(3,
+	y = 370 + v * 54; base = 17 + v * 12; id = 100 + v * 20;
+	col(150, 150, 160); txt(16, y, v == 0 ? vname0 : v == 1 ? vname1 : vname2);
+	hsl(id + 1, 90, y, 110, "pad", base, 0, 100, 100);
+	hsl(id + 2, 206, y, 110, "dens", base + 1, 0, 260, 50);
+	hsl(id + 3, 322, y, 80, "oct", base + 2, -2, 2, 0);
+	hsl(id + 4, 408, y, 100, "dur", base + 3, 1, 64, 3);
+	hsl(id + 5, 514, y, 100, "vel", base + 4, 1, 127, 100);
+	hsl(id + 6, 620, y, 100, "evol", base + 7, 0, 100, 20);
+	hsl(id + 7, 90, y + 20, 110, "swing", base + 5, 0, 100, 100);
+	hsl(id + 8, 206, y + 20, 110, "slide", base + 6, -30, 30, 0);
+	hsl(id + 9, 322, y + 20, 80, slider53 ? "bus" : "canal", base + 9, 1, 16, v + 1);
+	v == 1 ? (
+		hsl(id + 10, 408, y + 20, 100, "strum", base + 10, 0, 50, 0);
+		btn(514, y + 20, 100, 16, slider40 ? "partido" : "polifonico", slider40) ? slSet(40, 1 - slider40);
+	);
+	v == 2 ? hsl(id + 10, 408, y + 20, 100, "salto", base + 10, 2, 24, 12);
+	btn(726, y, 70, 16, "lock", vs(v, 8)) ? slSet(base + 8, 1 - vs(v, 8));
+	btn(726, y + 20, 70, 16, "dado motivo", 0) ? rndMotif(v);
+	v += 1;
+);
+
+lastCap = mouse_cap;
+gfx_dest = -1;
+gfx_set(1, 1, 1, 1);
+gfx_x = 0; gfx_y = 0; gfx_a = 1;
+col(0, 0, 0); gfx_rect(0, 0, gfx_w, gfx_h, 1);
+gfx_set(1, 1, 1, 1);
+gfx_blit(UI_BUF, sc, 0, 0, 0, UI_W, UI_H, ox, oy, UI_W * sc, UI_H * sc);

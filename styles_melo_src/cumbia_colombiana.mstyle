@@ -1,0 +1,67 @@
+name: CUMBIA COLOMBIANA
+# Cumbia de conjunto: bajo de fundamental y quinta en 1 y 3, guitarra/piano a contratiempo
+# ("chucu"), acordeon en corcheas por grados. Pad: centro=BASE p4/5 · dcha=ENERGIA p2/3
+# · arriba-dcha=VARIACION p6/7 · izda/abajo=INTRO p0/1 · FILL p8.
+bpm: 95
+meter: 4/4
+key: A
+scale: harmonic_minor
+chord_bars: 1
+cycle: 4
+form.bass: A A A A'
+form.chord: A A A A
+form.mel: A A' A B
+
+prog: i iv V7 i
+prog: i bVII bVI V7
+prog: i i iv V7
+prog: i V7 V7 i
+sub: V7 > vii°7
+sub: iv > ii°
+sub: i > i6
+markov: i > iv 3, V7 3, bVII 1
+markov: iv > V7 3, i 1
+markov: V7 > i 4
+markov: bVII > bVI 2, i 1
+markov: bVI > V7 1
+
+[p0 p1]                               # INTRO: bajo en el 1, acordes a contratiempo
+bass.rhy   X... .... .... ....
+chord.rhy  ..X. ..X. ..X. ..X.
+mel.rhy    .... .... .... ....
+
+[p2 p3]                               # ENERGIA: bajo con anticipaciones, acordeon en corcheas
+bass.rhy   X... ..X. X... ..X.
+bass.deg   R... ..5. 5... ..R.
+chord.rhy  ..X. ..XX ..X. ..XX
+mel.rhy    X.X. X.X. X.X. X.X.
+mel.cnt    ^.+. +.-. -.+. ^.-.
+[p3]
+bass.deg   R... ..5. 5... ..a.
+mel.cnt    +.+. -.-. ^.+. -.=.
+
+[p4 p5]                               # BASE
+bass.rhy   X... ..x. X... ..x.
+bass.deg   R... ..5. 5... ..R.
+chord.rhy  ..X. ..X. ..X. ..X.
+mel.rhy    X.X. X.x. X.X. X.x.
+mel.cnt    ^.+. -.+. ^.-. +.-.
+[p5]
+bass.rhy   X... ..x. X... x.x.
+bass.deg   R... ..5. 5... 3.a.
+mel.cnt    -.-. +.+. ^.=. -.-.
+
+[p6 p7]                               # VARIACION: bajo con octava, acordeon sincopado
+bass.rhy   X... X.x. X... X.x.
+bass.deg   R... 8.5. 5... 3.R.
+chord.rhy  ..X. ..X. ..X. ..XX
+chord.voi  ..t. ..t. ..7. ..77
+mel.rhy    X..X ..X. X..X ..X.
+mel.cnt    ^..+ ..-. +..- ..^.
+
+[p8]                                  # FILL: bajada del acordeon y del bajo
+bass.rhy   X.X. X.X. X.X. X.X.
+bass.deg   R.7. 5.3. R.7. 5.a.
+chord.rhy  X... X... X... X...
+mel.rhy    XXXX XXXX XXXX X...
+mel.cnt    ^--- ---- +--- ^...

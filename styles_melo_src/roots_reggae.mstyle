@@ -1,0 +1,66 @@
+name: ROOTS REGGAE
+# One drop: el bajo no ataca el 1 y deja silencios; skank corto en 2 y 4; melodia escasa.
+# Progresiones de 2 acordes, cada uno 2 compases. Pad como en gb_18 (BASE p4/5 en el centro).
+bpm: 75
+meter: 4/4
+key: A
+scale: dorian
+chord_bars: 2
+cycle: 4
+form.bass: A A A B
+form.chord: A A A A
+form.mel: A B A B
+
+prog: i iv
+prog: i bVII
+prog: i IV
+sub: iv > ii7
+sub: i > i7
+sub: bVII > bVI
+markov: i > iv 2, bVII 2, IV 1
+markov: iv > i 1
+markov: bVII > i 2, bVI 1
+markov: IV > i 1
+markov: bVI > bVII 1
+
+[p0 p1]                               # INTRO: solo skank y un bajo minimo
+bass.rhy   .... .... X... ....
+bass.deg   .... .... R... ....
+chord.rhy  .... X... .... X...
+mel.rhy    .... .... .... ....
+
+[p2 p3]                               # ENERGIA: bajo mas lleno, skank doble
+bass.rhy   ..X. X.X. ..X. X.X.
+bass.deg   ..R. R.5. ..8. 7.5.
+chord.rhy  .... X.X. .... X.X.
+mel.rhy    .... X... ..X. X...
+mel.cnt    .... ^... ..-. -...
+[p3]
+bass.deg   ..R. R.5. ..3. 5.a.
+
+[p4 p5]                               # BASE: one drop
+bass.rhy   .... X.X. ..X. ..x.
+bass.deg   .... R.5. ..8. ..7.
+bass.art   .... ~... .... ....
+chord.rhy  .... X... .... X...
+mel.rhy    .... .... X... ..x.
+mel.cnt    .... .... ^... ..-.
+[p5]
+bass.rhy   .... X.X. ..X. X...
+bass.deg   .... R.5. ..3. 5...
+mel.rhy    .... .... .... X...
+mel.cnt    .... .... .... -...
+
+[p6 p7]                               # VARIACION: rockers, bajo en corcheas
+bass.rhy   X.X. X.X. X.X. X.X.
+bass.deg   R.R. 5.5. 8.8. 7.5.
+chord.rhy  ..X. ..X. ..X. ..X.
+mel.rhy    .... X.X. .... X...
+mel.cnt    .... ^.+. .... -...
+
+[p8]                                  # FILL: bajada del bajo
+bass.rhy   .... X.X. X.X. X.X.
+bass.deg   .... 8.7. 5.3. R.a.
+chord.rhy  .... X... .... ....
+mel.rhy    .... .... X.X. X...
+mel.cnt    .... .... ^.-. -...
