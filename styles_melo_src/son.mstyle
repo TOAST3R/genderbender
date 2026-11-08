@@ -1,0 +1,68 @@
+name: SON
+# Tumbao: el bajo no ataca el 1, suena en el "y" del 2 y en el 4 (anticipa el compas siguiente).
+# Montuno sincopado en el piano/tres; melodia sobre la clave 3-2. Pad como en gb_18 (BASE p4/5).
+bpm: 95
+meter: 4/4
+key: G
+scale: major
+chord_bars: 1
+cycle: 4
+form.bass: A A A A
+form.chord: A A A A'
+form.mel: A A' A B
+
+prog: ii7 V7 I I
+prog: I IV V7 IV
+prog: I V7 V7 I
+prog: ii7 V7 I vi7
+sub: V7 > bII7
+sub: I > vi7
+sub: IV > ii7
+markov: I > IV 2, ii7 2, V7 1
+markov: ii7 > V7 3
+markov: V7 > I 3, IV 1
+markov: IV > V7 2, I 1
+markov: vi7 > ii7 1
+
+[p0 p1]                               # INTRO: tumbao y montuno ligero
+bass.rhy   .... ..X. .... X...
+bass.deg   .... ..5. .... R...
+chord.rhy  X... ..X. .X.. X...
+mel.rhy    .... .... .... ....
+
+[p2 p3]                               # ENERGIA: montuno completo y pregon
+bass.rhy   .... ..X. X... X.X.
+bass.deg   .... ..5. 8... R.5.
+chord.rhy  X.XX .XX. XX.X X.X.
+mel.rhy    X..X ..X. ..X. X...
+mel.cnt    ^..+ ..-. ..+. -...
+[p3]
+mel.rhy    ..X. X..X ..X. X...
+mel.cnt    ..^. -..+ ..-. -...
+
+[p4 p5]                               # BASE: tumbao, montuno, melodia en clave 3-2
+bass.rhy   .... ..X. .... X...
+bass.deg   .... ..5. .... R...
+chord.rhy  X..X ..X. .X.. X.x.
+mel.rhy    X... ..X. .... X...
+mel.cnt    ^... ..-. .... +...
+[p5]
+bass.rhy   .... ..X. ..x. X...
+bass.deg   .... ..5. ..3. R...
+mel.rhy    .... X... X... ....
+mel.cnt    .... ^... -... ....
+
+[p6 p7]                               # VARIACION: tumbao con aproximacion, montuno en 7as
+bass.rhy   .... ..X. .... X.X.
+bass.deg   .... ..5. .... R.a.
+chord.rhy  X..X ..X. .X.. X...
+chord.voi  7..7 ..7. .7.. 7...
+mel.rhy    X..X ..X. ..X. X...
+mel.cnt    ^..- ..+. ..-. ^...
+
+[p8]                                  # FILL: cierre (cierre de clave)
+bass.rhy   X... X... X..X ..X.
+bass.deg   R... 3... 5..a ..R.
+chord.rhy  X... X... X..X ..X.
+mel.rhy    X.X. X.X. X..X ..X.
+mel.cnt    ^.-. -.-. +..- ..^.

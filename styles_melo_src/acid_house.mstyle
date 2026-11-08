@@ -1,0 +1,71 @@
+name: ACID HOUSE
+# Linea 303: semicorcheas con acentos (X frente a x), slides (/) y octavas sobre 1 o 2 acordes.
+# Stabs escasos de 7a menor; melodia casi nula. Pad como en gb_18 (BASE p4/5 en el centro).
+bpm: 124
+meter: 4/4
+key: A
+scale: minor
+chord_bars: 2
+cycle: 4
+form.bass: A A' A B
+form.chord: A A A A
+form.mel: A A A B
+
+prog: i
+prog: i bII
+prog: i bVII
+prog: i iv
+sub: i > i7
+sub: bII > bVI
+sub: iv > iv7
+markov: i > i 2, bII 1, bVII 1, iv 1
+markov: bII > i 1
+markov: bVII > i 1
+markov: iv > i 1
+markov: bVI > i 1
+
+[p0 p1]                               # INTRO: bajo en corcheas, sin acordes
+bass.rhy   X.X. X.X. X.X. X.X.
+bass.deg   R.R. 8.R. R.R. 8.R.
+chord.rhy  .... .... .... ....
+mel.rhy    .... .... .... ....
+
+[p2 p3]                               # ENERGIA: semicorcheas casi seguidas, mas slides
+bass.rhy   XXXX XXXX XXXX XXXX
+bass.deg   R8R5 R8.7 RR8R 5a8R
+bass.art   ../. ./.. .../ ./..
+chord.rhy  .... ..X. .... ..X.
+chord.voi  .... ..7. .... ..7.
+mel.rhy    .... .... .... ....
+[p3]
+bass.deg   R8R5 R8.7 R5R8 7a5R
+bass.art   ../. ./.. ./.. ../.
+
+[p4 p5]                               # BASE
+bass.rhy   X.XX X.xX X.XX x.XX
+bass.deg   R.8R R.58 R.R8 7.5R
+bass.art   ../. ../. .... ../.
+chord.rhy  .... .... .... ..X.
+chord.voi  .... .... .... ..7.
+mel.rhy    .... .... .... ..x.            # escasa: solo con mas densidad
+mel.cnt    .... .... .... ..^.
+[p5]
+bass.deg   R.8R R.58 R.R8 a.7R
+bass.art   ../. .../ ../. ....
+
+[p6 p7]                               # VARIACION: linea desplazada y stab al contratiempo
+bass.rhy   .XX. XX.X .XX. XX.X
+bass.deg   .R8. R5.8 .R8. 7R.5
+bass.art   ../. ./.. ../. ./..
+chord.rhy  ..X. .... ..X. ....
+chord.voi  ..7. .... ..7. ....
+mel.rhy    .... .... X... ....
+mel.cnt    .... .... ^... ....
+
+[p8]                                  # FILL: subida con slides
+bass.rhy   XXXX XXXX XXXX XXXX
+bass.deg   R357 8753 R357 8a8R
+bass.art   //// .... //// ..//
+chord.rhy  X... .... .... ....
+chord.voi  7... .... .... ....
+mel.rhy    .... .... .... ....

@@ -1,0 +1,64 @@
+name: BULERIA
+# Compas de 12 por patron, en tresillos (12/8: no hace falta tocar el swing). 12 caracteres = los
+# 12 tiempos del compas flamenco; acentos en 3, 6, 8, 10 y 12. Frigia dominante sobre E:
+# cadencia andaluza iv-bIII-bII-I (Am-G-F-E). Pad como en gb_18 (BASE p4/5 en el centro).
+bpm: 80
+meter: 12/8
+key: E
+scale: phrygian_dominant
+chord_bars: 1
+cycle: 4
+form.bass: A A A A
+form.chord: A A' A A'
+form.mel: A A' A B
+
+prog: iv bIII bII I
+prog: I bII I bII
+prog: iv I iv I
+prog: I bII bIII bII
+sub: I > I7
+sub: bII > bIImaj7
+sub: iv > iv7
+markov: I > bII 3, iv 1
+markov: bII > I 3, bIII 1
+markov: bIII > bII 2
+markov: iv > bIII 2, I 1
+
+[p0 p1]                               # INTRO: rasgueo en los acentos, sin melodia
+bass.rhy   ..X.....X...
+chord.rhy  ..X..X.X.X.X
+mel.rhy    ............
+
+[p2 p3]                               # ENERGIA: rasgueo lleno y falseta
+bass.rhy   X.X..X.X.X.X
+bass.deg   R.R..5.R.5.R
+chord.rhy  X.XX.XXX.X.X
+chord.art  .~...~......
+mel.rhy    XXX.XXX.XXX.
+mel.cnt    ^--.+--.-+-.
+
+[p4 p5]                               # BASE
+bass.rhy   ..X..X.X.X.X
+bass.deg   ..R..5.R.5.R
+chord.rhy  ..X..X.X.X.X
+chord.art  .....~......
+mel.rhy    X.X.X.X.X.x.
+mel.cnt    ^.-.-.+.-.-.
+[p5]
+mel.rhy    X.X..XX.X.X.
+mel.cnt    +.-..-+.-.-.
+
+[p6 p7]                               # VARIACION: contratiempos (llamada)
+bass.rhy   X..X..X..X..
+bass.deg   R..5..R..a..
+chord.rhy  .X.X.X.X.X.X
+chord.voi  .p.p.p.t.t.t
+mel.rhy    X..X..X.XX..
+mel.cnt    ^..-..+.--..
+
+[p8]                                  # FILL: remate en el 10
+bass.rhy   X.X.X.X.XX..
+bass.deg   R.3.5.7.8R..
+chord.rhy  XXXXXXXXXX..
+mel.rhy    XXXXXXXXXX..
+mel.cnt    ^---+----=..

@@ -18,8 +18,11 @@ Read `README.md` first for the layout and the style format.
 - Sliders 65 and 66 need a current REAPER (older versions allowed 64 sliders).
 - The SuperCollider scripts in `editor/` find presets at `../presets/`, so every folder in `presets/` shows up as a preset. Put test or old presets in `presets_archive/`. Their REAPER save path is the `reaperFolder` setting at the top of each script.
 
+- **GenderBender Melo** (`GenderBenderMelo/genderbender_melo.jsfx`) is a separate plugin. Never hand-edit `melo_styles/*.txt`: build them from `styles_melo_src/*.mstyle` with `tools/make_melo_style.py build`. Its sliders follow the same rule: never renumber, add at the end.
+
 ## Checks
 
 - Run `python3 tools/check_styles.py` after any change to styles or `tools/`. It must print `ok`.
+- Run `python3 tools/check_melo_styles.py` and `python3 tools/test_melo.py` after any change to melodic styles or their tools. The check must print `ok`.
 - JSFX and timing changes can only be verified in REAPER. Install it with `sh tools/install.sh`, record the plugin's MIDI output, and check note positions against the spec. Past checks covered: no compile errors, all 66 sliders automatable, swing and slide offsets, loop wrap without double hits, no hung notes on stop or seek, and old presets loading with defaults.
 - No SuperCollider (`sclang`) is installed on this machine.
